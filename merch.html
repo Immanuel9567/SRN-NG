@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merch Store — SIM Racing NG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="scripts.js"></script>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <a href="index.html" class="brand">
+      <div class="logo-mark">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="6" fill="#00cc66"/>
+          <path d="M6 24 L12 12 L18 20 L22 15 L30 24" stroke="#001433" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="12" cy="12" r="2.5" fill="#001433"/>
+          <circle cx="30" cy="24" r="2.5" fill="#001433"/>
+          <path d="M18 24 L18 28" stroke="#001433" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 28 L22 28" stroke="#001433" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">SIM Racing <em>NG</em></span>
+    </a>
+
+    <nav class="navbar">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#events">Events</a></li>
+        <li><a href="merch.html" class="active">Merch Store</a></li>
+      </ul>
+      <a href="#" class="btn-primary nav-cta">Join the Club</a>
+      <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ── MERCH HERO ── -->
+  <section class="merch-hero">
+    <div class="merch-hero-bg"></div>
+    <div class="container merch-hero-content">
+      <p class="section-eyebrow">Official Gear</p>
+      <h1 class="merch-hero-title">SIM Racing NG<br><span>Merch Store</span></h1>
+      <p class="merch-hero-sub">Rep the community. Wear it on and off the rig.</p>
+    </div>
+  </section>
+
+  <!-- ── STORE COMING SOON BANNER ── -->
+  <div class="coming-soon-bar">
+    <span class="cs-icon">🚧</span>
+    <span>Store launching soon — products below are a preview. Sign up to get notified when we go live.</span>
+    <a href="#" class="cs-link">Notify me →</a>
+  </div>
+
+  <!-- ── FILTER BAR ── -->
+  <div class="filter-bar">
+    <div class="container filter-inner">
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="clothing">Clothing</button>
+        <button class="filter-tab" data-filter="headwear">Headwear</button>
+        <button class="filter-tab" data-filter="accessories">Accessories</button>
+      </div>
+      <div class="filter-count" id="filterCount">8 products</div>
+    </div>
+  </div>
+
+  <!-- ── PRODUCT GRID ── -->
+  <section class="section merch-store-section">
+    <div class="container">
+      <div class="merch-store-grid" id="productGrid">
+
+        <div class="merch-card merch-card--lg" data-category="clothing">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">👕</div>
+            <span class="merch-tag merch-tag--new">New</span>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Classic Logo Tee</h3>
+            <p class="merch-desc">100% cotton. SIM Racing NG logo front, "NG" back. Available in black and white.</p>
+            <div class="merch-sizes">
+              <span class="size-chip active">S</span>
+              <span class="size-chip">M</span>
+              <span class="size-chip">L</span>
+              <span class="size-chip">XL</span>
+              <span class="size-chip">XXL</span>
+            </div>
+            <div class="merch-foot">
+              <span class="merch-price">₦12,000</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="clothing">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🧥</div>
+            <span class="merch-tag merch-tag--new">New</span>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Zip-Up Hoodie</h3>
+            <p class="merch-desc">Heavyweight fleece. Embroidered logo. Front zip, kangaroo pockets.</p>
+            <div class="merch-sizes">
+              <span class="size-chip">S</span>
+              <span class="size-chip active">M</span>
+              <span class="size-chip">L</span>
+              <span class="size-chip">XL</span>
+            </div>
+            <div class="merch-foot">
+              <span class="merch-price">₦22,000</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="clothing">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🩱</div>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Racing Jersey</h3>
+            <p class="merch-desc">Breathable performance fabric. Sublimated print. Number customisation available.</p>
+            <div class="merch-sizes">
+              <span class="size-chip">S</span>
+              <span class="size-chip">M</span>
+              <span class="size-chip active">L</span>
+              <span class="size-chip">XL</span>
+              <span class="size-chip">XXL</span>
+            </div>
+            <div class="merch-foot">
+              <span class="merch-price">₦18,500</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="headwear">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🧢</div>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Racing Snapback</h3>
+            <p class="merch-desc">Flat-brim snapback. Embroidered logo. One size fits most.</p>
+            <div class="merch-foot merch-foot--no-sizes">
+              <span class="merch-price">₦9,500</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="headwear">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🎓</div>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Dad Cap — NG Edition</h3>
+            <p class="merch-desc">Washed cotton, curved brim, adjustable strap. Low-profile embroidery.</p>
+            <div class="merch-foot merch-foot--no-sizes">
+              <span class="merch-price">₦8,000</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="accessories">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🖱️</div>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Desk Mat — NG Edition</h3>
+            <p class="merch-desc">900×400mm extended mat. Non-slip rubber base. Green-on-black NG design.</p>
+            <div class="merch-foot merch-foot--no-sizes">
+              <span class="merch-price">₦8,000</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="accessories">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🔖</div>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Sticker Pack</h3>
+            <p class="merch-desc">8 die-cut vinyl stickers. Waterproof. Perfect for your rig, helmet, or laptop.</p>
+            <div class="merch-foot merch-foot--no-sizes">
+              <span class="merch-price">₦2,500</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="merch-card merch-card--lg" data-category="accessories">
+          <div class="merch-thumb merch-thumb--lg">
+            <div class="merch-icon">🧣</div>
+            <span class="merch-tag merch-tag--limited">Limited</span>
+          </div>
+          <div class="merch-body">
+            <h3 class="merch-name">Neck Gaiter</h3>
+            <p class="merch-desc">Stretch polyester. All-over print. Doubles as a face cover or headband.</p>
+            <div class="merch-foot merch-foot--no-sizes">
+              <span class="merch-price">₦5,000</span>
+              <button class="btn-primary merch-add-lg">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NOTIFY SECTION ── -->
+  <section class="section section-dark notify-section">
+    <div class="container notify-inner">
+      <div>
+        <p class="section-eyebrow">Stay in the Loop</p>
+        <h2 class="section-title">Get notified when we launch</h2>
+        <p class="section-sub">Be first to know when the store goes live — and get early access deals.</p>
+      </div>
+      <form class="notify-form" onsubmit="handleNotify(event)">
+        <input type="email" placeholder="your@email.com" class="notify-input" required />
+        <button type="submit" class="btn-primary">Notify Me</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand">
+          <div class="logo-mark">
+            <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="36" rx="6" fill="#00cc66"/>
+              <path d="M6 24 L12 12 L18 20 L22 15 L30 24" stroke="#001433" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="12" cy="12" r="2.5" fill="#001433"/>
+              <circle cx="30" cy="24" r="2.5" fill="#001433"/>
+              <path d="M18 24 L18 28" stroke="#001433" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 28 L22 28" stroke="#001433" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="brand-name">SIM Racing <em>NG</em></span>
+        </div>
+        <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
+      </div>
+      <div class="footer-links-group">
+        <div class="footer-col">
+          <h4>Site</h4>
+          <a href="index.html">Home</a>
+          <a href="index.html#events">Events</a>
+          <a href="merch.html">Merch Store</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="#">Discord</a>
+          <a href="#">Instagram</a>
+          <a href="#">Twitter / X</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SIM Racing NG. All rights reserved.</span>
+      <span>Built for Nigerian racers, by Nigerian racers.</span>
+    </div>
+  </footer>
+
+</body>
+</html>
