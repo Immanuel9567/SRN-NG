@@ -1,112 +1,354 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Merch Store — SIM Racing NG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="scripts.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="shared.js"></script>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="header-left">
-      <a href="index.html" class="back-btn" aria-label="Back to home">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-        Back
-      </a>
-      <a href="index.html" class="brand">
-        <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" />
-      </a>
+<header class="site-header">
+  <div class="header-left">
+    <a href="index.html" class="back-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </a>
+    <button id="adminToggle" class="icon-round admin-toggle-btn" title="Admin Panel" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </button>
+  </div>
+  <a href="index.html" class="header-logo">
+    <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img"/>
+  </a>
+  <div class="header-right">
+    <button id="themeBtn" class="icon-round" title="Toggle theme"></button>
+    <button id="headerAuthBtn" class="btn-auth-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Sign In
+    </button>
+    <div id="headerUserChip" class="header-user-chip" style="display:none"></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="merch-hero">
+  <div class="merch-hero-bg"></div>
+  <div class="container merch-hero-content">
+    <p class="section-eyebrow">Official Gear</p>
+    <h1 class="merch-hero-title">SIM Racing NG<br/><span>Merch Store</span></h1>
+    <p class="merch-hero-sub">Rep the community. Wear it on and off the rig.</p>
+  </div>
+</section>
+
+<div class="coming-soon-bar">
+  <span>🚧</span>
+  <span>Store launching soon — products below are a preview.</span>
+  <a href="#notify" class="cs-link">Notify me →</a>
+</div>
+
+<!-- FILTER + ACTIONS BAR -->
+<div class="filter-bar">
+  <div class="container filter-inner">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="clothing">Clothing</button>
+      <button class="filter-tab" data-filter="headwear">Headwear</button>
+      <button class="filter-tab" data-filter="accessories">Accessories</button>
     </div>
-      <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="filter-count" id="filterCount">— products</div>
+      <button id="addProductBtn" class="btn-primary btn-sm" style="display:none" onclick="apOpenAddProduct()">+ Add Product</button>
+      <button class="cart-bar-btn" onclick="openCart()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Cart
+        <span class="cart-badge" id="cartBadge" style="display:none">0</span>
       </button>
-    </nav>
-  </header>
-
-  <!-- MERCH HERO -->
-  <section class="merch-hero">
-    <div class="merch-hero-bg"></div>
-    <div class="container merch-hero-content">
-      <p class="section-eyebrow">Official Gear</p>
-      <h1 class="merch-hero-title">SIM Racing NG<br><span>Merch Store</span></h1>
-      <p class="merch-hero-sub">Rep the community. Wear it on and off the rig.</p>
     </div>
-  </section>
-
-  <!-- COMING SOON -->
-  <div class="coming-soon-bar">
-    <span class="cs-icon">🚧</span>
-    <span>Store launching soon — products below are a preview.</span>
-    <a href="#notify" class="cs-link">Notify me →</a>
   </div>
+</div>
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    <div class="container filter-inner">
-      <div class="filter-tabs" id="filterTabs">
-        <button class="filter-tab active" data-filter="all">All</button>
-        <button class="filter-tab" data-filter="clothing">Clothing</button>
-        <button class="filter-tab" data-filter="headwear">Headwear</button>
-        <button class="filter-tab" data-filter="accessories">Accessories</button>
+<!-- PRODUCT GRID -->
+<section class="section merch-store-section">
+  <div class="container">
+    <div class="merch-store-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<!-- NOTIFY -->
+<section class="section section-alt notify-section" id="notify">
+  <div class="container notify-inner">
+    <div>
+      <p class="section-eyebrow">Stay in the Loop</p>
+      <h2 class="section-title">Get notified when we launch</h2>
+      <p class="section-sub">Be first to know — and get early access deals.</p>
+    </div>
+    <form class="notify-form" onsubmit="handleNotify(event)">
+      <input type="email" placeholder="your@email.com" class="notify-input" required/>
+      <button type="submit" class="btn-primary">Notify Me</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" style="height:30px"/>
+      <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
+    </div>
+    <div class="footer-links-group">
+      <div class="footer-col"><h4>Site</h4><a href="index.html">Home</a><a href="index.html#platform">Platform</a><a href="merch.html">Merch</a></div>
+      <div class="footer-col"><h4>Community</h4><a href="#">Discord</a><a href="#">WhatsApp</a><a href="#">Instagram</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 SIM Racing NG. All rights reserved.</span>
+    <span>Built for Nigerian racers.</span>
+  </div>
+</footer>
+
+<!-- ════ SHARED MODALS ════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-glass auth-modal">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <img src="assets/logo.png" alt="SRN" style="height:36px;margin:0 auto 0.75rem;display:block"/>
+      <h2 class="modal-title">SIM Racing NG</h2>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" data-tab="signin">Sign In</button>
+      <button class="auth-tab-btn" data-tab="signup">Create Account</button>
+    </div>
+    <div id="authPane_signin">
+      <div class="mfield"><label>Username</label><input type="text" id="si_username" class="minput" placeholder="your_username" autocomplete="username"/></div>
+      <div class="mfield"><label>Password</label><input type="password" id="si_password" class="minput" placeholder="••••••••" autocomplete="current-password"/></div>
+      <div id="authErr_signin" class="merr" style="display:none"></div>
+      <button id="si_submitBtn" class="btn-primary msubmit">Sign In →</button>
+      <p class="mfootnote">New here? <a onclick="switchAuthTab('signup')" class="mlink">Create account</a></p>
+    </div>
+    <div id="authPane_signup" style="display:none">
+      <div class="mfield"><label>Display Name</label><input type="text" id="su_displayName" class="minput" placeholder="e.g. Lagos Racer" autocomplete="name"/></div>
+      <div class="mfield"><label>Username</label><input type="text" id="su_username" class="minput" placeholder="lowercase_no_spaces" autocomplete="username"/></div>
+      <div class="mfield"><label>Password</label><input type="password" id="su_password" class="minput" placeholder="min 6 characters" autocomplete="new-password"/></div>
+      <div class="mfield"><label>Confirm Password</label><input type="password" id="su_password2" class="minput" placeholder="repeat password" autocomplete="new-password"/></div>
+      <div id="authErr_signup" class="merr" style="display:none"></div>
+      <button id="su_submitBtn" class="btn-primary msubmit">Create Account →</button>
+      <p class="mfootnote">Already have one? <a onclick="switchAuthTab('signin')" class="mlink">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-glass profile-modal">
+    <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1.25rem">My Profile</h2>
+    <div class="profile-avatar-row">
+      <div class="profile-avatar-wrap">
+        <img id="prof_avatarPreview" src="" alt="" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border-card)"/>
+        <div id="prof_avatarPlaceholder" style="width:64px;height:64px;border-radius:50%;background:var(--surface2);border:2px solid var(--border-card);display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>
       </div>
-      <div class="filter-count" id="filterCount">8 products</div>
-    </div>
-  </div>
-
-  <!-- PRODUCT GRID — rendered by scripts.js from localStorage -->
-  <section class="section merch-store-section">
-    <div class="container">
-      <div class="merch-store-grid" id="productGrid"></div>
-    </div>
-  </section>
-
-  <!-- NOTIFY -->
-  <section class="section section-alt notify-section" id="notify">
-    <div class="container notify-inner">
       <div>
-        <p class="section-eyebrow">Stay in the Loop</p>
-        <h2 class="section-title">Get notified when we launch</h2>
-        <p class="section-sub">Be first to know when the store goes live.</p>
+        <button class="btn-ghost btn-sm" onclick="document.getElementById('prof_avatarInput').click()">Upload Photo</button>
+        <input type="file" id="prof_avatarInput" accept="image/*" style="display:none"/>
+        <div id="prof_roleDisplay" style="margin-top:6px"></div>
+        <div id="prof_username" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
+        <div id="prof_joined" style="font-size:11px;color:var(--text-muted)"></div>
       </div>
-      <form class="notify-form" onsubmit="handleNotify(event)">
-        <input type="email" placeholder="your@email.com" class="notify-input" required />
-        <button type="submit" class="btn-primary">Notify Me</button>
-      </form>
     </div>
-  </section>
+    <div class="mfield"><label>Display Name</label><input type="text" id="prof_displayName" class="minput"/></div>
+    <div class="mfield"><label>Bio</label><textarea id="prof_bio" class="minput" rows="3" style="resize:vertical"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button id="prof_cancelBtn" class="btn-ghost" style="flex:1;justify-content:center">Cancel</button>
+      <button id="prof_saveBtn" class="btn-primary" style="flex:1;justify-content:center">Save Changes</button>
+    </div>
+  </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" style="height:32px" />
-        <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
+<!-- ADMIN PANEL -->
+<div id="apOverlay" class="ap-overlay"></div>
+<aside id="adminPanel" class="admin-panel">
+  <div class="ap-head">
+    <span class="ap-title">⚡ Admin Panel</span>
+    <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeAdminPanel()">✕</button>
+  </div>
+  <div class="ap-tabs">
+    <button class="ap-tab-btn active" onclick="apSwitchTab('products',this)">Products</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('users',this)">Users</button>
+  </div>
+  <div id="apTab_products" class="ap-tab-pane">
+    <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="apOpenAddProduct()">+ Add Product</button>
+    <div id="apMerchGrid" class="ap-merch-grid"></div>
+    <div id="apProductForm" class="ap-product-form" style="display:none">
+      <div class="ap-form-head"><span id="apFormTitle" class="ap-sub-title">Add Product</span><button class="icon-btn" onclick="apCloseProductForm()">✕</button></div>
+      <div class="ap-field"><label>Name *</label><input type="text" id="apPName" class="ap-input" placeholder="Product name"/></div>
+      <div class="ap-field-row">
+        <div class="ap-field"><label>Category</label><select id="apPCategory" class="ap-input"><option value="clothing">Clothing</option><option value="headwear">Headwear</option><option value="accessories">Accessories</option></select></div>
+        <div class="ap-field"><label>Badge</label><select id="apPBadge" class="ap-input"><option value="">None</option><option value="new">New</option><option value="limited">Limited</option></select></div>
       </div>
-      <div class="footer-links-group">
-        <div class="footer-col">
-          <h4>Site</h4>
-          <a href="index.html">Home</a>
-          <a href="index.html#platform">Platform</a>
-          <a href="merch.html">Merch Store</a>
-        </div>
-        <div class="footer-col">
-          <h4>Community</h4>
-          <a href="#">Discord</a>
-          <a href="#">WhatsApp</a>
-          <a href="#">Instagram</a>
-        </div>
+      <div class="ap-field"><label>Price (₦) *</label><input type="number" id="apPPrice" class="ap-input" placeholder="12000" min="0"/></div>
+      <div class="ap-field"><label>Description</label><textarea id="apPDesc" class="ap-input ap-textarea" placeholder="Short description…"></textarea></div>
+      <div class="ap-field"><label>Sizes</label><input type="text" id="apPSizes" class="ap-input" placeholder="S, M, L, XL"/></div>
+      <div class="ap-field">
+        <label>Image</label>
+        <div class="ap-img-drop" onclick="document.getElementById('apImgInput').click()">📁 Click to upload<br/><span style="font-size:10px;color:var(--text-muted)">PNG/JPG/WebP · max 5MB</span></div>
+        <input type="file" id="apImgInput" accept="image/*" style="display:none" onchange="apHandleImage(event)"/>
+        <img id="apPImgPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-top:8px;border:1px solid var(--border-card)"/>
+      </div>
+      <div id="apFormError" class="ap-error" style="display:none"></div>
+      <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseProductForm()">Cancel</button><button class="btn-primary btn-sm" onclick="apSaveProduct()">Save</button></div>
+    </div>
+  </div>
+  <div id="apTab_users" class="ap-tab-pane" style="display:none">
+    <div class="ap-sub-head">
+      <div class="ap-utabs">
+        <button class="ap-utab active" onclick="apSwitchUserTab('all',this)">All</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('admins',this)">Admins</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('racers',this)">Racers</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('marketers',this)">Marketers</button>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 SIM Racing NG. All rights reserved.</span>
-      <span>Built for Nigerian racers, by Nigerian racers.</span>
+    <div class="ap-user-meta">
+      <span id="apOnlineBadge" class="ap-online-badge">0 online</span>
+      <span id="apUserCount" style="font-size:11px;color:var(--text-muted)">0 users</span>
     </div>
-  </footer>
+    <div id="apUserBody" class="ap-user-list"></div>
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:10px">
+      <button class="btn-outline btn-sm" style="width:100%;justify-content:center" onclick="apShowCreateAdmin()">+ Create Admin Account</button>
+    </div>
+    <div id="apCreateAdminForm" class="ap-product-form" style="display:none;margin-top:10px">
+      <div class="ap-form-head"><span class="ap-sub-title">New Admin</span><button class="icon-btn" onclick="apCloseCreateAdmin()">✕</button></div>
+      <div class="ap-field"><label>Display Name</label><input type="text" id="apCAName" class="ap-input" placeholder="e.g. Immanuel"/></div>
+      <div class="ap-field"><label>Username *</label><input type="text" id="apCAUsername" class="ap-input" placeholder="lowercase_only"/></div>
+      <div class="ap-field"><label>Password *</label><input type="password" id="apCAPassword" class="ap-input" placeholder="min 6 chars"/></div>
+      <div id="apCAError" class="ap-error" style="display:none"></div>
+      <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button><button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button></div>
+    </div>
+  </div>
+</aside>
 
+<!-- AP CONFIRM -->
+<div class="modal-overlay" id="apConfirmModal">
+  <div class="modal-glass confirm-modal">
+    <h3 id="apConfirmTitle" class="modal-title" style="font-size:17px">Are you sure?</h3>
+    <p id="apConfirmDesc" style="font-size:13px;color:var(--text-secondary);margin:8px 0 20px"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-ghost btn-sm" id="apConfirmNo">Cancel</button>
+      <button class="btn-danger btn-sm" id="apConfirmYes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal-overlay" id="cartModal">
+  <div class="modal-glass cart-modal">
+    <button class="modal-close" onclick="closeCart()">✕</button>
+    <div class="cart-header">
+      <h2 class="cart-title">Your Cart</h2>
+      <span class="cart-count-badge" id="cartCountBadge">0 items</span>
+    </div>
+    <div id="cartItemsList" class="cart-items-list"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-summary">
+        <div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal" class="cart-subtotal">₦0</span></div>
+        <div class="cart-summary-row cart-summary-note"><span>Shipping calculated at checkout</span></div>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="checkoutCart()">Proceed to Checkout →</button>
+      <button class="btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px" onclick="clearCartConfirm()">Clear Cart</button>
+    </div>
+    <div id="cartEmpty" class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <p>Your cart is empty.</p>
+      <span>Add some gear from the store above!</span>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING CART -->
+<button class="cart-float-btn" onclick="openCart()">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+  <span class="cart-float-badge" id="cartFloatBadge" style="display:none">0</span>
+</button>
+
+<div id="srnToast" class="srn-toast"></div>
+
+<script>
+function renderMerchPage(){
+  const grid = document.getElementById('productGrid');
+  const countEl = document.getElementById('filterCount');
+  if(!grid) return;
+  const items = getMerch();
+  if(countEl) countEl.textContent = items.length + ' products';
+  grid.innerHTML = items.map(item=>{
+    const thumb = item.image
+      ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover"/>`
+      : `<div class="merch-icon">${catEmoji(item.category)}</div>`;
+    const badge = item.badge ? `<span class="merch-tag merch-tag--${item.badge}">${item.badge==='new'?'New':'Limited'}</span>` : '';
+    const hasSizes = item.sizes && item.sizes.length;
+    const sizes = hasSizes
+      ? `<div class="merch-sizes">${item.sizes.map((s,i)=>`<span class="size-chip${i===0?' active':''}" onclick="selSize(this)">${s}</span>`).join('')}</div>` : '';
+    return `<div class="merch-card merch-card--lg" data-category="${item.category}">
+      <div class="merch-thumb merch-thumb--lg">${thumb}${badge}</div>
+      <div class="merch-body">
+        <h3 class="merch-name">${esc(item.name)}</h3>
+        <p class="merch-desc">${esc(item.desc||'')}</p>
+        ${sizes}
+        <div class="merch-foot${!hasSizes?' merch-foot--no-sizes':''}">
+          <span class="merch-price">${fmtPrice(item.price)}</span>
+          <button class="merch-add-lg" onclick="handleMerchAdd(${item.id},this)">Add to Cart</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  initFilters();
+  // Show add product button for admins/marketers
+  const session = getSession();
+  const addBtn = document.getElementById('addProductBtn');
+  if(addBtn) addBtn.style.display = (session && canAddProduct(session)) ? '' : 'none';
+}
+
+function handleMerchAdd(id, btn){
+  const card = btn.closest('.merch-card--lg');
+  const activeSize = card?.querySelector('.size-chip.active');
+  const size = activeSize ? activeSize.textContent.trim() : null;
+  addToCart(id, size);
+  btn.textContent='✓ Added!';
+  btn.style.opacity='0.7';
+  setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.opacity=''; }, 1600);
+}
+function selSize(el){
+  el.closest('.merch-sizes').querySelectorAll('.size-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+function initFilters(){
+  document.querySelectorAll('.filter-tab').forEach(tab=>{
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+      const f=this.dataset.filter;
+      let n=0;
+      document.querySelectorAll('[data-category]').forEach(card=>{
+        const show=f==='all'||card.dataset.category===f;
+        card.style.display=show?'':'none'; if(show) n++;
+      });
+      const c=document.getElementById('filterCount');
+      if(c) c.textContent=n+' products';
+    });
+  });
+}
+function handleNotify(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('button[type=submit]');
+  if(btn){btn.textContent="You're on the list!";btn.disabled=true;btn.style.opacity='0.7';}
+}
+document.addEventListener('DOMContentLoaded', renderMerchPage);
+</script>
 </body>
 </html>

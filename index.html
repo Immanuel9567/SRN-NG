@@ -1,178 +1,387 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SIM Racing NG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="scripts.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="shared.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <a href="index.html" class="brand">
-      <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" />
-    </a>
-    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
+
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+  <div class="header-left">
+    <button id="adminToggle" class="icon-round admin-toggle-btn" title="Admin Panel" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </button>
-    </nav>
-  </header>
+  </div>
+  <a href="index.html" class="header-logo">
+    <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img"/>
+  </a>
+  <div class="header-right">
+    <button id="themeBtn" class="icon-round" title="Toggle theme"></button>
+    <!-- logged out -->
+    <button id="headerAuthBtn" class="btn-auth-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Sign In
+    </button>
+    <!-- logged in -->
+    <div id="headerUserChip" class="header-user-chip" style="display:none"></div>
+  </div>
+</header>
 
-  <!-- SPLASH -->
-  <section class="splash">
-    <video autoplay muted loop playsinline class="splash-video">
-      <source src="assets/splash.mp4" type="video/mp4" />
-    </video>
-    <div class="splash-overlay"></div>
-    <div class="splash-grid-overlay"></div>
-    <div class="splash-content">
-      <h1 class="splash-title">Welcome to<br><span>SIM Racing NG!</span></h1>
-      <p class="splash-sub">Compete, connect, and rep the fastest growing sim racing community in Nigeria.</p>
-      <div class="splash-actions">
-        <button class="btn-join" onclick="openSocials()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Join the Club
-        </button>
-        <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-outline">View Platform</a>
-        <a href="merch.html" class="btn-outline">Shop Merch</a>
+<!-- ══ SPLASH ══ -->
+<section class="splash">
+  <video autoplay muted loop playsinline class="splash-video">
+    <source src="assets/splash.mp4" type="video/mp4"/>
+  </video>
+  <div class="splash-overlay"></div>
+  <div class="splash-grid-overlay"></div>
+  <div class="splash-content">
+    <h1 class="splash-title">Welcome to<br/><span>SIM Racing NG!</span></h1>
+    <p class="splash-sub">Placeholder for moto</p>
+    <div class="splash-actions">
+      <button class="btn-join" onclick="openSocials()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Join the Club
+      </button>
+      <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-primary">View Platform</a>
+      <a href="merch.html" class="btn-outline">Shop Merch</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ PLATFORM ══ -->
+<section class="section" id="platform">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h1 class="section-eyebrow">Compete Online</h1>
+        <h2 class="section-title">Record a Lap!</h2>
+        <p class="section-sub">Leaderboards, events, and championships across different titles.</p>
       </div>
     </div>
-  </section>
-
-  <!-- PLATFORM -->
-  <section class="section" id="platform">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <p class="section-eyebrow">Compete Online</p>
-          <h2 class="section-title">The Platform</h2>
-          <p class="section-sub">Leaderboards, lap times, events, and championships — all in one place.</p>
-        </div>
-        <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-outline">Open Platform →</a>
-      </div>
-
-      <div class="platform-card">
-        <div class="platform-card-left">
-          <h3 class="platform-title">SIM Racing Nigeria</h3>
-          <p class="platform-desc">Our dedicated platform for leaderboards, lap time submissions, and events across various simulators.</p>
-          <div class="platform-features">
-            <div class="pf-item">Lap time leaderboards</div>
-            <div class="pf-item">Championship standings</div>
-            <div class="pf-item">Event registration</div>
-            <div class="pf-item">Community profiles</div>
-          </div>
-          <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-primary">Go to Platform →</a>
-        </div>
-        <div class="platform-card-right">
-          <div class="platform-preview">
-            <div class="preview-bar">
-              <div class="preview-dots"><span></span><span></span><span></span></div>
-              <div class="preview-url">simracenigeria.vercel.app</div>
-            </div>
-            <div class="preview-body">
-              <div class="preview-row"></span><span class="preview-driver"></span></div>
-              <div class="preview-row"></span><span class="preview-driver"></span></div>
-              <div class="preview-row"></span><span class="preview-driver"></span></div>
-              <div class="preview-row"></span><span class="preview-driver"></span></div>
-              <div class="preview-row"></span><span class="preview-driver"></span></div>
-            </div>
-          </div>
-        </div>
+    <div class="platform-card">
+      <div class="platform-card-left">
+        <h3 class="platform-title">SIM Racing Nigeria</h3>
+        <p class="platform-desc">Our dedicated platform for lap times, events, championships, and community profiles — all in one place.</p>
+        <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-primary" style="margin-top:1.25rem;align-self:flex-start">Go to Platform →</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- MERCH PREVIEW -->
-  <section class="section section-alt" id="merch-preview">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <p class="section-eyebrow">Gear Up</p>
-          <h2 class="section-title">Official Merch</h2>
-          <p class="section-sub">Rep the community on and off the rig.</p>
-        </div>
-        <a href="merch.html" class="btn-ghost">Full store →</a>
+
+<!-- ══ MERCH PREVIEW ══ -->
+<section class="section" id="merch-preview">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Gear Up</p>
+        <h2 class="section-title">Official Merch</h2>
+        <p class="section-sub">Community Merch/Accessories/Misc.</p>
       </div>
-      <div class="merch-preview-grid" id="homeMerchGrid">
-        <!-- populated by scripts.js from localStorage -->
+      <a href="merch.html" class="btn-ghost">Full store →</a>
+    </div>
+    <div class="merch-preview-grid" id="homeMerchGrid"></div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" style="height:30px"/>
+      <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
+    </div>
+    <div class="footer-links-group">
+      <div class="footer-col">
+        <h4>Site</h4>
+        <a href="index.html">Home</a>
+        <a href="#platform">Platform</a>
+        <a href="merch.html">Merch Store</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="#" onclick="openSocials();return false">Discord</a>
+        <a href="#" onclick="openSocials();return false">WhatsApp</a>
+        <a href="#" onclick="openSocials();return false">Instagram</a>
       </div>
     </div>
-  </section>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 SIM Racing NG. All rights reserved.</span>
+    <span>Built for Nigerian racers.</span>
+  </div>
+</footer>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" style="height:32px" />
-        <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
+<!-- ══════════════════════════════════════════════════
+     SHARED MODALS + PANELS (same block on every page)
+     ══════════════════════════════════════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-glass auth-modal">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <img src="assets/logo.png" alt="SRN" style="height:36px;margin:0 auto 0.75rem;display:block"/>
+      <h2 class="modal-title">SIM Racing NG</h2>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" data-tab="signin">Sign In</button>
+      <button class="auth-tab-btn" data-tab="signup">Create Account</button>
+    </div>
+    <!-- SIGN IN -->
+    <div id="authPane_signin">
+      <div class="mfield"><label>Username</label><input type="text" id="si_username" class="minput" placeholder="your_username" autocomplete="username"/></div>
+      <div class="mfield"><label>Password</label><input type="password" id="si_password" class="minput" placeholder="••••••••" autocomplete="current-password"/></div>
+      <div id="authErr_signin" class="merr" style="display:none"></div>
+      <button id="si_submitBtn" class="btn-primary msubmit">Sign In →</button>
+      <p class="mfootnote">Don't have an account? <a onclick="switchAuthTab('signup')" class="mlink">Create one</a></p>
+    </div>
+    <!-- SIGN UP -->
+    <div id="authPane_signup" style="display:none">
+      <div class="mfield"><label>Display Name</label><input type="text" id="su_displayName" class="minput" placeholder="e.g. Lagos Racer" autocomplete="name"/></div>
+      <div class="mfield"><label>Username</label><input type="text" id="su_username" class="minput" placeholder="lowercase_no_spaces" autocomplete="username"/></div>
+      <div class="mfield"><label>Password</label><input type="password" id="su_password" class="minput" placeholder="min 6 characters" autocomplete="new-password"/></div>
+      <div class="mfield"><label>Confirm Password</label><input type="password" id="su_password2" class="minput" placeholder="repeat password" autocomplete="new-password"/></div>
+      <div id="authErr_signup" class="merr" style="display:none"></div>
+      <button id="su_submitBtn" class="btn-primary msubmit">Create Account →</button>
+      <p class="mfootnote">Already have an account? <a onclick="switchAuthTab('signin')" class="mlink">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-glass profile-modal">
+    <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1.25rem">My Profile</h2>
+    <div class="profile-avatar-row">
+      <div class="profile-avatar-wrap">
+        <img id="prof_avatarPreview" src="" alt="" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border-card)"/>
+        <div id="prof_avatarPlaceholder" style="width:64px;height:64px;border-radius:50%;background:var(--surface2);border:2px solid var(--border-card);display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>
       </div>
-      <div class="footer-links-group">
-        <div class="footer-col">
-          <h4>Site</h4>
-          <a href="index.html">Home</a>
-          <a href="#platform">Platform</a>
-          <a href="merch.html">Merch Store</a>
-        </div>
-        <div class="footer-col">
-          <h4>Community</h4>
-          <a href="#" onclick="openSocials();return false;">Discord</a>
-          <a href="#" onclick="openSocials();return false;">WhatsApp</a>
-          <a href="#" onclick="openSocials();return false;">Instagram</a>
-        </div>
+      <div>
+        <button class="btn-ghost btn-sm" onclick="document.getElementById('prof_avatarInput').click()">Upload Photo</button>
+        <input type="file" id="prof_avatarInput" accept="image/*" style="display:none"/>
+        <div id="prof_roleDisplay" style="margin-top:6px"></div>
+        <div id="prof_username" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
+        <div id="prof_joined" style="font-size:11px;color:var(--text-muted)"></div>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 SIM Racing NG. All rights reserved.</span>
-      <span>Built for Nigerian racers, by Nigerian racers.</span>
+    <div class="mfield"><label>Display Name</label><input type="text" id="prof_displayName" class="minput" placeholder="How you appear to others"/></div>
+    <div class="mfield"><label>Bio <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label><textarea id="prof_bio" class="minput" rows="3" placeholder="Tell the community about yourself…" style="resize:vertical"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button id="prof_cancelBtn" class="btn-ghost" style="flex:1;justify-content:center">Cancel</button>
+      <button id="prof_saveBtn" class="btn-primary" style="flex:1;justify-content:center">Save Changes</button>
     </div>
-  </footer>
+  </div>
+</div>
 
-  <!-- SOCIALS MODAL -->
-  <div class="modal-overlay" id="socialsModal" onclick="closeSocialsOutside(event)">
-    <div class="modal-glass socials-modal">
-      <button class="modal-close" onclick="closeSocials()">✕</button>
-      <div class="socials-header">
-        <img src="assets/logo.png" alt="SRN" class="socials-logo" />
-        <h2 class="socials-title">Join the Club</h2>
-        <p class="socials-sub">Connect with the SIM Racing NG community.</p>
+<!-- SOCIALS MODAL -->
+<div class="modal-overlay" id="socialsModal">
+  <div class="modal-glass socials-modal">
+    <button class="modal-close" onclick="closeSocials()">✕</button>
+    <div class="socials-header">
+      <img src="assets/logo.png" alt="SRN" class="socials-logo"/>
+      <h2 class="socials-title">Join the Club</h2>
+      <p class="socials-sub">Connect with the SIM Racing NG community.</p>
+    </div>
+    <div class="socials-grid">
+      <a href="https://discord.gg/REPLACE" target="_blank" rel="noopener" class="social-link social-discord">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        <div class="social-info"><span class="social-name">Discord</span><span class="social-desc">Chat &amp; voice rooms</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a href="https://wa.me/REPLACE" target="_blank" rel="noopener" class="social-link social-whatsapp">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        <div class="social-info"><span class="social-name">WhatsApp</span><span class="social-desc">Community group</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a href="https://instagram.com/REPLACE" target="_blank" rel="noopener" class="social-link social-instagram">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        <div class="social-info"><span class="social-name">Instagram</span><span class="social-desc">Photos &amp; reels</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a href="https://twitter.com/REPLACE" target="_blank" rel="noopener" class="social-link social-twitter">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <div class="social-info"><span class="social-name">Twitter / X</span><span class="social-desc">News &amp; updates</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a href="https://tiktok.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-tiktok">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.23 8.23 0 0 0 4.83 1.55V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+        <div class="social-info"><span class="social-name">TikTok</span><span class="social-desc">Race clips</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+      <a href="https://youtube.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-youtube">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        <div class="social-info"><span class="social-name">YouTube</span><span class="social-desc">Streams &amp; events</span></div>
+        <span class="social-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="apOverlay" class="ap-overlay"></div>
+<aside id="adminPanel" class="admin-panel">
+  <div class="ap-head">
+    <span class="ap-title">⚡ Admin Panel</span>
+    <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeAdminPanel()">✕</button>
+  </div>
+  <div class="ap-tabs">
+    <button class="ap-tab-btn active" onclick="apSwitchTab('products',this)">Products</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('users',this)">Users</button>
+  </div>
+
+  <!-- PRODUCTS TAB -->
+  <div id="apTab_products" class="ap-tab-pane">
+    <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="apOpenAddProduct()">+ Add Product</button>
+    <div id="apMerchGrid" class="ap-merch-grid"></div>
+    <div id="apProductForm" class="ap-product-form" style="display:none">
+      <div class="ap-form-head">
+        <span id="apFormTitle" class="ap-sub-title">Add Product</span>
+        <button class="icon-btn" onclick="apCloseProductForm()">✕</button>
       </div>
-      <div class="socials-grid">
-        <a href="https://discord.gg/REPLACE" target="_blank" rel="noopener" class="social-link social-discord">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          <div class="social-info"><span class="social-name">Discord</span><span class="social-desc">Chat & voice rooms</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
-        <a href="https://wa.me/REPLACE" target="_blank" rel="noopener" class="social-link social-whatsapp">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-          <div class="social-info"><span class="social-name">WhatsApp</span><span class="social-desc">Community group</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
-        <a href="https://instagram.com/REPLACE" target="_blank" rel="noopener" class="social-link social-instagram">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          <div class="social-info"><span class="social-name">Instagram</span><span class="social-desc">Photos & reels</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
-        <a href="https://twitter.com/REPLACE" target="_blank" rel="noopener" class="social-link social-twitter">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          <div class="social-info"><span class="social-name">Twitter / X</span><span class="social-desc">News & updates</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
-        <a href="https://tiktok.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-tiktok">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.23 8.23 0 0 0 4.83 1.55V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
-          <div class="social-info"><span class="social-name">TikTok</span><span class="social-desc">Race clips</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
-        <a href="https://youtube.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-youtube">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          <div class="social-info"><span class="social-name">YouTube</span><span class="social-desc">Streams & events</span></div>
-          <span class="social-arrow">↗</span>
-        </a>
+      <div class="ap-field"><label>Name *</label><input type="text" id="apPName" class="ap-input" placeholder="Product name"/></div>
+      <div class="ap-field-row">
+        <div class="ap-field"><label>Category</label>
+          <select id="apPCategory" class="ap-input">
+            <option value="clothing">Clothing</option>
+            <option value="headwear">Headwear</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="ap-field"><label>Badge</label>
+          <select id="apPBadge" class="ap-input">
+            <option value="">None</option>
+            <option value="new">New</option>
+            <option value="limited">Limited</option>
+          </select>
+        </div>
+      </div>
+      <div class="ap-field"><label>Price (₦) *</label><input type="number" id="apPPrice" class="ap-input" placeholder="12000" min="0"/></div>
+      <div class="ap-field"><label>Description</label><textarea id="apPDesc" class="ap-input ap-textarea" placeholder="Short description…"></textarea></div>
+      <div class="ap-field"><label>Sizes (comma separated)</label><input type="text" id="apPSizes" class="ap-input" placeholder="S, M, L, XL"/></div>
+      <div class="ap-field">
+        <label>Image (from local storage)</label>
+        <div class="ap-img-drop" onclick="document.getElementById('apImgInput').click()">
+          📁 Click to upload<br/><span style="font-size:10px;color:var(--text-muted)">PNG/JPG/WebP · max 5MB</span>
+        </div>
+        <input type="file" id="apImgInput" accept="image/*" style="display:none" onchange="apHandleImage(event)"/>
+        <img id="apPImgPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-top:8px;border:1px solid var(--border-card)"/>
+      </div>
+      <div id="apFormError" class="ap-error" style="display:none"></div>
+      <div class="ap-form-footer">
+        <button class="btn-ghost btn-sm" onclick="apCloseProductForm()">Cancel</button>
+        <button class="btn-primary btn-sm" onclick="apSaveProduct()">Save</button>
       </div>
     </div>
   </div>
 
+  <!-- USERS TAB -->
+  <div id="apTab_users" class="ap-tab-pane" style="display:none">
+    <div class="ap-sub-head">
+      <div class="ap-utabs">
+        <button class="ap-utab active" onclick="apSwitchUserTab('all',this)">All</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('admins',this)">Admins</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('racers',this)">Racers</button>
+        <button class="ap-utab" onclick="apSwitchUserTab('marketers',this)">Marketers</button>
+      </div>
+    </div>
+    <div class="ap-user-meta">
+      <span id="apOnlineBadge" class="ap-online-badge">0 online</span>
+      <span id="apUserCount" style="font-size:11px;color:var(--text-muted)">0 users</span>
+    </div>
+    <div id="apUserBody" class="ap-user-list"></div>
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:10px">
+      <button class="btn-outline btn-sm" style="width:100%;justify-content:center" onclick="apShowCreateAdmin()">+ Create Admin Account</button>
+    </div>
+    <div id="apCreateAdminForm" class="ap-product-form" style="display:none;margin-top:10px">
+      <div class="ap-form-head"><span class="ap-sub-title">New Admin</span><button class="icon-btn" onclick="apCloseCreateAdmin()">✕</button></div>
+      <div class="ap-field"><label>Display Name</label><input type="text" id="apCAName" class="ap-input" placeholder="e.g. Immanuel"/></div>
+      <div class="ap-field"><label>Username *</label><input type="text" id="apCAUsername" class="ap-input" placeholder="lowercase_only"/></div>
+      <div class="ap-field"><label>Password *</label><input type="password" id="apCAPassword" class="ap-input" placeholder="min 6 chars"/></div>
+      <div id="apCAError" class="ap-error" style="display:none"></div>
+      <div class="ap-form-footer">
+        <button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button>
+        <button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- AP CONFIRM MODAL -->
+<div class="modal-overlay" id="apConfirmModal">
+  <div class="modal-glass confirm-modal">
+    <h3 id="apConfirmTitle" class="modal-title" style="font-size:17px">Are you sure?</h3>
+    <p id="apConfirmDesc" style="font-size:13px;color:var(--text-secondary);margin:8px 0 20px"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-ghost btn-sm" id="apConfirmNo">Cancel</button>
+      <button class="btn-danger btn-sm" id="apConfirmYes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="srnToast" class="srn-toast"></div>
+
+<script>
+/* ── PAGE SPECIFIC ── */
+let _membersDirOpen = false;
+
+function toggleMembersDir(){
+  _membersDirOpen = !_membersDirOpen;
+  const wrap = document.getElementById('membersDirWrap');
+  const label = document.getElementById('membersDirToggleLabel');
+  if(wrap){ wrap.style.display = _membersDirOpen ? '' : 'none'; }
+  if(label){ label.textContent = _membersDirOpen ? 'Hide Members ↑' : 'Show Members ↓'; }
+  if(_membersDirOpen) renderMembersDirectory();
+}
+
+function buildMerchPreviewCard(item){
+  const thumb = item.image
+    ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:80px;height:80px;object-fit:contain"/>`
+    : `<div class="merch-icon">${catEmoji(item.category)}</div>`;
+  const badge = item.badge ? `<span class="merch-tag merch-tag--${item.badge}">${item.badge==='new'?'New':'Ltd'}</span>` : '';
+  return `<div class="merch-card">
+    <div class="merch-thumb">${thumb}${badge}</div>
+    <div class="merch-body">
+      <h3 class="merch-name">${esc(item.name)}</h3>
+      <div class="merch-foot">
+        <span class="merch-price">${fmtPrice(item.price)}</span>
+        <button class="merch-add" onclick="addToCart(${item.id},null);this.textContent='✓';setTimeout(()=>this.textContent='+ Cart',1600)">+ Cart</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  // Live stats
+  const users = getUsers();
+  const online = getOnline();
+  const merch  = getMerch();
+  document.getElementById('statMemberCount').textContent = users.length;
+  document.getElementById('statOnlineCount').textContent  = online.length;
+  document.getElementById('statMerchCount').textContent  = merch.length;
+
+  // Merch preview
+  const grid = document.getElementById('homeMerchGrid');
+  if(grid){
+    const preview = merch.slice(0,3);
+    grid.innerHTML = preview.map(i=>buildMerchPreviewCard(i)).join('')
+      + `<div class="merch-card merch-card--cta"><a href="merch.html" class="merch-see-all"><span>See all products</span><div class="merch-arrow">→</div></a></div>`;
+  }
+
+  // Activity
+  renderHomeActivity();
+});
+</script>
 </body>
 </html>
