@@ -12,6 +12,7 @@
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="site-header">
   <div class="header-left">
     <a href="index.html" class="back-btn">
@@ -45,13 +46,14 @@
   </div>
 </section>
 
+<!-- COMING SOON -->
 <div class="coming-soon-bar">
   <span>🚧</span>
   <span>Store launching soon — products below are a preview.</span>
   <a href="#notify" class="cs-link">Notify me →</a>
 </div>
 
-<!-- FILTER + ACTIONS BAR -->
+<!-- FILTER BAR -->
 <div class="filter-bar">
   <div class="container filter-inner">
     <div class="filter-tabs" id="filterTabs">
@@ -60,13 +62,13 @@
       <button class="filter-tab" data-filter="headwear">Headwear</button>
       <button class="filter-tab" data-filter="accessories">Accessories</button>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="filter-count" id="filterCount">— products</div>
-      <button id="addProductBtn" class="btn-primary btn-sm" style="display:none" onclick="apOpenAddProduct()">+ Add Product</button>
-      <button class="cart-bar-btn" onclick="openCart()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Cart
-        <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+    <div class="filter-actions">
+      <!-- Submit product: admins + marketers only -->
+      <button id="addProductBtn" class="btn-primary btn-sm" style="display:none" onclick="openAddProductModal()">+ Submit Product</button>
+      <!-- Review pending: admins only, shown when there are pending items -->
+      <button id="reviewPendingBtn" class="btn-review" style="display:none" onclick="openPendingReview()">
+        Review
+        <span id="pendingCountBadge" class="pending-badge">0</span>
       </button>
     </div>
   </div>
@@ -79,7 +81,7 @@
   </div>
 </section>
 
-<!-- NOTIFY -->
+<!-- NEWSLETTER -->
 <section class="section section-alt notify-section" id="notify">
   <div class="container notify-inner">
     <div>
@@ -87,7 +89,7 @@
       <h2 class="section-title">Get notified when we launch</h2>
       <p class="section-sub">Be first to know — and get early access deals.</p>
     </div>
-    <form class="notify-form" onsubmit="handleNotify(event)">
+    <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
       <input type="email" placeholder="your@email.com" class="notify-input" required/>
       <button type="submit" class="btn-primary">Notify Me</button>
     </form>
@@ -145,32 +147,65 @@
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
-<div class="modal-overlay" id="profileModal">
-  <div class="modal-glass profile-modal">
-    <button class="modal-close" onclick="closeProfileModal()">✕</button>
-    <h2 class="modal-title" style="margin-bottom:1.25rem">My Profile</h2>
-    <div class="profile-avatar-row">
-      <div class="profile-avatar-wrap">
-        <img id="prof_avatarPreview" src="" alt="" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--border-card)"/>
-        <div id="prof_avatarPlaceholder" style="width:64px;height:64px;border-radius:50%;background:var(--surface2);border:2px solid var(--border-card);display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>
-      </div>
-      <div>
-        <button class="btn-ghost btn-sm" onclick="document.getElementById('prof_avatarInput').click()">Upload Photo</button>
-        <input type="file" id="prof_avatarInput" accept="image/*" style="display:none"/>
-        <div id="prof_roleDisplay" style="margin-top:6px"></div>
-        <div id="prof_username" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
-        <div id="prof_joined" style="font-size:11px;color:var(--text-muted)"></div>
-      </div>
+<!-- USER PANEL -->
+<div id="upOverlay" class="up-overlay"></div>
+<aside id="userPanel" class="user-panel">
+  <div class="up-head">
+    <span class="up-title">My Account</span>
+    <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeUserPanel()">✕</button>
+  </div>
+  <div class="up-profile-card">
+    <div class="up-avatar-wrap">
+      <div id="upAvatarDisplay"></div>
+      <button class="up-avatar-edit" onclick="document.getElementById('upAvatarInput').click()" title="Change photo">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <input type="file" id="upAvatarInput" accept="image/*" style="display:none"/>
     </div>
-    <div class="mfield"><label>Display Name</label><input type="text" id="prof_displayName" class="minput"/></div>
-    <div class="mfield"><label>Bio</label><textarea id="prof_bio" class="minput" rows="3" style="resize:vertical"></textarea></div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button id="prof_cancelBtn" class="btn-ghost" style="flex:1;justify-content:center">Cancel</button>
-      <button id="prof_saveBtn" class="btn-primary" style="flex:1;justify-content:center">Save Changes</button>
+    <div class="up-profile-info">
+      <div id="upNameDisplay" class="up-name"></div>
+      <div id="upUsernameDisplay" class="up-username"></div>
+      <div id="upRoleDisplay" style="margin-top:4px"></div>
+      <div id="upJoinedDisplay" class="up-joined"></div>
     </div>
   </div>
-</div>
+  <div id="upStatsRow" class="up-stats"></div>
+  <div class="up-quick-actions">
+    <button id="upCartShortcut" class="up-quick-btn up-quick-cart"></button>
+  </div>
+  <div class="up-body">
+    <div class="up-section">
+      <div class="up-section-title">Edit Profile</div>
+      <div class="up-field"><label>Display Name</label><input type="text" id="upEditDisplayName" class="up-input" placeholder="How you appear to others"/></div>
+      <div class="up-field"><label>Bio</label><textarea id="upEditBio" class="up-input up-textarea" placeholder="Tell the community about yourself…"></textarea></div>
+      <button id="upSaveProfileBtn" class="btn-primary btn-sm" style="width:100%;justify-content:center">Save Profile</button>
+    </div>
+    <div class="up-section">
+      <div class="up-section-header">
+        <div class="up-section-title">Security</div>
+        <button id="upChangePassToggle" class="up-section-toggle">Change Password</button>
+      </div>
+      <div id="upChangePassForm" style="display:none;margin-top:10px">
+        <div class="up-field"><label>Current Password</label><input type="password" id="upOldPass" class="up-input" autocomplete="current-password"/></div>
+        <div class="up-field"><label>New Password</label><input type="password" id="upNewPass" class="up-input" autocomplete="new-password"/></div>
+        <div class="up-field"><label>Confirm New</label><input type="password" id="upNewPass2" class="up-input" autocomplete="new-password"/></div>
+        <div id="upPassErr" class="ap-error" style="display:none"></div>
+        <button id="upSavePassBtn" class="btn-primary btn-sm" style="width:100%;justify-content:center">Update Password</button>
+      </div>
+    </div>
+    <div class="up-section up-danger-zone">
+      <div class="up-section-title" style="color:var(--red)">Danger Zone</div>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account.</p>
+      <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
+    </div>
+    <div style="padding:0 0 28px">
+      <button id="upLogoutBtn" class="btn-ghost btn-sm" style="width:100%;justify-content:center">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </div>
+</aside>
 
 <!-- ADMIN PANEL -->
 <div id="apOverlay" class="ap-overlay"></div>
@@ -180,33 +215,10 @@
     <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeAdminPanel()">✕</button>
   </div>
   <div class="ap-tabs">
-    <button class="ap-tab-btn active" onclick="apSwitchTab('products',this)">Products</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('users',this)">Users</button>
+    <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('news',this)">News</button>
   </div>
-  <div id="apTab_products" class="ap-tab-pane">
-    <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="apOpenAddProduct()">+ Add Product</button>
-    <div id="apMerchGrid" class="ap-merch-grid"></div>
-    <div id="apProductForm" class="ap-product-form" style="display:none">
-      <div class="ap-form-head"><span id="apFormTitle" class="ap-sub-title">Add Product</span><button class="icon-btn" onclick="apCloseProductForm()">✕</button></div>
-      <div class="ap-field"><label>Name *</label><input type="text" id="apPName" class="ap-input" placeholder="Product name"/></div>
-      <div class="ap-field-row">
-        <div class="ap-field"><label>Category</label><select id="apPCategory" class="ap-input"><option value="clothing">Clothing</option><option value="headwear">Headwear</option><option value="accessories">Accessories</option></select></div>
-        <div class="ap-field"><label>Badge</label><select id="apPBadge" class="ap-input"><option value="">None</option><option value="new">New</option><option value="limited">Limited</option></select></div>
-      </div>
-      <div class="ap-field"><label>Price (₦) *</label><input type="number" id="apPPrice" class="ap-input" placeholder="12000" min="0"/></div>
-      <div class="ap-field"><label>Description</label><textarea id="apPDesc" class="ap-input ap-textarea" placeholder="Short description…"></textarea></div>
-      <div class="ap-field"><label>Sizes</label><input type="text" id="apPSizes" class="ap-input" placeholder="S, M, L, XL"/></div>
-      <div class="ap-field">
-        <label>Image</label>
-        <div class="ap-img-drop" onclick="document.getElementById('apImgInput').click()">📁 Click to upload<br/><span style="font-size:10px;color:var(--text-muted)">PNG/JPG/WebP · max 5MB</span></div>
-        <input type="file" id="apImgInput" accept="image/*" style="display:none" onchange="apHandleImage(event)"/>
-        <img id="apPImgPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-top:8px;border:1px solid var(--border-card)"/>
-      </div>
-      <div id="apFormError" class="ap-error" style="display:none"></div>
-      <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseProductForm()">Cancel</button><button class="btn-primary btn-sm" onclick="apSaveProduct()">Save</button></div>
-    </div>
-  </div>
-  <div id="apTab_users" class="ap-tab-pane" style="display:none">
+  <div id="apTab_users" class="ap-tab-pane">
     <div class="ap-sub-head">
       <div class="ap-utabs">
         <button class="ap-utab active" onclick="apSwitchUserTab('all',this)">All</button>
@@ -225,12 +237,16 @@
     </div>
     <div id="apCreateAdminForm" class="ap-product-form" style="display:none;margin-top:10px">
       <div class="ap-form-head"><span class="ap-sub-title">New Admin</span><button class="icon-btn" onclick="apCloseCreateAdmin()">✕</button></div>
-      <div class="ap-field"><label>Display Name</label><input type="text" id="apCAName" class="ap-input" placeholder="e.g. Immanuel"/></div>
+      <div class="ap-field"><label>Display Name</label><input type="text" id="apCAName" class="ap-input"/></div>
       <div class="ap-field"><label>Username *</label><input type="text" id="apCAUsername" class="ap-input" placeholder="lowercase_only"/></div>
       <div class="ap-field"><label>Password *</label><input type="password" id="apCAPassword" class="ap-input" placeholder="min 6 chars"/></div>
       <div id="apCAError" class="ap-error" style="display:none"></div>
       <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button><button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button></div>
     </div>
+  </div>
+  <div id="apTab_news" class="ap-tab-pane" style="display:none">
+    <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openPostNewsModal()">+ Post News</button>
+    <div id="apNewsList" class="ap-merch-grid"></div>
   </div>
 </aside>
 
@@ -242,6 +258,95 @@
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn-ghost btn-sm" id="apConfirmNo">Cancel</button>
       <button class="btn-danger btn-sm" id="apConfirmYes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/SUBMIT PRODUCT MODAL -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal-glass add-product-modal">
+    <button class="modal-close" onclick="closeAddProductModal()">✕</button>
+    <h2 id="prodFormTitle" class="modal-title" style="margin-bottom:1.25rem">Submit Product</h2>
+    <p class="prod-submit-note" id="prodSubmitNote"></p>
+    <div class="prod-form-grid">
+      <div class="mfield"><label>Product Name *</label><input type="text" id="prodName" class="minput" placeholder="e.g. Classic Logo Tee"/></div>
+      <div class="mfield"><label>Price (₦) *</label><input type="number" id="prodPrice" class="minput" placeholder="12000" min="0"/></div>
+      <div class="mfield"><label>Category</label>
+        <select id="prodCategory" class="minput">
+          <option value="clothing">Clothing</option>
+          <option value="headwear">Headwear</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+      <div class="mfield"><label>Badge</label>
+        <select id="prodBadge" class="minput">
+          <option value="">None</option>
+          <option value="new">New</option>
+          <option value="limited">Limited</option>
+        </select>
+      </div>
+    </div>
+    <div class="mfield"><label>Description</label><textarea id="prodDesc" class="minput" rows="3" style="resize:vertical" placeholder="Short product description…"></textarea></div>
+    <div class="mfield"><label>Sizes <span style="font-weight:400;color:var(--text-muted)">(comma separated, leave blank if N/A)</span></label><input type="text" id="prodSizes" class="minput" placeholder="S, M, L, XL, XXL"/></div>
+    <div class="mfield">
+      <label>Product Image
+        <span style="font-weight:400;color:var(--text-muted)"> — stored as base64 in browser localStorage</span>
+      </label>
+      <div class="ap-img-drop" onclick="document.getElementById('prodImgInput').click()">
+        📁 Upload from your device<br/>
+        <span style="font-size:10px;color:var(--text-muted)">PNG / JPG / WebP · max 5MB · stored locally</span>
+      </div>
+      <input type="file" id="prodImgInput" accept="image/*" style="display:none"/>
+      <img id="prodImgPreview" src="" alt="" style="display:none;width:100%;max-height:180px;object-fit:contain;border-radius:8px;margin-top:8px;border:1px solid var(--border-card)"/>
+    </div>
+    <div id="prodFormError" class="merr" style="display:none"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeAddProductModal()">Cancel</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="prodSubmit()">Submit for Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- PENDING REVIEW MODAL (admins only) -->
+<div class="modal-overlay" id="pendingReviewModal">
+  <div class="modal-glass pending-review-modal">
+    <button class="modal-close" onclick="closePendingReview()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1.25rem">
+      Pending Products
+      <span id="pendingModalCount" class="pending-badge" style="margin-left:8px;font-size:14px">0</span>
+    </h2>
+    <div id="pendingReviewList"></div>
+  </div>
+</div>
+
+<!-- NEWS READ MODAL -->
+<div class="modal-overlay" id="newsModal">
+  <div class="modal-glass news-read-modal">
+    <button class="modal-close" onclick="closeNewsModal()">✕</button>
+    <h2 id="newsModalTitle" class="modal-title" style="margin-bottom:1rem"></h2>
+    <div id="newsModalBody"></div>
+  </div>
+</div>
+
+<!-- POST NEWS MODAL -->
+<div class="modal-overlay" id="postNewsModal">
+  <div class="modal-glass post-news-modal">
+    <button class="modal-close" onclick="closePostNewsModal()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1.25rem">Post News</h2>
+    <div class="mfield"><label>Title *</label><input type="text" id="newsPostTitle" class="minput" placeholder="e.g. Season 2 Kickoff Announced"/></div>
+    <div class="mfield"><label>Tag</label><input type="text" id="newsPostTag" class="minput" placeholder="Announcement, Event, Results…" value="News"/></div>
+    <div class="mfield"><label>Excerpt *</label><textarea id="newsPostExcerpt" class="minput" rows="2" style="resize:vertical" placeholder="Short summary shown in card…"></textarea></div>
+    <div class="mfield"><label>Full Body <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label><textarea id="newsPostBody" class="minput" rows="4" style="resize:vertical" placeholder="Full article content…"></textarea></div>
+    <div class="mfield">
+      <label>Image <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+      <div class="ap-img-drop" onclick="document.getElementById('newsPostImgInput').click()">📁 Upload image<br/><span style="font-size:10px;color:var(--text-muted)">PNG/JPG/WebP · max 5MB</span></div>
+      <input type="file" id="newsPostImgInput" accept="image/*" style="display:none"/>
+      <img id="newsPostImgPreview" src="" alt="" style="display:none;width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-top:8px"/>
+    </div>
+    <div id="newsPostError" class="merr" style="display:none"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closePostNewsModal()">Cancel</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="newsPostSubmit()">Publish</button>
     </div>
   </div>
 </div>
@@ -266,35 +371,35 @@
     <div id="cartEmpty" class="cart-empty">
       <div class="cart-empty-icon">🛒</div>
       <p>Your cart is empty.</p>
-      <span>Add some gear from the store above!</span>
+      <span>Add some gear above!</span>
     </div>
   </div>
 </div>
 
-<!-- FLOATING CART -->
-<button class="cart-float-btn" onclick="openCart()">
+<!-- SINGLE FLOATING CART BUTTON -->
+<button class="cart-float-btn" id="cartFloatBtn" onclick="openCart()" title="View Cart">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-  <span class="cart-float-badge" id="cartFloatBadge" style="display:none">0</span>
+  <span id="cartFloatBadge" class="cart-float-badge" style="display:none">0</span>
 </button>
 
 <div id="srnToast" class="srn-toast"></div>
 
 <script>
+/* ── MERCH PAGE LOGIC ── */
 function renderMerchPage(){
-  const grid = document.getElementById('productGrid');
-  const countEl = document.getElementById('filterCount');
-  if(!grid) return;
-  const items = getMerch();
-  if(countEl) countEl.textContent = items.length + ' products';
-  grid.innerHTML = items.map(item=>{
+  const grid = document.getElementById('productGrid'); if(!grid) return;
+  const s     = getSession();
+  const items = getMerch(); // only published items
+
+  grid.innerHTML = items.length ? items.map(item=>{
     const thumb = item.image
       ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover"/>`
-      : `<div class="merch-icon">${catEmoji(item.category)}</div>`;
+      : `<div class="merch-icon">${catEmoji(item.cat)}</div>`;
     const badge = item.badge ? `<span class="merch-tag merch-tag--${item.badge}">${item.badge==='new'?'New':'Limited'}</span>` : '';
     const hasSizes = item.sizes && item.sizes.length;
     const sizes = hasSizes
       ? `<div class="merch-sizes">${item.sizes.map((s,i)=>`<span class="size-chip${i===0?' active':''}" onclick="selSize(this)">${s}</span>`).join('')}</div>` : '';
-    return `<div class="merch-card merch-card--lg" data-category="${item.category}">
+    return `<div class="merch-card merch-card--lg" data-category="${item.cat}">
       <div class="merch-thumb merch-thumb--lg">${thumb}${badge}</div>
       <div class="merch-body">
         <h3 class="merch-name">${esc(item.name)}</h3>
@@ -302,25 +407,21 @@ function renderMerchPage(){
         ${sizes}
         <div class="merch-foot${!hasSizes?' merch-foot--no-sizes':''}">
           <span class="merch-price">${fmtPrice(item.price)}</span>
-          <button class="merch-add-lg" onclick="handleMerchAdd(${item.id},this)">Add to Cart</button>
+          <button class="merch-add-lg" onclick="handleAdd(${item.id},this)">Add to Cart</button>
         </div>
       </div>
     </div>`;
-  }).join('');
+  }).join('')
+  : `<div class="merch-empty"><div style="font-size:40px;margin-bottom:12px">🛍️</div><p>No products yet — check back soon!</p></div>`;
+
   initFilters();
-  // Show add product button for admins/marketers
-  const session = getSession();
-  const addBtn = document.getElementById('addProductBtn');
-  if(addBtn) addBtn.style.display = (session && canAddProduct(session)) ? '' : 'none';
 }
 
-function handleMerchAdd(id, btn){
+function handleAdd(id, btn){
   const card = btn.closest('.merch-card--lg');
-  const activeSize = card?.querySelector('.size-chip.active');
-  const size = activeSize ? activeSize.textContent.trim() : null;
+  const size = card?.querySelector('.size-chip.active')?.textContent.trim()||null;
   addToCart(id, size);
-  btn.textContent='✓ Added!';
-  btn.style.opacity='0.7';
+  btn.textContent='✓ Added!'; btn.style.opacity='0.75';
   setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.opacity=''; }, 1600);
 }
 function selSize(el){
@@ -332,23 +433,130 @@ function initFilters(){
     tab.addEventListener('click',function(){
       document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
       this.classList.add('active');
-      const f=this.dataset.filter;
-      let n=0;
+      const f=this.dataset.filter; let n=0;
       document.querySelectorAll('[data-category]').forEach(card=>{
         const show=f==='all'||card.dataset.category===f;
         card.style.display=show?'':'none'; if(show) n++;
       });
-      const c=document.getElementById('filterCount');
-      if(c) c.textContent=n+' products';
     });
   });
 }
-function handleNotify(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button[type=submit]');
-  if(btn){btn.textContent="You're on the list!";btn.disabled=true;btn.style.opacity='0.7';}
+
+/* ── PENDING REVIEW (admin) ── */
+function renderPendingBadge(){
+  const s = getSession();
+  const pending = getPending();
+  const count = pending.length;
+  // Review button — admin only, only when there are pending items
+  const btn = document.getElementById('reviewPendingBtn');
+  if(btn){
+    btn.style.display = (isAdmin(s) && count > 0) ? '' : 'none';
+    const badge = document.getElementById('pendingCountBadge');
+    if(badge) badge.textContent = count;
+  }
+  // Submit button — admins + marketers
+  const addBtn = document.getElementById('addProductBtn');
+  if(addBtn) addBtn.style.display = (s && canAddProduct(s)) ? '' : 'none';
 }
-document.addEventListener('DOMContentLoaded', renderMerchPage);
+
+function openPendingReview(){
+  const m = document.getElementById('pendingReviewModal'); if(!m) return;
+  m.classList.add('open');
+  document.body.style.overflow='hidden';
+  _renderPendingList();
+}
+function closePendingReview(){
+  document.getElementById('pendingReviewModal')?.classList.remove('open');
+  document.body.style.overflow='';
+}
+function _renderPendingList(){
+  const list  = document.getElementById('pendingReviewList'); if(!list) return;
+  const items = getPending();
+  const count = document.getElementById('pendingModalCount');
+  if(count) count.textContent = items.length;
+  if(!items.length){
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">No pending products 🎉</div>';
+    return;
+  }
+  list.innerHTML = items.map(item=>{
+    const thumb = item.image
+      ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>`
+      : `<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:10px">${catEmoji(item.cat)}</div>`;
+    return `<div class="pending-review-card">
+      ${thumb}
+      <div class="prc-info">
+        <div class="prc-name">${esc(item.name)}</div>
+        <div class="prc-meta">${fmtPrice(item.price)} · ${esc(item.cat)}${item.badge?' · '+item.badge:''}</div>
+        <div class="prc-desc">${esc(item.desc||'')}</div>
+        <div class="prc-submitted">Submitted by <strong>${esc(item.submittedByName||'Unknown')}</strong> · ${timeAgo(item.submittedAt)}</div>
+      </div>
+      <div class="prc-actions">
+        <button class="btn-primary btn-sm" onclick="approveProduct(${item.id})">✓ Approve &amp; Publish</button>
+        <button class="btn-danger btn-sm" onclick="rejectProduct(${item.id},'${esc(item.name)}')">✕ Reject</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function approveProduct(id){
+  const pending = getPending();
+  const item = pending.find(p=>p.id===id); if(!item) return;
+  const published = getMerch();
+  // Remove pending fields before publishing
+  const {submittedBy,submittedByName,submittedAt,...clean} = item;
+  published.push(clean);
+  saveMerch(published);
+  savePending(pending.filter(p=>p.id!==id));
+  pushActivity({type:'product', text:`New product approved: ${item.name}`});
+  _renderPendingList();
+  renderPendingBadge();
+  renderMerchPage();
+  toast(`"${item.name}" approved and published ✓`);
+}
+
+function rejectProduct(id, name){
+  apOpenConfirm(`Reject "${name}"?`,'The submission will be removed.', ()=>{
+    savePending(getPending().filter(p=>p.id!==id));
+    _renderPendingList();
+    renderPendingBadge();
+    toast(`"${name}" rejected.`);
+  });
+}
+
+/* ── PRODUCT SUBMIT NOTE ── */
+function openAddProductModal(){
+  const s = getSession();
+  if(!s){ openAuthModal('signin'); return; }
+  const noteEl = document.getElementById('prodSubmitNote');
+  if(noteEl){
+    noteEl.textContent = isAdmin(s)
+      ? '✓ As admin, your product will be published immediately.'
+      : '📋 Your product will be sent to admins for review before publishing.';
+    noteEl.className = isAdmin(s) ? 'prod-submit-note prod-note-admin' : 'prod-submit-note prod-note-pending';
+  }
+  // Change button text
+  const btn = document.querySelector('#addProductModal .btn-primary');
+  if(btn) btn.textContent = isAdmin(s) ? 'Publish Now' : 'Submit for Review';
+
+  document.getElementById('addProductModal')?.classList.add('open');
+  document.body.style.overflow='hidden';
+  ['prodName','prodDesc','prodSizes','prodPrice'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('prodCategory').value='clothing';
+  document.getElementById('prodBadge').value='';
+  document.getElementById('prodImgPreview').style.display='none';
+  document.getElementById('prodFormError').style.display='none';
+  _pendingImg=null;
+}
+let _pendingImg = null;
+
+/* ── PENDING REVIEW MODAL CLOSE ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('pendingReviewModal')?.addEventListener('click',e=>{
+    if(e.target===document.getElementById('pendingReviewModal')) closePendingReview();
+  });
+  renderMerchPage();
+  renderPendingBadge();
+});
 </script>
 </body>
 </html>
