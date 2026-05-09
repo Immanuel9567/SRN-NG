@@ -33,7 +33,7 @@
 const SRN_CONFIG = {
   supabaseUrl:  'https://ubksukwbckpoilocdsno.supabase.co',   // e.g. https://xyzabcde.supabase.co
   supabaseKey:  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia3N1a3diY2twb2lsb2Nkc25vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjYxODYsImV4cCI6MjA5Mzg0MjE4Nn0.ftJUIa3aXrTvq1w---k6DDSvLMwyMjq9f1lrjjD3nlU',
-  useSupabase:  false, // ← set true after completing setup above
+  useSupabase:  true, // ← set true after completing setup above
 };
 
 /* ── SUPABASE HELPERS ── */
