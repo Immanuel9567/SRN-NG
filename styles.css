@@ -756,3 +756,393 @@ select.minput { cursor:pointer; }
 }
 .nl-result--ok  { background: rgba(0,224,107,0.12); color: var(--green);  border: 1px solid rgba(0,224,107,0.3); }
 .nl-result--err { background: rgba(255,59,92,0.12);  color: var(--red);   border: 1px solid rgba(255,59,92,0.3);  }
+
+/* ════════════════════════════════════════════════════════
+   v7 — LIGHTWEIGHT TRANSITIONS + HEADER REDESIGN
+   (all entrance animations removed — they were causing lag)
+   ════════════════════════════════════════════════════════ */
+
+/* Only keep the two animations that matter for UX feel */
+@keyframes panelSlideIn {
+  from { opacity:0; transform:translateX(16px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes modalPop {
+  from { opacity:0; transform:scale(.96); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+/* Panels — fast, feels native */
+.admin-panel.open { animation: panelSlideIn .18s ease both; }
+.user-panel.open  { animation: panelSlideIn .18s ease both; }
+
+/* Modals — quick pop */
+.modal-overlay.open > .modal-glass,
+.modal-overlay.open > .product-popup {
+  animation: modalPop .16s ease both;
+}
+
+/* Button hover — opacity only, no transform (transform causes reflow) */
+.btn-primary, .btn-ghost, .btn-outline, .btn-danger {
+  transition: opacity .12s ease, background .12s ease;
+}
+.btn-primary:hover  { opacity: .88; }
+.btn-danger:hover   { opacity: .88; }
+.btn-ghost:hover    { opacity: .75; }
+.btn-outline:hover  { opacity: .82; }
+
+/* Filter + size chips — fast color swap only */
+.filter-tab { transition: background .1s, color .1s; }
+.size-chip  { transition: background .1s, color .1s; }
+
+/* Logo hover */
+.header-logo { transition: opacity .12s; }
+.header-logo:hover { opacity: .82; }
+
+/* ── HEADER REDESIGN ──────────────────────────────────── */
+
+/* Header uses flex with space-between, 3 zones */
+.site-header {
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items: center;
+  gap: 0;
+}
+.header-left  { display:flex; align-items:center; gap:8px; justify-content:flex-start; }
+.header-right { display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+
+/* ── THEME TOGGLE — pill switch ── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--navy-card);
+  border: 1px solid var(--border-card);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+  cursor: pointer;
+  height: 32px;
+}
+.theme-toggle-opt {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 16px;
+  font-size: 13px;
+  transition: background .15s, color .15s;
+  color: var(--text-muted);
+  user-select: none;
+}
+[data-theme="dark"]  .theme-toggle-opt--dark  { background: var(--green); color: #020e1f; }
+[data-theme="light"] .theme-toggle-opt--light { background: var(--green); color: #fff; }
+
+/* ── ADMIN PILL BUTTON ── */
+.admin-pill {
+  display: none; /* shown via JS when admin */
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,59,92,.12);
+  border: 1px solid rgba(255,59,92,.35);
+  color: var(--red);
+  border-radius: 20px;
+  padding: 5px 12px 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: .04em;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 32px;
+  transition: background .12s, border-color .12s;
+}
+.admin-pill:hover { background: rgba(255,59,92,.22); }
+.admin-pill svg { flex-shrink:0; }
+.admin-pill-label { display:none; }
+
+/* Show label on wider screens */
+@media (min-width: 480px) {
+  .admin-pill-label { display:inline; }
+}
+
+/* ── USER CHIP — avatar + name pill ── */
+.header-user-chip {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: var(--navy-card);
+  border: 1px solid var(--border-card);
+  border-radius: 20px;
+  padding: 3px 10px 3px 3px;
+  cursor: pointer;
+  height: 32px;
+  transition: border-color .12s, background .12s;
+  max-width: 160px;
+}
+.header-user-chip:hover { border-color: var(--green); background: rgba(0,224,107,.06); }
+.huc-name {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width: 80px;
+}
+/* Hide name on tiny screens — avatar only */
+@media (max-width: 400px) {
+  .huc-name { display:none; }
+  .header-user-chip { padding: 3px; border-radius:50%; width:32px; justify-content:center; }
+}
+.huc-chevron { font-size:14px; color:var(--text-muted); margin-left:1px; line-height:1; }
+
+/* Role badge in chip — hide on mobile */
+.header-user-chip .role-badge { display:none; }
+@media (min-width: 560px) {
+  .header-user-chip .role-badge { display:inline-flex; }
+}
+
+/* ── Sign in button ── */
+.btn-auth-header {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green);
+  color: #020e1f;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: .04em;
+  cursor: pointer;
+  height: 32px;
+  white-space: nowrap;
+  transition: opacity .12s;
+}
+.btn-auth-header:hover { opacity: .88; }
+
+
+/* ── MERCH STORE MOBILE ── */
+@media (max-width: 600px) {
+  /* Single column grid on mobile */
+  #productGrid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 0 4px;
+  }
+
+  /* Compact card layout on mobile — horizontal */
+  .merch-card--lg {
+    display: grid !important;
+    grid-template-columns: 100px 1fr !important;
+    min-height: 110px;
+    border-radius: 14px;
+  }
+
+  .merch-thumb--lg {
+    height: 100% !important;
+    min-height: 110px;
+    border-radius: 14px 0 0 14px !important;
+  }
+
+  .merch-body {
+    padding: 12px 14px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .merch-name  { font-size: 14px !important; margin-bottom: 2px; }
+  .merch-desc  { font-size: 11px !important; -webkit-line-clamp: 2; display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden; }
+  .merch-price { font-size: 15px !important; }
+
+  .merch-add-lg {
+    font-size: 11px !important;
+    padding: 6px 12px !important;
+    white-space: nowrap;
+  }
+
+  .merch-foot {
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  /* Filter bar on mobile */
+  .filter-bar { position: sticky; top: 56px; z-index: 40; }
+  .filter-inner {
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 10px 16px !important;
+  }
+  .filter-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+    padding-bottom: 2px;
+  }
+  .filter-tabs::-webkit-scrollbar { display:none; }
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+/* ── PRODUCT POPUP MOBILE ── */
+.product-popup {
+  /* Ensure it scrolls properly on mobile */
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 700px) {
+  .product-popup {
+    width: 100% !important;
+    max-width: 100vw;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0 !important;
+    margin-top: auto;
+  }
+
+  /* Stack image above info on mobile */
+  .pp-inner {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pp-image-col {
+    border-radius: 20px 20px 0 0 !important;
+    padding: 1.2rem 1.2rem 0.8rem !important;
+  }
+
+  .pp-thumb {
+    aspect-ratio: 16/9 !important; /* landscape on mobile saves vertical space */
+    max-height: 200px;
+  }
+
+  .pp-info-col {
+    padding: 1rem 1.2rem 1.5rem !important;
+    gap: 8px;
+  }
+
+  .pp-name  { font-size: 20px !important; }
+  .pp-price { font-size: 22px !important; }
+
+  /* Edit section stacks to single column on mobile */
+  .prod-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modal overlay for popup — slides up from bottom on mobile */
+  #productPopup.open {
+    align-items: flex-end !important;
+  }
+}
+
+/* ── ADMIN PANEL MOBILE ── */
+@media (max-width: 600px) {
+  .admin-panel, .user-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 20px 20px 0 0;
+    top: auto !important;
+    bottom: 0;
+    height: 90vh;
+  }
+
+  /* Panels slide up from bottom on mobile */
+  .admin-panel, .user-panel {
+    transform: translateY(100%);
+    transition: transform .22s cubic-bezier(.4,0,.2,1);
+  }
+  .admin-panel.open, .user-panel.open {
+    transform: translateY(0);
+    animation: none;
+  }
+}
+
+/* ── NEWSLETTER COMPOSER ── */
+.nl-img-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nl-img-drop {
+  flex: 1;
+  cursor: pointer;
+  text-align: center;
+  font-size: 12px;
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px dashed var(--border-card);
+  color: var(--text-muted);
+  transition: border-color .15s, color .15s;
+}
+.nl-img-drop:hover { border-color: var(--green); color: var(--green); }
+.nl-preview-box {
+  min-height: 60px;
+  border-radius: var(--radius);
+  font-size: 12px;
+}
+.nl-preview-box:empty::before {
+  content: 'Preview will appear here as you type…';
+  color: var(--text-muted);
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* ── TOAST — always above everything ── */
+.srn-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--surface2);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  white-space: nowrap;
+  border: 1px solid var(--border-card);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.srn-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.srn-toast.srn-toast--err {
+  border-color: rgba(255,59,92,.4);
+  color: var(--red);
+}
+
+/* ── NATIVE SELECT FIX — force dark theme on all selects ── */
+select,
+select.minput,
+select.ap-input,
+select.ap-role-sel {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--navy-card) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300e06b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 14px !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-card) !important;
+  border-radius: var(--radius) !important;
+  padding-right: 32px !important;
+  cursor: pointer;
+}
+select:focus,
+select.minput:focus,
+select.ap-input:focus,
+select.ap-role-sel:focus {
+  outline: none;
+  border-color: var(--green) !important;
+}
+/* Force option elements to match */
+select option {
+  background-color: #0d1f35 !important;
+  color: var(--text-primary) !important;
+}

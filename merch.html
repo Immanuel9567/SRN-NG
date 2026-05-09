@@ -19,15 +19,19 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
       Back
     </a>
-    <button id="adminToggle" class="icon-round admin-toggle-btn" title="Admin Panel" style="display:none">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <button id="adminToggle" class="admin-pill" title="Admin Panel" style="display:none" onclick="toggleAdminPanel()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="admin-pill-label">Admin</span>
     </button>
   </div>
   <a href="index.html" class="header-logo">
     <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img"/>
   </a>
   <div class="header-right">
-    <button id="themeBtn" class="icon-round" title="Toggle theme"></button>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" role="button" aria-label="Toggle dark/light mode">
+      <div class="theme-toggle-opt theme-toggle-opt--dark">🌙</div>
+      <div class="theme-toggle-opt theme-toggle-opt--light">☀️</div>
+    </div>
     <button id="headerAuthBtn" class="btn-auth-header">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Sign In
@@ -268,19 +272,33 @@
       <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px">Send Newsletter</div>
       <div id="nlRecipientCount" style="font-size:11px;color:var(--text-muted)">0 subscribers</div>
     </div>
-    <div class="ap-field" style="margin-top:12px"><label>Subject *</label><input type="text" id="nlSubject" class="ap-input" placeholder="e.g. April Race Results 🏁" oninput="nlUpdatePreview()"/></div>
-    <div class="ap-field"><label>Message <span style="font-weight:400;color:var(--text-muted)">(plain text — one line per paragraph)</span></label>
-      <textarea id="nlBody" class="ap-input" rows="7" style="resize:vertical;font-size:12px;line-height:1.6" placeholder="Write your newsletter here...&#10;&#10;Each line becomes a paragraph in the email." oninput="nlUpdatePreview()"></textarea>
+    <div class="ap-field" style="margin-top:12px">
+      <label>Subject *</label>
+      <input type="text" id="nlSubject" class="ap-input" placeholder="e.g. April Race Results 🏁" oninput="nlUpdatePreview()"/>
+    </div>
+    <div class="ap-field">
+      <label>Banner Image <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+      <div class="nl-img-row">
+        <div class="ap-img-drop nl-img-drop" onclick="document.getElementById('nlBannerInput').click()">📷 Upload Banner</div>
+        <input type="file" id="nlBannerInput" accept="image/*" style="display:none"/>
+        <button id="nlBannerRemove" class="icon-btn danger btn-sm" style="display:none" onclick="nlRemoveBanner()">✕</button>
+      </div>
+      <img id="nlBannerPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:6px"/>
+    </div>
+    <div class="ap-field">
+      <label>Message <span style="font-weight:400;color:var(--text-muted)">(one paragraph per line)</span></label>
+      <textarea id="nlBody" class="ap-input" rows="6" style="resize:vertical;font-size:12px;line-height:1.6" placeholder="Write your newsletter here...&#10;&#10;Each line becomes a paragraph." oninput="nlUpdatePreview()"></textarea>
     </div>
     <div class="ap-field">
       <label>Preview</label>
-      <iframe id="nlPreviewFrame" style="width:100%;height:180px;border:1px solid var(--border-card);border-radius:8px;background:var(--surface)" sandbox="allow-same-origin"></iframe>
+      <div id="nlPreviewBox" class="nl-preview-box"></div>
     </div>
     <div id="nlSendResult" class="nl-result" style="display:none"></div>
     <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-ghost btn-sm" onclick="nlResetCompose()">Clear</button>
       <button id="nlSendBtn" class="btn-primary btn-sm" style="flex:1;justify-content:center" onclick="nlSend()">Send Newsletter</button>
     </div>
-    <p style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.5">Configure <code>NEWSLETTER_API_ENDPOINT</code> and <code>NEWSLETTER_SECRET</code> in shared.js first.</p>
+    <p style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.5">Configure <code>NEWSLETTER_API_ENDPOINT</code> + <code>NEWSLETTER_SECRET</code> in shared.js to enable sending.</p>
   </div>
 </aside>
 

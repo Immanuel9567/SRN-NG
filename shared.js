@@ -97,10 +97,7 @@ const _sb = {
 function getTheme(){ return localStorage.getItem('srn_theme') || 'dark'; }
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme', t);
-  const btn = document.getElementById('themeBtn');
-  if(btn) btn.innerHTML = t === 'dark'
-    ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
-    : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  // Pill toggle is CSS-driven via data-theme — no JS needed
 }
 function toggleTheme(){
   const next = getTheme() === 'dark' ? 'light' : 'dark';
@@ -541,9 +538,15 @@ function apSwitchTab(tab, el){
   if(tab==='members') apRenderMembersList();
   if(tab==='newsletter'){
     getNewsletter().then(list=>{
-      const el=document.getElementById('nlRecipientCount');
-      if(el) el.textContent=list.length+' subscriber'+(list.length===1?'':'s');
+      const countEl=document.getElementById('nlRecipientCount');
+      if(countEl) countEl.textContent=list.length+' subscriber'+(list.length===1?'':'s');
     });
+    // Wire banner input once
+    const bannerInp=document.getElementById('nlBannerInput');
+    if(bannerInp && !bannerInp._wired){
+      bannerInp.addEventListener('change', nlHandleBanner);
+      bannerInp._wired=true;
+    }
   }
 }
 
@@ -693,22 +696,8 @@ async function saveCatModal(){
   await saveCategories(cats);
   closeCatModal();
   toast('Categories saved ✓');
-  typeof renderMerchPage==='function' && renderMerchPage();
-  _rebuildCatSelects();
-}
-async function _rebuildCatSelects(){
-  const cats=await getCategories();
-  document.querySelectorAll('#prodCategory, #filterTabsDynamic').forEach(el=>{
-    if(el.id==='prodCategory'){
-      el.innerHTML=cats.map(c=>`<option value="${c}">${c.charAt(0).toUpperCase()+c.slice(1).replace(/_/g,' ')}</option>`).join('');
-    }
-  });
-  // Rebuild filter tabs dynamically on merch page
-  const ft=document.getElementById('filterTabs');
-  if(ft){
-    ft.innerHTML=`<button class="filter-tab active" data-filter="all" onclick="applyFilter(this)">All</button>`
-      +cats.map(c=>`<button class="filter-tab" data-filter="${esc(c)}" onclick="applyFilter(this)">${c.charAt(0).toUpperCase()+c.slice(1).replace(/_/g,' ')}</button>`).join('');
-  }
+  // renderMerchPage rebuilds filter tabs and category selects internally
+  if(typeof renderMerchPage==='function') await renderMerchPage();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -903,8 +892,8 @@ async function apDeleteNews(id){
                                 env var you set in Vercel dashboard
    Leave as '' to keep the compose UI but disable actual sending.
    ════════════════════════════════════════════════════════ */
-const NEWSLETTER_API_ENDPOINT = 'https://srn-ng.vercel.app/'; // e.g. 'https://simracingng.vercel.app/api/send-newsletter'
-const NEWSLETTER_SECRET       = 'teamsrnpaul'; // must match NEWSLETTER_SECRET in Vercel env vars
+const NEWSLETTER_API_ENDPOINT = 'https://srn-ng.vercel.app/api/send-newsletter';
+const NEWSLETTER_SECRET       = 'teamsrnpaul';
 
 async function handleNewsletterSignup(e){
   e.preventDefault();
@@ -921,76 +910,97 @@ async function handleNewsletterSignup(e){
   toast('Subscribed to the newsletter ✓');
 }
 
-/* ── Admin: open newsletter composer ── */
-function openNewsletterModal(){
-  const s=getSession(); if(!isAdmin(s)) return;
-  getNewsletter().then(list=>{
-    const countEl=document.getElementById('nlRecipientCount');
-    if(countEl) countEl.textContent=list.length+' subscriber'+(list.length===1?'':'s');
-  });
-  ['nlSubject','nlBody'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const preview=document.getElementById('nlPreviewFrame');
-  if(preview) preview.srcdoc='';
-  document.getElementById('nlSendResult')?.style && (document.getElementById('nlSendResult').style.display='none');
-  document.getElementById('nlModal')?.classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeNewsletterModal(){
-  document.getElementById('nlModal')?.classList.remove('open');
-  document.body.style.overflow='';
-}
+/* ── Admin: newsletter compose ── */
+let _nlBannerImg = null;
 
 function nlUpdatePreview(){
-  const subject=document.getElementById('nlSubject')?.value||'(No subject)';
-  const body   =document.getElementById('nlBody')?.value||'';
-  const frame  =document.getElementById('nlPreviewFrame'); if(!frame) return;
-  // Simple preview — wrap in basic styles
-  const html=`<div style="font-family:sans-serif;font-size:14px;line-height:1.7;color:#c8d8e8;background:#081c32;padding:20px;border-radius:8px">
-    <h2 style="color:#00e06b;margin-top:0">${esc(subject)}</h2>
-    ${body.split('\n').map(l=>l?`<p style="margin:6px 0">${esc(l)}</p>`:'<br/>').join('')}
-  </div>`;
-  frame.srcdoc=`<body style="margin:0;background:#081c32">${html}</body>`;
+  const subject = document.getElementById('nlSubject')?.value||'(No subject)';
+  const body    = document.getElementById('nlBody')?.value||'';
+  const prevEl  = document.getElementById('nlPreviewBox'); if(!prevEl) return;
+  const imgHtml = _nlBannerImg
+    ? `<img src="${_nlBannerImg}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:12px;display:block"/>`
+    : '';
+  prevEl.innerHTML = `
+    <div style="padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border-card)">
+      ${imgHtml}
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:6px">${esc(subject)}</div>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+        ${body.split('\n').map(l=>l.trim()?`<p style="margin:4px 0">${esc(l)}</p>`:'').join('')}
+      </div>
+    </div>`;
+}
+
+function nlHandleBanner(e){
+  const file = e.target.files[0]; if(!file) return;
+  if(file.size > 3*1024*1024){ toast('Banner image must be under 3MB','err'); return; }
+  const r = new FileReader();
+  r.onload = ev => {
+    _nlBannerImg = ev.target.result;
+    const prev = document.getElementById('nlBannerPreview');
+    if(prev){ prev.src = _nlBannerImg; prev.style.display='block'; }
+    const removeBtn = document.getElementById('nlBannerRemove');
+    if(removeBtn) removeBtn.style.display='';
+    nlUpdatePreview();
+  };
+  r.readAsDataURL(file);
+}
+
+function nlRemoveBanner(){
+  _nlBannerImg = null;
+  const prev = document.getElementById('nlBannerPreview');
+  if(prev){ prev.src=''; prev.style.display='none'; }
+  const inp = document.getElementById('nlBannerInput');
+  if(inp) inp.value='';
+  const removeBtn = document.getElementById('nlBannerRemove');
+  if(removeBtn) removeBtn.style.display='none';
+  nlUpdatePreview();
+}
+
+function nlResetCompose(){
+  ['nlSubject','nlBody'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  nlRemoveBanner();
+  const resultEl = document.getElementById('nlSendResult');
+  if(resultEl) resultEl.style.display='none';
+  const prevEl = document.getElementById('nlPreviewBox');
+  if(prevEl) prevEl.innerHTML='';
 }
 
 async function nlSend(){
   const s=getSession(); if(!isAdmin(s)){ toast('Admins only','err'); return; }
-  const subject=document.getElementById('nlSubject')?.value.trim();
-  const bodyText=document.getElementById('nlBody')?.value.trim();
-  const resultEl=document.getElementById('nlSendResult');
+  const subject  = document.getElementById('nlSubject')?.value.trim();
+  const bodyText = document.getElementById('nlBody')?.value.trim();
+  const resultEl = document.getElementById('nlSendResult');
 
   if(!subject){ toast('Subject required','err'); return; }
   if(!bodyText){ toast('Message body required','err'); return; }
 
-  const recipients=await getNewsletter();
+  const recipients = await getNewsletter();
   if(!recipients.length){ toast('No subscribers yet!','err'); return; }
 
   if(!NEWSLETTER_API_ENDPOINT){
-    toast('API endpoint not configured — see shared.js NEWSLETTER_API_ENDPOINT','err');
-    return;
+    toast('Set NEWSLETTER_API_ENDPOINT in shared.js first','err'); return;
   }
   if(!NEWSLETTER_SECRET){
-    toast('NEWSLETTER_SECRET not configured — see shared.js','err');
-    return;
+    toast('Set NEWSLETTER_SECRET in shared.js first','err'); return;
   }
 
-  const sendBtn=document.getElementById('nlSendBtn');
+  const sendBtn = document.getElementById('nlSendBtn');
   if(sendBtn){ sendBtn.textContent='Sending…'; sendBtn.disabled=true; }
 
-  // Convert plain text body to simple HTML paragraphs
-  const bodyHtml=bodyText.split('\n')
-    .map(l=>l.trim()?`<p>${esc(l)}</p>`:'')
+  const bannerHtml = _nlBannerImg
+    ? `<img src="${_nlBannerImg}" style="width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:20px;display:block"/>`
+    : '';
+  const bodyHtml = bannerHtml + bodyText.split('\n')
+    .map(l=>l.trim()?`<p style="margin:0 0 10px">${esc(l)}</p>`:'')
     .join('');
 
   try {
-    const r=await fetch(NEWSLETTER_API_ENDPOINT, {
+    const r = await fetch(NEWSLETTER_API_ENDPOINT, {
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+NEWSLETTER_SECRET
-      },
-      body:JSON.stringify({subject, html:bodyHtml, recipients})
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+NEWSLETTER_SECRET },
+      body: JSON.stringify({subject, html:bodyHtml, recipients})
     });
-    const data=await r.json();
+    const data = await r.json();
     if(resultEl){
       resultEl.style.display='';
       if(data.ok){
@@ -1001,7 +1011,7 @@ async function nlSend(){
         resultEl.innerHTML=`⚠ Sent: ${data.sent}, Failed: ${data.failed}${data.errors?'<br/><small>'+data.errors.join(', ')+'</small>':''}`;
       }
     }
-    toast(data.ok?`Newsletter sent to ${data.sent} subscribers ✓`:`Partial send: ${data.sent} ok, ${data.failed} failed`,'ok');
+    toast(data.ok?`Newsletter sent to ${data.sent} subscribers ✓`:`Partial: ${data.sent} ok, ${data.failed} failed`,'ok');
   } catch(err){
     if(resultEl){
       resultEl.style.display='';
@@ -1099,11 +1109,9 @@ function clearCartConfirm(){ if(confirm('Clear your entire cart?')){ clearCart()
    ════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', async ()=>{
   applyTheme(getTheme());
-  document.getElementById('themeBtn')?.addEventListener('click', toggleTheme);
 
   await updateHeaderAuth();
   document.getElementById('headerAuthBtn')?.addEventListener('click', ()=>openAuthModal('signin'));
-  document.getElementById('adminToggle')?.addEventListener('click', toggleAdminPanel);
   document.getElementById('apOverlay')?.addEventListener('click', closeAdminPanel);
 
   document.querySelectorAll('.auth-tab-btn').forEach(b=>b.addEventListener('click',()=>switchAuthTab(b.dataset.tab)));
