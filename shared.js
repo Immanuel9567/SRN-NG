@@ -539,6 +539,12 @@ function apSwitchTab(tab, el){
   const pane=document.getElementById('apTab_'+tab);
   if(pane) pane.style.display='';
   if(tab==='members') apRenderMembersList();
+  if(tab==='newsletter'){
+    getNewsletter().then(list=>{
+      const el=document.getElementById('nlRecipientCount');
+      if(el) el.textContent=list.length+' subscriber'+(list.length===1?'':'s');
+    });
+  }
 }
 
 async function apRenderUsers(){
@@ -888,7 +894,18 @@ async function apDeleteNews(id){
 
 /* ════════════════════════════════════════════════════════
    NEWSLETTER
+   ════════════════════════════════════════════════════════
+
+   To enable real sending, set these two values:
+     NEWSLETTER_API_ENDPOINT  — your Vercel function URL
+       e.g. 'https://simracingng.vercel.app/api/send-newsletter'
+     NEWSLETTER_SECRET        — same value as the NEWSLETTER_SECRET
+                                env var you set in Vercel dashboard
+   Leave as '' to keep the compose UI but disable actual sending.
    ════════════════════════════════════════════════════════ */
+const NEWSLETTER_API_ENDPOINT = ''; // e.g. 'https://simracingng.vercel.app/api/send-newsletter'
+const NEWSLETTER_SECRET       = ''; // must match NEWSLETTER_SECRET in Vercel env vars
+
 async function handleNewsletterSignup(e){
   e.preventDefault();
   const input=e.target.querySelector('input[type=email]');
@@ -902,6 +919,99 @@ async function handleNewsletterSignup(e){
   if(btn){btn.textContent="You're in! 🏁";btn.disabled=true;btn.style.opacity='0.7';}
   if(input) input.value='';
   toast('Subscribed to the newsletter ✓');
+}
+
+/* ── Admin: open newsletter composer ── */
+function openNewsletterModal(){
+  const s=getSession(); if(!isAdmin(s)) return;
+  getNewsletter().then(list=>{
+    const countEl=document.getElementById('nlRecipientCount');
+    if(countEl) countEl.textContent=list.length+' subscriber'+(list.length===1?'':'s');
+  });
+  ['nlSubject','nlBody'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const preview=document.getElementById('nlPreviewFrame');
+  if(preview) preview.srcdoc='';
+  document.getElementById('nlSendResult')?.style && (document.getElementById('nlSendResult').style.display='none');
+  document.getElementById('nlModal')?.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeNewsletterModal(){
+  document.getElementById('nlModal')?.classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function nlUpdatePreview(){
+  const subject=document.getElementById('nlSubject')?.value||'(No subject)';
+  const body   =document.getElementById('nlBody')?.value||'';
+  const frame  =document.getElementById('nlPreviewFrame'); if(!frame) return;
+  // Simple preview — wrap in basic styles
+  const html=`<div style="font-family:sans-serif;font-size:14px;line-height:1.7;color:#c8d8e8;background:#081c32;padding:20px;border-radius:8px">
+    <h2 style="color:#00e06b;margin-top:0">${esc(subject)}</h2>
+    ${body.split('\n').map(l=>l?`<p style="margin:6px 0">${esc(l)}</p>`:'<br/>').join('')}
+  </div>`;
+  frame.srcdoc=`<body style="margin:0;background:#081c32">${html}</body>`;
+}
+
+async function nlSend(){
+  const s=getSession(); if(!isAdmin(s)){ toast('Admins only','err'); return; }
+  const subject=document.getElementById('nlSubject')?.value.trim();
+  const bodyText=document.getElementById('nlBody')?.value.trim();
+  const resultEl=document.getElementById('nlSendResult');
+
+  if(!subject){ toast('Subject required','err'); return; }
+  if(!bodyText){ toast('Message body required','err'); return; }
+
+  const recipients=await getNewsletter();
+  if(!recipients.length){ toast('No subscribers yet!','err'); return; }
+
+  if(!NEWSLETTER_API_ENDPOINT){
+    toast('API endpoint not configured — see shared.js NEWSLETTER_API_ENDPOINT','err');
+    return;
+  }
+  if(!NEWSLETTER_SECRET){
+    toast('NEWSLETTER_SECRET not configured — see shared.js','err');
+    return;
+  }
+
+  const sendBtn=document.getElementById('nlSendBtn');
+  if(sendBtn){ sendBtn.textContent='Sending…'; sendBtn.disabled=true; }
+
+  // Convert plain text body to simple HTML paragraphs
+  const bodyHtml=bodyText.split('\n')
+    .map(l=>l.trim()?`<p>${esc(l)}</p>`:'')
+    .join('');
+
+  try {
+    const r=await fetch(NEWSLETTER_API_ENDPOINT, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+NEWSLETTER_SECRET
+      },
+      body:JSON.stringify({subject, html:bodyHtml, recipients})
+    });
+    const data=await r.json();
+    if(resultEl){
+      resultEl.style.display='';
+      if(data.ok){
+        resultEl.className='nl-result nl-result--ok';
+        resultEl.innerHTML=`✓ Sent to <strong>${data.sent}</strong> subscriber${data.sent===1?'':'s'}!`;
+      } else {
+        resultEl.className='nl-result nl-result--err';
+        resultEl.innerHTML=`⚠ Sent: ${data.sent}, Failed: ${data.failed}${data.errors?'<br/><small>'+data.errors.join(', ')+'</small>':''}`;
+      }
+    }
+    toast(data.ok?`Newsletter sent to ${data.sent} subscribers ✓`:`Partial send: ${data.sent} ok, ${data.failed} failed`,'ok');
+  } catch(err){
+    if(resultEl){
+      resultEl.style.display='';
+      resultEl.className='nl-result nl-result--err';
+      resultEl.textContent='Error: '+err.message;
+    }
+    toast('Send failed: '+err.message,'err');
+  }
+
+  if(sendBtn){ sendBtn.textContent='Send Newsletter'; sendBtn.disabled=false; }
 }
 
 /* ════════════════════════════════════════════════════════

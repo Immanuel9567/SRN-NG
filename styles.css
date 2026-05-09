@@ -739,3 +739,20 @@ select.minput { cursor:pointer; }
 .ap-news-meta  { font-size:10px; color:var(--text-muted); margin-top:2px; }
 
 /* Member dir grid in admin panel (single column override handled inline) */
+
+/* ── Newsletter composer (admin panel) ── */
+.ap-nl-head {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  border-left: 3px solid var(--green);
+}
+.nl-result {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+.nl-result--ok  { background: rgba(0,224,107,0.12); color: var(--green);  border: 1px solid rgba(0,224,107,0.3); }
+.nl-result--err { background: rgba(255,59,92,0.12);  color: var(--red);   border: 1px solid rgba(255,59,92,0.3);  }

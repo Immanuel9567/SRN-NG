@@ -225,6 +225,7 @@
     <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
     <button class="ap-tab-btn" onclick="apSwitchTab('members',this)">Members</button>
     <button class="ap-tab-btn" onclick="apSwitchTab('news',this)">News</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('newsletter',this)">📧</button>
   </div>
   <div id="apTab_users" class="ap-tab-pane">
     <div class="ap-sub-head">
@@ -261,6 +262,25 @@
   <div id="apTab_news" class="ap-tab-pane" style="display:none">
     <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openPostNewsModal()">+ Post News</button>
     <div id="apNewsList" class="ap-merch-grid"></div>
+  </div>
+  <div id="apTab_newsletter" class="ap-tab-pane" style="display:none">
+    <div class="ap-nl-head">
+      <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px">Send Newsletter</div>
+      <div id="nlRecipientCount" style="font-size:11px;color:var(--text-muted)">0 subscribers</div>
+    </div>
+    <div class="ap-field" style="margin-top:12px"><label>Subject *</label><input type="text" id="nlSubject" class="ap-input" placeholder="e.g. April Race Results 🏁" oninput="nlUpdatePreview()"/></div>
+    <div class="ap-field"><label>Message <span style="font-weight:400;color:var(--text-muted)">(plain text — one line per paragraph)</span></label>
+      <textarea id="nlBody" class="ap-input" rows="7" style="resize:vertical;font-size:12px;line-height:1.6" placeholder="Write your newsletter here...&#10;&#10;Each line becomes a paragraph in the email." oninput="nlUpdatePreview()"></textarea>
+    </div>
+    <div class="ap-field">
+      <label>Preview</label>
+      <iframe id="nlPreviewFrame" style="width:100%;height:180px;border:1px solid var(--border-card);border-radius:8px;background:var(--surface)" sandbox="allow-same-origin"></iframe>
+    </div>
+    <div id="nlSendResult" class="nl-result" style="display:none"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button id="nlSendBtn" class="btn-primary btn-sm" style="flex:1;justify-content:center" onclick="nlSend()">Send Newsletter</button>
+    </div>
+    <p style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.5">Configure <code>NEWSLETTER_API_ENDPOINT</code> and <code>NEWSLETTER_SECRET</code> in shared.js first.</p>
   </div>
 </aside>
 
