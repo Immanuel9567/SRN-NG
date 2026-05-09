@@ -655,3 +655,87 @@ select.minput { cursor:pointer; }
   .merch-store-grid { grid-template-columns:1fr; }
   .merch-preview-grid { grid-template-columns:1fr; }
 }
+
+/* ════════════════════════════════════════════════════════
+   v5 ADDITIONS — product popup, danger zone toggle, cat rows
+   ════════════════════════════════════════════════════════ */
+
+/* Danger zone collapsible */
+.up-danger-zone { border-top: 1px solid rgba(255,59,92,0.2); padding-top: 12px; margin-top: 4px; }
+.up-danger-toggle {
+  width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+  color: var(--red); font-size: 12px; font-weight: 600; padding: 4px 0;
+  font-family: var(--font-body); letter-spacing: 0.03em;
+  transition: opacity .15s;
+}
+.up-danger-toggle:hover { opacity: 0.8; }
+.up-danger-toggle.dz-open { color: var(--red); }
+
+/* Clickable merch card */
+.merch-card--clickable { cursor: pointer; transition: transform .18s, box-shadow .18s; }
+.merch-card--clickable:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.35); }
+.merch-card--clickable:hover .merch-add-lg { background: var(--green-hover); }
+
+/* Product popup */
+.product-popup {
+  width: min(860px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 0;
+}
+.pp-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0;
+}
+@media (max-width: 600px) {
+  .pp-inner { grid-template-columns: 1fr; }
+}
+.pp-image-col {
+  padding: 1.75rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+@media (max-width: 600px) {
+  .pp-image-col { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+}
+.pp-thumb {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+}
+.pp-info-col {
+  padding: 1.75rem;
+  display: flex; flex-direction: column; gap: 10px;
+  overflow-y: auto;
+}
+.pp-name {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  color: var(--text-primary); line-height: 1.2;
+  margin: 0;
+}
+.pp-cat {
+  font-size: 11px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.pp-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+.pp-price-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.pp-price { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--green); }
+.pp-cart-btn { width: 100%; justify-content: center; }
+
+/* Cat row in edit categories modal */
+.cat-row { display: flex; align-items: center; gap: 8px; }
+
+/* Admin news row in panel */
+.ap-news-row {
+  display: flex; align-items: center; gap:10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.ap-news-info { flex:1; min-width:0; }
+.ap-news-title { font-size:12px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ap-news-meta  { font-size:10px; color:var(--text-muted); margin-top:2px; }
+
+/* Member dir grid in admin panel (single column override handled inline) */

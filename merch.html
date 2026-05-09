@@ -57,15 +57,14 @@
 <div class="filter-bar">
   <div class="container filter-inner">
     <div class="filter-tabs" id="filterTabs">
-      <button class="filter-tab active" data-filter="all">All</button>
-      <button class="filter-tab" data-filter="clothing">Clothing</button>
-      <button class="filter-tab" data-filter="headwear">Headwear</button>
-      <button class="filter-tab" data-filter="accessories">Accessories</button>
+      <button class="filter-tab active" data-filter="all" onclick="applyFilter(this)">All</button>
+      <button class="filter-tab" data-filter="clothing" onclick="applyFilter(this)">Clothing</button>
+      <button class="filter-tab" data-filter="headwear" onclick="applyFilter(this)">Headwear</button>
+      <button class="filter-tab" data-filter="accessories" onclick="applyFilter(this)">Accessories</button>
     </div>
     <div class="filter-actions">
-      <!-- Submit product: admins + marketers only -->
+      <button id="editCatBtn" class="btn-ghost btn-sm" style="display:none" onclick="openCatModal()" title="Edit categories">⚙ Categories</button>
       <button id="addProductBtn" class="btn-primary btn-sm" style="display:none" onclick="openAddProductModal()">+ Submit Product</button>
-      <!-- Review pending: admins only, shown when there are pending items -->
       <button id="reviewPendingBtn" class="btn-review" style="display:none" onclick="openPendingReview()">
         Review
         <span id="pendingCountBadge" class="pending-badge">0</span>
@@ -173,6 +172,12 @@
   <div class="up-quick-actions">
     <button id="upCartShortcut" class="up-quick-btn up-quick-cart"></button>
   </div>
+  <!-- No member count stats -->
+  <div id="upStatsRow"></div>
+  <!-- Cart shortcut -->
+  <div class="up-quick-actions">
+    <button id="upCartShortcut" class="up-quick-btn up-quick-cart"></button>
+  </div>
   <div class="up-body">
     <div class="up-section">
       <div class="up-section-title">Edit Profile</div>
@@ -194,9 +199,11 @@
       </div>
     </div>
     <div class="up-section up-danger-zone">
-      <div class="up-section-title" style="color:var(--red)">Danger Zone</div>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account.</p>
-      <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
+      <button id="upDangerToggle" class="up-danger-toggle">▸ Danger Zone</button>
+      <div id="upDangerContent" style="display:none;margin-top:10px">
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account.</p>
+        <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
+      </div>
     </div>
     <div style="padding:0 0 28px">
       <button id="upLogoutBtn" class="btn-ghost btn-sm" style="width:100%;justify-content:center">
@@ -216,6 +223,7 @@
   </div>
   <div class="ap-tabs">
     <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('members',this)">Members</button>
     <button class="ap-tab-btn" onclick="apSwitchTab('news',this)">News</button>
   </div>
   <div id="apTab_users" class="ap-tab-pane">
@@ -243,6 +251,12 @@
       <div id="apCAError" class="ap-error" style="display:none"></div>
       <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button><button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button></div>
     </div>
+  </div>
+  <div id="apTab_members" class="ap-tab-pane" style="display:none">
+    <div class="ap-user-meta" style="margin-bottom:10px">
+      <span id="apMemberCount" style="font-size:12px;color:var(--text-muted)">— members</span>
+    </div>
+    <div id="apMembersGrid" class="members-dir-grid" style="grid-template-columns:1fr"></div>
   </div>
   <div id="apTab_news" class="ap-tab-pane" style="display:none">
     <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openPostNewsModal()">+ Post News</button>
@@ -384,100 +398,272 @@
 
 <div id="srnToast" class="srn-toast"></div>
 
+<!-- CATEGORIES MODAL -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal-glass" style="width:min(460px,95vw);max-height:90vh;overflow-y:auto;padding:1.5rem">
+    <button class="modal-close" onclick="closeCatModal()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1rem">Edit Categories</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:1rem">These category labels appear in the filter bar and product form.</p>
+    <div id="catList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+    <button class="btn-outline btn-sm" style="width:100%;justify-content:center;margin-bottom:16px" onclick="addCatRow()">+ Add Category</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeCatModal()">Cancel</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="saveCatModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL POPUP -->
+<div class="modal-overlay" id="productPopup">
+  <div class="modal-glass product-popup">
+    <button class="modal-close" onclick="closeProductPopup()">✕</button>
+    <div class="pp-inner">
+      <div class="pp-image-col">
+        <div class="pp-thumb" id="ppThumb"></div>
+        <div id="ppAdminImgWrap" style="display:none;margin-top:10px">
+          <div class="ap-img-drop" style="font-size:12px;padding:10px" onclick="document.getElementById('ppImgInput').click()">📁 Change Image</div>
+          <input type="file" id="ppImgInput" accept="image/*" style="display:none"/>
+          <img id="ppImgPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:contain;border-radius:8px;margin-top:6px"/>
+        </div>
+      </div>
+      <div class="pp-info-col">
+        <div id="ppBadge" style="margin-bottom:6px"></div>
+        <h2 id="ppName" class="pp-name"></h2>
+        <div id="ppCat" class="pp-cat"></div>
+        <p id="ppDesc" class="pp-desc"></p>
+        <div id="ppSizesWrap">
+          <div class="up-section-title" style="font-size:11px;margin-bottom:6px">Size</div>
+          <div id="ppSizes" class="merch-sizes"></div>
+        </div>
+        <div class="pp-price-row">
+          <span id="ppPrice" class="pp-price"></span>
+        </div>
+        <button id="ppCartBtn" class="btn-primary pp-cart-btn" onclick="ppAddToCart()">Add to Cart</button>
+        <div id="ppEditWrap" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem">
+          <div class="up-section-title" style="font-size:11px;margin-bottom:8px;color:var(--amber)">✏️ Edit Product</div>
+          <div class="prod-form-grid" style="gap:8px">
+            <div class="mfield"><label>Name</label><input type="text" id="ppEditName" class="minput" style="font-size:13px"/></div>
+            <div class="mfield"><label>Price (₦)</label><input type="number" id="ppEditPrice" class="minput" style="font-size:13px" min="0"/></div>
+            <div class="mfield"><label>Category</label><select id="ppEditCat" class="minput" style="font-size:13px"></select></div>
+            <div class="mfield"><label>Badge</label>
+              <select id="ppEditBadge" class="minput" style="font-size:13px">
+                <option value="">None</option><option value="new">New</option><option value="limited">Limited</option>
+              </select>
+            </div>
+          </div>
+          <div class="mfield"><label>Description</label><textarea id="ppEditDesc" class="minput" rows="2" style="resize:vertical;font-size:13px"></textarea></div>
+          <div class="mfield"><label>Sizes <span style="font-weight:400;color:var(--text-muted)">(comma separated)</span></label><input type="text" id="ppEditSizes" class="minput" style="font-size:13px" placeholder="S, M, L, XL"/></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn-primary btn-sm" style="flex:1;justify-content:center" onclick="ppSaveEdit()">Save Changes</button>
+            <button class="btn-danger btn-sm" onclick="ppDeleteProduct()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-/* ── MERCH PAGE LOGIC ── */
-function renderMerchPage(){
+'use strict';
+let _currentFilter = 'all';
+let _ppProductId = null;
+let _ppNewImg = null;
+
+/* ── FILTER (inline onclick, no addEventListener needed) ── */
+function applyFilter(btn){
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  _currentFilter = btn.dataset.filter;
+  document.querySelectorAll('#productGrid [data-category]').forEach(card=>{
+    card.style.display = (_currentFilter==='all' || card.dataset.category===_currentFilter) ? '' : 'none';
+  });
+}
+
+/* ── RENDER MERCH PAGE ── */
+async function renderMerchPage(){
   const grid = document.getElementById('productGrid'); if(!grid) return;
-  const s     = getSession();
-  const items = getMerch(); // only published items
+  const s = getSession();
+  const items = await getMerch();
+  const cats = await getCategories();
+
+  // Rebuild filter tabs from saved categories
+  const ft = document.getElementById('filterTabs');
+  if(ft){
+    ft.innerHTML = `<button class="filter-tab${_currentFilter==='all'?' active':''}" data-filter="all" onclick="applyFilter(this)">All</button>`
+      + cats.map(c=>`<button class="filter-tab${_currentFilter===c?' active':''}" data-filter="${esc(c)}" onclick="applyFilter(this)">${c.charAt(0).toUpperCase()+c.slice(1).replace(/_/g,' ')}</button>`).join('');
+  }
+
+  const ecb = document.getElementById('editCatBtn');
+  if(ecb) ecb.style.display = (s && canAddProduct(s)) ? '' : 'none';
 
   grid.innerHTML = items.length ? items.map(item=>{
     const thumb = item.image
       ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover"/>`
       : `<div class="merch-icon">${catEmoji(item.cat)}</div>`;
     const badge = item.badge ? `<span class="merch-tag merch-tag--${item.badge}">${item.badge==='new'?'New':'Limited'}</span>` : '';
-    const hasSizes = item.sizes && item.sizes.length;
-    const sizes = hasSizes
-      ? `<div class="merch-sizes">${item.sizes.map((s,i)=>`<span class="size-chip${i===0?' active':''}" onclick="selSize(this)">${s}</span>`).join('')}</div>` : '';
-    return `<div class="merch-card merch-card--lg" data-category="${item.cat}">
+    const hidden = (_currentFilter !== 'all' && item.cat !== _currentFilter) ? 'style="display:none"' : '';
+    return `<div class="merch-card merch-card--lg merch-card--clickable" data-category="${esc(item.cat)}" ${hidden} onclick="openProductPopup(${item.id})">
       <div class="merch-thumb merch-thumb--lg">${thumb}${badge}</div>
       <div class="merch-body">
         <h3 class="merch-name">${esc(item.name)}</h3>
         <p class="merch-desc">${esc(item.desc||'')}</p>
-        ${sizes}
-        <div class="merch-foot${!hasSizes?' merch-foot--no-sizes':''}">
+        <div class="merch-foot">
           <span class="merch-price">${fmtPrice(item.price)}</span>
-          <button class="merch-add-lg" onclick="handleAdd(${item.id},this)">Add to Cart</button>
+          <button class="merch-add-lg" onclick="event.stopPropagation();popupQuickAdd(${item.id},this)">Add to Cart</button>
         </div>
       </div>
     </div>`;
   }).join('')
   : `<div class="merch-empty"><div style="font-size:40px;margin-bottom:12px">🛍️</div><p>No products yet — check back soon!</p></div>`;
-
-  initFilters();
 }
 
-function handleAdd(id, btn){
-  const card = btn.closest('.merch-card--lg');
-  const size = card?.querySelector('.size-chip.active')?.textContent.trim()||null;
-  addToCart(id, size);
+async function popupQuickAdd(id, btn){
+  await addToCart(id, null);
   btn.textContent='✓ Added!'; btn.style.opacity='0.75';
-  setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.opacity=''; }, 1600);
+  setTimeout(()=>{btn.textContent='Add to Cart';btn.style.opacity='';}, 1600);
 }
-function selSize(el){
+
+/* ── PRODUCT POPUP ── */
+async function openProductPopup(id){
+  const items = await getMerch();
+  const item = items.find(i=>i.id===id); if(!item) return;
+  _ppProductId = id;
+  _ppNewImg = null;
+  const s = getSession();
+  const canEdit = s && canAddProduct(s);
+
+  const thumbEl = document.getElementById('ppThumb');
+  if(thumbEl) thumbEl.innerHTML = item.image
+    ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px">${catEmoji(item.cat)}</div>`;
+
+  const badgeEl = document.getElementById('ppBadge');
+  if(badgeEl) badgeEl.innerHTML = item.badge ? `<span class="merch-tag merch-tag--${item.badge}">${item.badge==='new'?'New':'Limited'}</span>` : '';
+
+  document.getElementById('ppName').textContent = item.name;
+  document.getElementById('ppCat').textContent = item.cat;
+  document.getElementById('ppDesc').textContent = item.desc||'';
+  document.getElementById('ppPrice').textContent = fmtPrice(item.price);
+
+  const sizesWrap = document.getElementById('ppSizesWrap');
+  const sizesEl = document.getElementById('ppSizes');
+  if(item.sizes && item.sizes.length){
+    sizesWrap.style.display='';
+    sizesEl.innerHTML = item.sizes.map((sz,i)=>`<span class="size-chip${i===0?' active':''}" onclick="ppSelSize(this)">${esc(sz)}</span>`).join('');
+  } else { sizesWrap.style.display='none'; }
+
+  const editWrap = document.getElementById('ppEditWrap');
+  const adminImgWrap = document.getElementById('ppAdminImgWrap');
+  if(editWrap) editWrap.style.display = canEdit ? '' : 'none';
+  if(adminImgWrap) adminImgWrap.style.display = canEdit ? '' : 'none';
+
+  if(canEdit){
+    document.getElementById('ppEditName').value = item.name||'';
+    document.getElementById('ppEditPrice').value = item.price||'';
+    document.getElementById('ppEditDesc').value = item.desc||'';
+    document.getElementById('ppEditSizes').value = (item.sizes||[]).join(', ');
+    document.getElementById('ppEditBadge').value = item.badge||'';
+    const cats = await getCategories();
+    const catSel = document.getElementById('ppEditCat');
+    if(catSel) catSel.innerHTML = cats.map(c=>`<option value="${c}"${item.cat===c?' selected':''}>${c.charAt(0).toUpperCase()+c.slice(1).replace(/_/g,' ')}</option>`).join('');
+    const ppImgPrev = document.getElementById('ppImgPreview');
+    if(ppImgPrev){ ppImgPrev.src=''; ppImgPrev.style.display='none'; }
+    document.getElementById('ppImgInput').value='';
+  }
+
+  document.getElementById('productPopup')?.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeProductPopup(){
+  document.getElementById('productPopup')?.classList.remove('open');
+  document.body.style.overflow='';
+  _ppProductId=null; _ppNewImg=null;
+}
+
+function ppSelSize(el){
   el.closest('.merch-sizes').querySelectorAll('.size-chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
 }
-function initFilters(){
-  document.querySelectorAll('.filter-tab').forEach(tab=>{
-    tab.addEventListener('click',function(){
-      document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
-      this.classList.add('active');
-      const f=this.dataset.filter; let n=0;
-      document.querySelectorAll('[data-category]').forEach(card=>{
-        const show=f==='all'||card.dataset.category===f;
-        card.style.display=show?'':'none'; if(show) n++;
-      });
-    });
+
+async function ppAddToCart(){
+  if(!_ppProductId) return;
+  const sizeEl = document.getElementById('ppSizes')?.querySelector('.size-chip.active');
+  await addToCart(_ppProductId, sizeEl?.textContent.trim()||null);
+  const btn = document.getElementById('ppCartBtn');
+  if(btn){ btn.textContent='✓ Added!'; btn.style.opacity='0.75'; setTimeout(()=>{btn.textContent='Add to Cart';btn.style.opacity='';},1600); }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('ppImgInput')?.addEventListener('change', e=>{
+    const file=e.target.files[0]; if(!file) return;
+    if(file.size>5*1024*1024){ toast('Image must be under 5MB','err'); return; }
+    const r=new FileReader(); r.onload=ev=>{
+      _ppNewImg=ev.target.result;
+      const prev=document.getElementById('ppImgPreview');
+      if(prev){ prev.src=_ppNewImg; prev.style.display='block'; }
+      const thumbEl=document.getElementById('ppThumb');
+      if(thumbEl) thumbEl.innerHTML=`<img src="${_ppNewImg}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`;
+    }; r.readAsDataURL(file);
+  });
+});
+
+async function ppSaveEdit(){
+  if(!_ppProductId) return;
+  const name  = document.getElementById('ppEditName').value.trim();
+  const price = parseFloat(document.getElementById('ppEditPrice').value);
+  if(!name||!price){ toast('Name and price required.','err'); return; }
+  const cat   = document.getElementById('ppEditCat').value;
+  const badge = document.getElementById('ppEditBadge').value;
+  const desc  = document.getElementById('ppEditDesc').value.trim();
+  const sizes = document.getElementById('ppEditSizes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const items = await getMerch();
+  const idx   = items.findIndex(i=>i.id===_ppProductId); if(idx<0) return;
+  items[idx]  = {...items[idx], name, price, cat, badge, desc, sizes};
+  if(_ppNewImg) items[idx].image = _ppNewImg;
+  await saveMerch(items);
+  toast('Product updated ✓');
+  closeProductPopup();
+  await renderMerchPage();
+}
+
+async function ppDeleteProduct(){
+  if(!_ppProductId) return;
+  const items = await getMerch();
+  const item  = items.find(i=>i.id===_ppProductId); if(!item) return;
+  apOpenConfirm(`Delete "${item.name}"?`,'This cannot be undone.', async()=>{
+    await saveMerch(items.filter(i=>i.id!==_ppProductId));
+    closeProductPopup();
+    await renderMerchPage();
+    toast('Product deleted.');
   });
 }
 
-/* ── PENDING REVIEW (admin) ── */
-function renderPendingBadge(){
+/* ── PENDING BADGE ── */
+async function renderPendingBadge(){
   const s = getSession();
-  const pending = getPending();
+  const pending = await getPending();
   const count = pending.length;
-  // Review button — admin only, only when there are pending items
   const btn = document.getElementById('reviewPendingBtn');
-  if(btn){
-    btn.style.display = (isAdmin(s) && count > 0) ? '' : 'none';
-    const badge = document.getElementById('pendingCountBadge');
-    if(badge) badge.textContent = count;
-  }
-  // Submit button — admins + marketers
+  if(btn){ btn.style.display=(isAdmin(s)&&count>0)?'':'none'; document.getElementById('pendingCountBadge').textContent=count; }
   const addBtn = document.getElementById('addProductBtn');
-  if(addBtn) addBtn.style.display = (s && canAddProduct(s)) ? '' : 'none';
+  if(addBtn) addBtn.style.display=(s&&canAddProduct(s))?'':'none';
+  const ecb = document.getElementById('editCatBtn');
+  if(ecb) ecb.style.display=(s&&canAddProduct(s))?'':'none';
 }
 
 function openPendingReview(){
-  const m = document.getElementById('pendingReviewModal'); if(!m) return;
-  m.classList.add('open');
-  document.body.style.overflow='hidden';
-  _renderPendingList();
+  const m=document.getElementById('pendingReviewModal'); if(!m) return;
+  m.classList.add('open'); document.body.style.overflow='hidden'; _renderPendingList();
 }
-function closePendingReview(){
-  document.getElementById('pendingReviewModal')?.classList.remove('open');
-  document.body.style.overflow='';
-}
-function _renderPendingList(){
-  const list  = document.getElementById('pendingReviewList'); if(!list) return;
-  const items = getPending();
+function closePendingReview(){ document.getElementById('pendingReviewModal')?.classList.remove('open'); document.body.style.overflow=''; }
+
+async function _renderPendingList(){
+  const list = document.getElementById('pendingReviewList'); if(!list) return;
+  const items = await getPending();
   const count = document.getElementById('pendingModalCount');
   if(count) count.textContent = items.length;
-  if(!items.length){
-    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">No pending products 🎉</div>';
-    return;
-  }
+  if(!items.length){ list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:13px">No pending products 🎉</div>'; return; }
   list.innerHTML = items.map(item=>{
     const thumb = item.image
       ? `<img src="${item.image}" alt="${esc(item.name)}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>`
@@ -498,64 +684,36 @@ function _renderPendingList(){
   }).join('');
 }
 
-function approveProduct(id){
-  const pending = getPending();
-  const item = pending.find(p=>p.id===id); if(!item) return;
-  const published = getMerch();
-  // Remove pending fields before publishing
+async function approveProduct(id){
+  const pending  = await getPending();
+  const item     = pending.find(p=>p.id===id); if(!item) return;
+  const published= await getMerch();
   const {submittedBy,submittedByName,submittedAt,...clean} = item;
   published.push(clean);
-  saveMerch(published);
-  savePending(pending.filter(p=>p.id!==id));
-  pushActivity({type:'product', text:`New product approved: ${item.name}`});
-  _renderPendingList();
+  await saveMerch(published);
+  await savePending(pending.filter(p=>p.id!==id));
+  await pushActivity({type:'product', text:`New product approved: ${item.name}`});
+  await _renderPendingList();
   renderPendingBadge();
-  renderMerchPage();
+  await renderMerchPage();
   toast(`"${item.name}" approved and published ✓`);
 }
 
 function rejectProduct(id, name){
-  apOpenConfirm(`Reject "${name}"?`,'The submission will be removed.', ()=>{
-    savePending(getPending().filter(p=>p.id!==id));
-    _renderPendingList();
+  apOpenConfirm(`Reject "${name}"?`,'The submission will be removed.', async()=>{
+    await savePending((await getPending()).filter(p=>p.id!==id));
+    await _renderPendingList();
     renderPendingBadge();
     toast(`"${name}" rejected.`);
   });
 }
 
-/* ── PRODUCT SUBMIT NOTE ── */
-function openAddProductModal(){
-  const s = getSession();
-  if(!s){ openAuthModal('signin'); return; }
-  const noteEl = document.getElementById('prodSubmitNote');
-  if(noteEl){
-    noteEl.textContent = isAdmin(s)
-      ? '✓ As admin, your product will be published immediately.'
-      : '📋 Your product will be sent to admins for review before publishing.';
-    noteEl.className = isAdmin(s) ? 'prod-submit-note prod-note-admin' : 'prod-submit-note prod-note-pending';
-  }
-  // Change button text
-  const btn = document.querySelector('#addProductModal .btn-primary');
-  if(btn) btn.textContent = isAdmin(s) ? 'Publish Now' : 'Submit for Review';
-
-  document.getElementById('addProductModal')?.classList.add('open');
-  document.body.style.overflow='hidden';
-  ['prodName','prodDesc','prodSizes','prodPrice'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('prodCategory').value='clothing';
-  document.getElementById('prodBadge').value='';
-  document.getElementById('prodImgPreview').style.display='none';
-  document.getElementById('prodFormError').style.display='none';
-  _pendingImg=null;
-}
-let _pendingImg = null;
-
-/* ── PENDING REVIEW MODAL CLOSE ── */
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('pendingReviewModal')?.addEventListener('click',e=>{
-    if(e.target===document.getElementById('pendingReviewModal')) closePendingReview();
-  });
-  renderMerchPage();
-  renderPendingBadge();
+/* ── BOOT ── */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  document.getElementById('pendingReviewModal')?.addEventListener('click',e=>{if(e.target===document.getElementById('pendingReviewModal'))closePendingReview();});
+  document.getElementById('productPopup')?.addEventListener('click',e=>{if(e.target===document.getElementById('productPopup'))closeProductPopup();});
+  await renderMerchPage();
+  await renderPendingBadge();
 });
 </script>
 </body>

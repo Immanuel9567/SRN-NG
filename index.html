@@ -134,24 +134,17 @@
   </div>
 </section>
 
-<!-- ══ COMMUNITY / MEMBERS ══ -->
+<!-- ══ COMMUNITY / ACTIVITY ══ -->
 <section class="section" id="community">
   <div class="container">
     <div class="section-header">
       <div>
         <p class="section-eyebrow">Community</p>
-        <h2 class="section-title">Members</h2>
-        <p class="section-sub" id="membersDirCount">—</p>
+        <h2 class="section-title">Recent Activity</h2>
+        <p class="section-sub">Live feed of community events and milestones.</p>
       </div>
-      <button class="btn-ghost" onclick="toggleMembersDir()" id="membersDirToggle">Show Members ↓</button>
     </div>
-    <div id="membersDirWrap" style="display:none">
-      <div class="members-dir-grid" id="membersGrid"></div>
-    </div>
-    <div class="activity-section">
-      <h3 class="activity-title">Recent Activity</h3>
-      <div class="activity-feed" id="activityFeed"></div>
-    </div>
+    <div class="activity-feed" id="activityFeed"></div>
   </div>
 </section>
 
@@ -241,8 +234,8 @@
       <div id="upJoinedDisplay" class="up-joined"></div>
     </div>
   </div>
-  <!-- Stats: member count only for logged-in -->
-  <div id="upStatsRow" class="up-stats"></div>
+  <!-- Stats row removed — no member count shown -->
+  <div id="upStatsRow"></div>
   <!-- Cart shortcut -->
   <div class="up-quick-actions">
     <button id="upCartShortcut" class="up-quick-btn up-quick-cart"></button>
@@ -268,9 +261,11 @@
       </div>
     </div>
     <div class="up-section up-danger-zone">
-      <div class="up-section-title" style="color:var(--red)">Danger Zone</div>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account. Cannot be undone.</p>
-      <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
+      <button id="upDangerToggle" class="up-danger-toggle">▸ Danger Zone</button>
+      <div id="upDangerContent" style="display:none;margin-top:10px">
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account. Cannot be undone.</p>
+        <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
+      </div>
     </div>
     <div style="padding:0 0 28px">
       <button id="upLogoutBtn" class="btn-ghost btn-sm" style="width:100%;justify-content:center">
@@ -334,6 +329,7 @@
   </div>
   <div class="ap-tabs">
     <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('members',this)">Members</button>
     <button class="ap-tab-btn" onclick="apSwitchTab('news',this)">News</button>
   </div>
   <!-- USERS TAB -->
@@ -363,7 +359,14 @@
       <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button><button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button></div>
     </div>
   </div>
-  <!-- NEWS MANAGEMENT TAB -->
+  <!-- MEMBERS TAB -->
+  <div id="apTab_members" class="ap-tab-pane" style="display:none">
+    <div class="ap-user-meta" style="margin-bottom:10px">
+      <span id="apMemberCount" style="font-size:12px;color:var(--text-muted)">— members</span>
+    </div>
+    <div id="apMembersGrid" class="members-dir-grid" style="grid-template-columns:1fr"></div>
+  </div>
+  <!-- NEWS TAB -->
   <div id="apTab_news" class="ap-tab-pane" style="display:none">
     <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openPostNewsModal()">+ Post News</button>
     <div id="apNewsList" class="ap-merch-grid"></div>
@@ -442,32 +445,27 @@
 <!-- TOAST -->
 <div id="srnToast" class="srn-toast"></div>
 
+<!-- CATEGORIES MODAL -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal-glass" style="width:min(460px,95vw);max-height:90vh;overflow-y:auto;padding:1.5rem">
+    <button class="modal-close" onclick="closeCatModal()">✕</button>
+    <h2 class="modal-title" style="margin-bottom:1rem">Edit Categories</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:1rem">These category labels appear in the filter bar and product form. Changes apply immediately.</p>
+    <div id="catList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+    <button class="btn-outline btn-sm" style="width:100%;justify-content:center;margin-bottom:16px" onclick="addCatRow()">+ Add Category</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeCatModal()">Cancel</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="saveCatModal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
-let _membersDirOpen = false;
-function toggleMembersDir(){
-  _membersDirOpen = !_membersDirOpen;
-  const wrap  = document.getElementById('membersDirWrap');
-  const label = document.getElementById('membersDirToggle');
-  if(wrap)  wrap.style.display = _membersDirOpen ? '' : 'none';
-  if(label) label.textContent  = _membersDirOpen ? 'Hide Members ↑' : 'Show Members ↓';
-  if(_membersDirOpen) renderMembersDirectory();
-}
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  const s = getSession();
-
-  // Post news button — admin only
-  const pnb = document.getElementById('postNewsBtn');
-  if(pnb) pnb.style.display = isAdmin(s) ? '' : 'none';
-
-  // Render AP news list when panel is already open
-  const apNewsList = document.getElementById('apNewsList');
-  if(apNewsList) _renderApNewsList();
-
-  // Merch preview — only approved (published) items
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // Merch preview — published items only
   const grid = document.getElementById('homeMerchGrid');
   if(grid){
-    const items = getMerch().filter(i=>!i.pending).slice(0,3);
+    const items = (await getMerch()).slice(0,3);
     grid.innerHTML = items.map(i=>{
       const thumb = i.image
         ? `<img src="${i.image}" alt="${esc(i.name)}" style="width:80px;height:80px;object-fit:contain"/>`
@@ -485,23 +483,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
       </div>`;
     }).join('') + `<div class="merch-card merch-card--cta"><a href="merch.html" class="merch-see-all"><span>See all products</span><div class="merch-arrow">→</div></a></div>`;
   }
-});
 
-function _renderApNewsList(){
-  const el = document.getElementById('apNewsList'); if(!el) return;
-  const news = getNews();
-  if(!news.length){ el.innerHTML='<div class="ap-empty">No news posts yet.</div>'; return; }
-  el.innerHTML = news.map(n=>`
-    <div class="ap-product-card">
-      <div class="ap-product-info" style="flex:1">
-        <div class="ap-product-name">${esc(n.title)}</div>
-        <div class="ap-product-price" style="color:var(--text-muted);font-size:10px">${timeAgo(n.ts)}</div>
-      </div>
-      <div class="ap-product-actions">
-        <button class="icon-btn danger" onclick="apDeleteNews(${n.id});_renderApNewsList()">🗑️</button>
-      </div>
-    </div>`).join('');
-}
+  // Post news button visibility
+  const s = getSession();
+  const pnb = document.getElementById('postNewsBtn');
+  if(pnb) pnb.style.display = isAdmin(s) ? '' : 'none';
+});
 </script>
 </body>
 </html>
