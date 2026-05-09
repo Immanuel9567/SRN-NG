@@ -903,8 +903,8 @@ async function apDeleteNews(id){
                                 env var you set in Vercel dashboard
    Leave as '' to keep the compose UI but disable actual sending.
    ════════════════════════════════════════════════════════ */
-const NEWSLETTER_API_ENDPOINT = ''; // e.g. 'https://simracingng.vercel.app/api/send-newsletter'
-const NEWSLETTER_SECRET       = ''; // must match NEWSLETTER_SECRET in Vercel env vars
+const NEWSLETTER_API_ENDPOINT = 'https://srn-ng.vercel.app/'; // e.g. 'https://simracingng.vercel.app/api/send-newsletter'
+const NEWSLETTER_SECRET       = 'teamsrnpaul'; // must match NEWSLETTER_SECRET in Vercel env vars
 
 async function handleNewsletterSignup(e){
   e.preventDefault();
