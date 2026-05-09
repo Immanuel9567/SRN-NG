@@ -1146,3 +1146,62 @@ select option {
   background-color: #0d1f35 !important;
   color: var(--text-primary) !important;
 }
+
+/* ════════════════════════════════════════════════════════
+   v8 — PERFORMANCE + ACCESSIBILITY + NEWSLETTER FIXES
+   ════════════════════════════════════════════════════════ */
+
+/* ── Contrast fixes — override muted colors to meet WCAG AA ── */
+/* Dark mode: #4a6a88 on #020e1f = ~3.1:1 (fail). Bump to #7a9ab8 = ~5.2:1 (pass) */
+:root {
+  --text-muted:     #7a9ab8;
+  --text-secondary: #a0bed8;
+}
+[data-theme="light"] {
+  --text-muted:     #3a5a7a;
+  --text-secondary: #2a4a6a;
+}
+
+/* Footer headings — were too dim */
+.footer-col h4 { color: var(--text-secondary) !important; }
+.footer-tagline { color: var(--text-secondary) !important; }
+.footer-bottom span { color: var(--text-secondary) !important; }
+
+/* News date */
+.news-date { color: var(--text-secondary) !important; }
+
+/* Admin tab buttons — inactive state */
+.ap-tab-btn  { color: var(--text-secondary) !important; }
+.ap-utab     { color: var(--text-secondary) !important; }
+.apu-sub     { color: var(--text-secondary) !important; }
+
+/* User panel labels */
+.up-field label { color: var(--text-secondary) !important; }
+
+/* ── Missing aria labels on icon-only buttons ── */
+/* These are set via aria-label in HTML — CSS reminder only */
+
+/* ── Interaction performance — remove transition from non-visual props ── */
+/* `all .15s` on icon-btn causes style recalc on every hover */
+.icon-btn {
+  transition: opacity .1s ease !important;
+}
+.icon-btn:hover { opacity: .75; }
+
+/* touch-action: manipulation prevents the 300ms tap delay on mobile */
+button, a, [role="button"], select, input, textarea {
+  touch-action: manipulation;
+}
+
+/* content-visibility: auto lets browser skip off-screen section rendering */
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
+}
+
+/* ── btn-outline performance fix (was the 124ms culprit) ── */
+/* The a.btn-outline on the platform page was triggering layout via box-shadow */
+a.btn-outline {
+  will-change: opacity;
+  transform: translateZ(0); /* promote to own layer */
+}

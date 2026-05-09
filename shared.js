@@ -118,6 +118,9 @@ function canAddProduct(s){ return s && ['admin','marketer'].includes(s.role); }
 
 /* ════════════════════════════════════════════════════════
    STORAGE LAYER — Supabase if configured, else localStorage
+   In-memory cache: first load fetches from Supabase/LS,
+   subsequent reads within the same session are instant.
+   Cache is invalidated on every write.
    ════════════════════════════════════════════════════════ */
 const USE_SB = SRN_CONFIG.useSupabase && SRN_CONFIG.supabaseUrl !== 'YOUR_SUPABASE_URL';
 
@@ -125,26 +128,46 @@ const USE_SB = SRN_CONFIG.useSupabase && SRN_CONFIG.supabaseUrl !== 'YOUR_SUPABA
 function _lsGet(key, def){ try{ return JSON.parse(localStorage.getItem(key)) ?? def; } catch{ return def; } }
 function _lsSet(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
+/* ── In-memory cache ── */
+const _cache = {};
+function _cacheGet(key){ return _cache.hasOwnProperty(key) ? _cache[key] : undefined; }
+function _cacheSet(key, val){ _cache[key] = val; }
+function _cacheDel(key){ delete _cache[key]; }
+function _cacheDelAll(){ for(const k in _cache) delete _cache[k]; }
+
 /* ── Users ── */
 async function getUsers(){
-  if(USE_SB){ try{ return await _sb.getUsers(); } catch(e){ console.warn('SB getUsers',e); } }
-  return _lsGet('srn_users', []);
+  const cached = _cacheGet('srn_users');
+  if(cached !== undefined) return cached;
+  let users;
+  if(USE_SB){ try{ users = await _sb.getUsers(); } catch(e){ console.warn('SB getUsers',e); } }
+  if(users === undefined) users = _lsGet('srn_users', []);
+  _cacheSet('srn_users', users);
+  return users;
 }
 async function saveUsers(users){
+  _cacheSet('srn_users', users);
   if(USE_SB){ try{ await _sb.saveUsers(users); } catch(e){ console.warn('SB saveUsers',e); } }
   _lsSet('srn_users', users);
 }
 async function deleteUserById(id){
+  _cacheDel('srn_users');
   if(USE_SB){ try{ await _sb.deleteUser(id); } catch(e){ console.warn('SB deleteUser',e); } }
   _lsSet('srn_users', _lsGet('srn_users',[]).filter(u=>u.id!==id));
 }
 
 /* ── Generic data (merch, news, newsletter, activity, pending, categories) ── */
 async function _getData(key, def){
-  if(USE_SB){ try{ const v=await _sb.getData(key); if(v!==null) return v; } catch(e){ console.warn('SB getData',key,e); } }
-  return _lsGet(key, def);
+  const cached = _cacheGet(key);
+  if(cached !== undefined) return cached;
+  let val;
+  if(USE_SB){ try{ val = await _sb.getData(key); } catch(e){ console.warn('SB getData',key,e); } }
+  if(val === undefined || val === null) val = _lsGet(key, def);
+  if(val !== null) _cacheSet(key, val);
+  return val ?? def;
 }
 async function _setData(key, val){
+  _cacheSet(key, val); // update cache immediately — UI reads are instant
   if(USE_SB){ try{ await _sb.setData(key, val); } catch(e){ console.warn('SB setData',key,e); } }
   _lsSet(key, val);
 }
@@ -1000,7 +1023,17 @@ async function nlSend(){
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+NEWSLETTER_SECRET },
       body: JSON.stringify({subject, html:bodyHtml, recipients})
     });
-    const data = await r.json();
+
+    // Guard: Vercel error pages return HTML not JSON
+    const ct = r.headers.get('content-type')||'';
+    let data;
+    if(ct.includes('application/json')){
+      data = await r.json();
+    } else {
+      const txt = await r.text();
+      throw new Error(`HTTP ${r.status} — server returned non-JSON. Check Vercel function logs.\n${txt.slice(0,300)}`);
+    }
+
     if(resultEl){
       resultEl.style.display='';
       if(data.ok){
@@ -1008,17 +1041,23 @@ async function nlSend(){
         resultEl.innerHTML=`✓ Sent to <strong>${data.sent}</strong> subscriber${data.sent===1?'':'s'}!`;
       } else {
         resultEl.className='nl-result nl-result--err';
-        resultEl.innerHTML=`⚠ Sent: ${data.sent}, Failed: ${data.failed}${data.errors?'<br/><small>'+data.errors.join(', ')+'</small>':''}`;
+        resultEl.innerHTML=`⚠ Sent: ${data.sent}, Failed: ${data.failed}. ${data.error||''}${data.errors?'<br/><small>'+data.errors.join(', ')+'</small>':''}`;
       }
     }
     toast(data.ok?`Newsletter sent to ${data.sent} subscribers ✓`:`Partial: ${data.sent} ok, ${data.failed} failed`,'ok');
   } catch(err){
+    let hint='';
+    const m=err.message||'';
+    if(m.includes('NetworkError')||m.includes('Failed to fetch')) hint=' — possible CORS issue. Check ALLOWED_ORIGIN in Vercel env vars.';
+    else if(m.includes('401')) hint=' — secret mismatch. NEWSLETTER_SECRET in shared.js must match Vercel env var.';
+    else if(m.includes('404')) hint=' — endpoint not found. Is api/send-newsletter.js deployed?';
+    else if(m.includes('500')) hint=' — function crashed. Check Vercel function logs.';
     if(resultEl){
       resultEl.style.display='';
       resultEl.className='nl-result nl-result--err';
-      resultEl.textContent='Error: '+err.message;
+      resultEl.innerHTML=`Error${hint}<br/><small style="opacity:.8">${esc(m.slice(0,200))}</small>`;
     }
-    toast('Send failed: '+err.message,'err');
+    toast('Send failed — see details below','err');
   }
 
   if(sendBtn){ sendBtn.textContent='Send Newsletter'; sendBtn.disabled=false; }

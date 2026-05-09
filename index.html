@@ -36,6 +36,7 @@
   </div>
 </header>
 
+<main id="main-content">
 <!-- ══ SPLASH ══ -->
 <section class="splash">
   <video autoplay muted loop playsinline class="splash-video">
@@ -138,6 +139,8 @@
   </div>
 </section>
 
+
+</main>
 
 <!-- ══ FOOTER ══ -->
 <footer class="site-footer">
@@ -320,9 +323,9 @@
   </div>
   <div class="ap-tabs">
     <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('members',this)">Members</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('news',this)">News</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('newsletter',this)">📧</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('members',this)" aria-label="Members tab">Members</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('news',this)" aria-label="News tab">News</button>
+    <button class="ap-tab-btn" onclick="apSwitchTab('newsletter',this)" aria-label="Newsletter tab">📧</button>
   </div>
   <!-- USERS TAB -->
   <div id="apTab_users" class="ap-tab-pane">
