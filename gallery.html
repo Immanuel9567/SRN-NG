@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Gallery — SIM Racing NG</title>
+  <meta name="description" content="Simulators raced by the Nigerian Sim Racing community." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <div class="container">
+        <p class="page-header-eyebrow">Game Gallery</p>
+        <h1 class="page-header-title">GAMES WE RACE</h1>
+        <p class="page-header-subtitle">The simulators the SRN community competes on — from strict GT racing to open-wheel setup tuning.</p>
+      </div>
+    </header>
+
+    <section class="section-py">
+      <div class="container">
+        <!-- Filter Tabs -->
+        <div id="genre-filters" style="display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 2.5rem;">
+          <button class="btn-pill active" data-genre="All">All</button>
+          <button class="btn-pill" data-genre="GT & Endurance">GT & Endurance</button>
+          <button class="btn-pill" data-genre="Open Wheel">Open Wheel</button>
+          <button class="btn-pill" data-genre="Touring & Classic">Touring & Classic</button>
+        </div>
+
+        <!-- Games Grid -->
+        <div id="games-grid" class="grid grid-cols-1 grid-cols-2-sm">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Game Details Modal -->
+  <div id="game-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="position: relative; height: 14rem;">
+        <img id="modal-img" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
+        <button id="modal-close" style="position: absolute; top: 0.75rem; right: 0.75rem; width: 2rem; height: 2rem; border-radius: 50%; background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+      <div style="padding: 1.5rem;">
+        <span id="modal-genre" class="badge badge-orange"></span>
+        <h3 id="modal-title" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; color: #fff; margin-top: 0.5rem; margin-bottom: 0.75rem;"></h3>
+        <p id="modal-desc" style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentGenre = 'All';
+
+      function renderGames() {
+        const grid = document.getElementById('games-grid');
+        const filtered = currentGenre === 'All' ? GAMES : GAMES.filter(g => g.genre === currentGenre);
+
+        grid.innerHTML = filtered.map(game => `
+          <button class="card game-card" data-id="${game.id}" style="text-align: left; cursor: pointer; width: 100%;">
+            <div style="position: relative; height: 14rem; overflow: hidden;">
+              <img src="${game.img}" alt="${game.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0E0E14 0%, transparent 55%);"></div>
+              <span class="badge badge-green" style="position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,230,118,0.4);">${game.genre}</span>
+            </div>
+            <div style="padding: 1.5rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 900; color: #FFF; margin-bottom: 0.25rem;">${game.shortName}</h3>
+              <p style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 0.75rem;">${game.name}</p>
+              <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">${game.description}</p>
+            </div>
+          </button>
+        `).join('');
+
+        document.querySelectorAll('.game-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const gameId = card.getAttribute('data-id');
+            const game = GAMES.find(g => g.id === gameId);
+            if (game) showModal(game);
+          });
+        });
+      }
+
+      // Filter handling
+      document.querySelectorAll('#genre-filters button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#genre-filters button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentGenre = btn.getAttribute('data-genre');
+          renderGames();
+        });
+      });
+
+      // Modal handling
+      const modal = document.getElementById('game-modal');
+      const closeBtn = document.getElementById('modal-close');
+
+      function showModal(game) {
+        document.getElementById('modal-img').src = game.img;
+        document.getElementById('modal-genre').innerText = game.genre;
+        document.getElementById('modal-title').innerText = game.name;
+        document.getElementById('modal-desc').innerText = game.description;
+        modal.classList.add('active');
+      }
+
+      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+
+      renderGames();
+    });
+  </script>
+</body>
+</html>

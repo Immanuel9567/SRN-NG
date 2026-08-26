@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merchandise — SIM Racing NG</title>
+  <meta name="description" content="Official SIM Racing Nigeria merch. Apparel, stickers, and accessories." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <div class="container">
+        <p class="page-header-eyebrow">Shop</p>
+        <h1 class="page-header-title">MERCHANDISE</h1>
+        <p class="page-header-subtitle">Wear the badge. Every purchase helps fund SRN meetups and events.</p>
+      </div>
+    </header>
+
+    <section class="section-py" style="padding-bottom: 7rem;">
+      <div class="container">
+        <div id="shop-categories" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.5rem;">
+          <button class="btn-pill active" data-category="All">All</button>
+          <button class="btn-pill" data-category="Apparel">Apparel</button>
+          <button class="btn-pill" data-category="Stickers">Stickers</button>
+          <button class="btn-pill" data-category="Accessories">Accessories</button>
+        </div>
+
+        <div id="shop-grid" class="grid grid-cols-1 grid-cols-2-sm grid-cols-3-lg">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Cart Bar -->
+  <div id="cart-bar" style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; padding: 1rem; background: rgba(8,8,12,0.97); border-top: 1px solid rgba(0,230,118,0.2); backdrop-filter: blur(12px); display: none;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <span id="cart-summary" style="font-size: 0.875rem; font-weight: 600; color: #FFF;"></span>
+      <button class="btn btn-primary">CHECKOUT</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let activeCategory = 'All';
+      const cart = {};
+
+      document.querySelectorAll('#shop-categories button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#shop-categories button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeCategory = btn.getAttribute('data-category');
+          renderProducts();
+        });
+      });
+
+      function updateCartBar() {
+        let count = 0;
+        let total = 0;
+        for (const [id, qty] of Object.entries(cart)) {
+          const product = MERCH.find(p => p.id === id);
+          if (product) {
+            count += qty;
+            total += product.price * qty;
+          }
+        }
+
+        const cartBar = document.getElementById('cart-bar');
+        const cartSummary = document.getElementById('cart-summary');
+
+        if (count > 0) {
+          cartBar.style.display = 'block';
+          cartSummary.innerText = `${count} item${count > 1 ? 's' : ''} · ${formatNaira(total)}`;
+        } else {
+          cartBar.style.display = 'none';
+        }
+      }
+
+      function renderProducts() {
+        const grid = document.getElementById('shop-grid');
+        const filtered = activeCategory === 'All' ? MERCH : MERCH.filter(p => p.category === activeCategory);
+
+        grid.innerHTML = filtered.map(p => `
+          <div class="card" style="display: flex; flex-direction: column;">
+            <div style="height: 12rem; overflow: hidden;">
+              <img src="${p.img}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <span class="badge badge-orange" style="margin-bottom: 0.5rem;">${p.category}</span>
+                <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-bottom: 0.35rem;">${p.name}</h3>
+                <p style="font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1rem;">${p.description}</p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 900; color: var(--accent-green);">${formatNaira(p.price)}</span>
+                <button class="btn btn-primary add-cart-btn" data-id="${p.id}" style="padding: 0.5rem 1rem; font-size: 10px;">
+                  ${cart[p.id] ? `IN CART (${cart[p.id]})` : 'ADD TO CART'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.add-cart-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            cart[id] = (cart[id] || 0) + 1;
+            renderProducts();
+            updateCartBar();
+          });
+        });
+      }
+
+      renderProducts();
+    });
+  </script>
+</body>
+</html>

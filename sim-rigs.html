@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sim Rigs — SIM Racing NG</title>
+  <meta name="description" content="Community Sim Rig Showcase of SIM Racing Nigeria drivers." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+    </div>
+  </nav>
+
+  <main id="rigs-view">
+    <!-- Rendered dynamically by JS (Detail or List) -->
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const id = getQueryParam('id');
+      const view = document.getElementById('rigs-view');
+
+      if (id) {
+        renderDetail(id);
+      } else {
+        renderList();
+      }
+
+      function renderDetail(rigId) {
+        const rig = getRig(rigId);
+        if (!rig) {
+          view.innerHTML = `
+            <div class="container" style="padding-top: 10rem; padding-bottom: 6rem; text-align: center;">
+              <h1 style="font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: #FFF; margin-bottom: 1rem;">Rig Not Found</h1>
+              <a href="sim-rigs.html" style="color: var(--accent-green); font-size: 0.875rem; font-weight: 600;">← Back to Rigs</a>
+            </div>
+          `;
+          return;
+        }
+
+        document.title = `${rig.name} — SIM Racing NG`;
+
+        view.innerHTML = `
+          <header class="page-header">
+            <div class="container container-narrow">
+              <a href="sim-rigs.html" style="display: inline-block; color: var(--text-dim); font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem;">← Back to Rigs</a>
+              <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-bottom: 0.5rem;">${rig.name}</h1>
+              <a href="member-profile.html?id=${rig.ownerId}" style="color: var(--accent-green); font-size: 0.875rem;">by ${rig.owner} · ${rig.city}</a>
+            </div>
+          </header>
+
+          <div class="container container-narrow" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+            <div style="border-radius: 1rem; overflow: hidden; height: 20rem; margin-bottom: 2rem;">
+              <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+
+            <div class="card" style="padding: 1.5rem;">
+              <h2 style="font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 1.25rem;">Full Spec Sheet</h2>
+              <div class="grid grid-cols-1 grid-cols-2-sm" style="row-gap: 0.75rem; column-gap: 2rem;">
+                ${rig.specs.map(s => `
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem;">
+                    <span style="font-family: var(--font-display); font-size: 11px; color: var(--text-dark); text-transform: uppercase;">${s.label}</span>
+                    <span style="font-weight: 600; color: #FFF;">${s.value}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderList() {
+        document.title = `Member Sim Rigs — SIM Racing NG`;
+
+        view.innerHTML = `
+          <header class="page-header">
+            <div class="container">
+              <p class="page-header-eyebrow">Hardware</p>
+              <h1 class="page-header-title">MEMBER SIM RIGS</h1>
+              <p class="page-header-subtitle">Real setups from real SRN drivers — from entry-level builds to full direct-drive rigs.</p>
+            </div>
+          </header>
+
+          <section class="section-py">
+            <div class="container">
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 2.5rem;">
+                <button id="toggle-rig-form" class="btn btn-outline-orange">+ SUBMIT YOUR RIG</button>
+              </div>
+
+              <div id="rig-form-card" class="card" style="padding: 1.5rem; margin-bottom: 2.5rem; display: none;">
+                <div id="rig-form-content">
+                  <form id="rig-form" style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                      <input required placeholder="Rig name" class="input-field" />
+                      <input required placeholder="Your name" class="input-field" />
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                      <input required placeholder="Wheelbase / wheel" class="input-field" />
+                      <input required placeholder="Pedals" class="input-field" />
+                    </div>
+                    <textarea placeholder="Anything else worth mentioning?" rows="3" class="input-field"></textarea>
+                    <button type="submit" class="btn btn-primary">SUBMIT FOR REVIEW</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-3-lg">
+                ${RIGS.map(rig => `
+                  <a href="sim-rigs.html?id=${rig.id}" class="card card-alt" style="display: block;">
+                    <div style="position: relative; height: 12rem; overflow: hidden;">
+                      <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                      <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, rgba(19,19,26,0.3) 100%);"></div>
+                      <div style="position: absolute; bottom: 1rem; left: 1.25rem;">
+                        <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; color: #FFF;">${rig.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-green);">by ${rig.owner}</div>
+                      </div>
+                    </div>
+                    <div style="padding: 1.25rem;">
+                      ${rig.specs.slice(0, 3).map(s => `
+                        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.75rem;">
+                          <span style="font-family: var(--font-display); color: var(--text-dark);">${s.label}</span>
+                          <span style="font-weight: 600; color: #FFF;">${s.value}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+        `;
+
+        // Form handlers
+        const formCard = document.getElementById('rig-form-card');
+        const toggleBtn = document.getElementById('toggle-rig-form');
+        let visible = false;
+
+        toggleBtn.addEventListener('click', () => {
+          visible = !visible;
+          formCard.style.display = visible ? 'block' : 'none';
+          toggleBtn.innerText = visible ? 'CLOSE FORM' : '+ SUBMIT YOUR RIG';
+        });
+
+        document.getElementById('rig-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          document.getElementById('rig-form-content').innerHTML = `
+            <p style="font-size: 0.875rem; color: var(--accent-green);">
+              Thanks — your rig has been submitted for review.
+            </p>
+          `;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

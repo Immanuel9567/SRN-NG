@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Hub — SIM Racing NG</title>
+  <meta name="description" content="Photos, videos, highlights, and streams from the Nigerian sim racing community." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <div class="container">
+        <p class="page-header-eyebrow">Media Hub</p>
+        <h1 class="page-header-title">PHOTOS, VIDEOS & STREAMS</h1>
+        <p class="page-header-subtitle">Race weekend footage, meetup galleries, and community streams in one place.</p>
+      </div>
+    </header>
+
+    <section class="section-py">
+      <div class="container">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 2.5rem;">
+          <button id="media-tab-photos" class="btn-pill active">Photos</button>
+          <button id="media-tab-videos" class="btn-pill">Videos</button>
+          <button id="media-tab-streams" class="btn-pill">Streams</button>
+        </div>
+
+        <div id="media-content">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Video Playback Modal -->
+  <div id="video-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 42rem; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative;">
+      <button id="video-close" style="position: absolute; top: 0.75rem; right: 0.75rem; width: 2rem; height: 2rem; border-radius: 50%; background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">✕</button>
+      <p id="video-playing-title" style="font-size: 0.875rem; color: var(--text-dim); font-family: var(--font-sans);"></p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let activeTab = 'Photos';
+
+      const PHOTOS = [IMGS.race1, IMGS.race2, IMGS.race3, IMGS.wheel, IMGS.hero, IMGS.member, IMGS.race1, IMGS.race2];
+      const VIDEOS = [
+        { title: 'WASC Final Round — Full Race', img: IMGS.race1, duration: '58:12' },
+        { title: 'Lagos Meetup Highlight Reel', img: IMGS.race3, duration: '6:40' },
+        { title: 'Moza R21 Rig Build', img: IMGS.wheel, duration: '14:05' },
+        { title: 'Formula Pro Setup Walkthrough', img: IMGS.race2, duration: '11:22' },
+      ];
+
+      const btnPhotos = document.getElementById('media-tab-photos');
+      const btnVideos = document.getElementById('media-tab-videos');
+      const btnStreams = document.getElementById('media-tab-streams');
+
+      btnPhotos.addEventListener('click', () => setTab('Photos'));
+      btnVideos.addEventListener('click', () => setTab('Videos'));
+      btnStreams.addEventListener('click', () => setTab('Streams'));
+
+      function setTab(tab) {
+        activeTab = tab;
+        btnPhotos.classList.toggle('active', tab === 'Photos');
+        btnVideos.classList.toggle('active', tab === 'Videos');
+        btnStreams.classList.toggle('active', tab === 'Streams');
+        render();
+      }
+
+      function render() {
+        const content = document.getElementById('media-content');
+
+        if (activeTab === 'Photos') {
+          content.innerHTML = `
+            <div class="grid grid-cols-2 grid-cols-4-lg" style="gap: 1rem;">
+              ${PHOTOS.map((src, i) => `
+                <div class="card" style="height: 11rem; overflow: hidden;">
+                  <img src="${src}" alt="Photo ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else if (activeTab === 'Videos') {
+          content.innerHTML = `
+            <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
+              ${VIDEOS.map(v => `
+                <button class="card video-card" data-title="${v.title}" style="text-align: left; cursor: pointer;">
+                  <div style="position: relative; height: 9rem; overflow: hidden;">
+                    <img src="${v.img}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+                    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+                      <div style="width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#08080C"><polygon points="6 3 20 12 6 21"/></svg>
+                      </div>
+                    </div>
+                    <span style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${v.duration}</span>
+                  </div>
+                  <div style="padding: 1rem;">
+                    <h3 style="font-size: 0.875rem; font-weight: 600; color: #FFF;">${v.title}</h3>
+                  </div>
+                </button>
+              `).join('')}
+            </div>
+          `;
+
+          document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('click', () => {
+              const title = card.getAttribute('data-title');
+              openVideoModal(title);
+            });
+          });
+        } else if (activeTab === 'Streams') {
+          content.innerHTML = `
+            <div class="card" style="padding: 3rem 1.5rem; text-align: center;">
+              <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; border-radius: 9999px; border: 1px solid rgba(255,107,26,0.4); background: rgba(255,107,26,0.08); margin-bottom: 1.25rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-orange);"></span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase;">No one live right now</span>
+              </div>
+              <p style="font-size: 0.875rem; color: var(--text-dim); max-width: 28rem; margin: 0 auto; line-height: 1.6;">
+                SRN members stream race nights and setup sessions regularly. Check the community Discord for the schedule and links to go live.
+              </p>
+            </div>
+          `;
+        }
+      }
+
+      // Video Modal
+      const modal = document.getElementById('video-modal');
+      const closeBtn = document.getElementById('video-close');
+      const playingTitle = document.getElementById('video-playing-title');
+
+      function openVideoModal(title) {
+        playingTitle.innerText = `Playing: ${title}`;
+        modal.classList.add('active');
+      }
+
+      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+
+      render();
+    });
+  </script>
+</body>
+</html>

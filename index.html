@@ -1,523 +1,389 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SIM Racing NG</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css"/>
-  <script src="shared.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIM Racing NG — Nigeria's Sim Racing Community</title>
+  <meta name="description" content="Nigeria's home for competitive sim racing. Join 2,400+ drivers, follow news, join events, and show off your rig." />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
-<header class="site-header">
-  <div class="header-left">
-    <button id="adminToggle" class="admin-pill" title="Admin Panel" style="display:none" onclick="toggleAdminPanel()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span class="admin-pill-label">Admin</span>
-    </button>
-  </div>
-  <a href="index.html" class="header-logo">
-    <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img"/>
-  </a>
-  <div class="header-right">
-    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" role="button" aria-label="Toggle dark/light mode">
-      <div class="theme-toggle-opt theme-toggle-opt--dark">🌙</div>
-      <div class="theme-toggle-opt theme-toggle-opt--light">☀️</div>
-    </div>
-    <button id="headerAuthBtn" class="btn-auth-header">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Sign In
-    </button>
-    <div id="headerUserChip" class="header-user-chip" style="display:none"></div>
-  </div>
-</header>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
 
-<main id="main-content">
-<!-- ══ SPLASH ══ -->
-<section class="splash">
-  <video autoplay muted loop playsinline class="splash-video">
-    <source src="assets/splash.mp4" type="video/mp4"/>
-  </video>
-  <div class="splash-overlay"></div>
-  <div class="splash-grid-overlay"></div>
-  <div class="splash-content">
-    <h1 class="splash-title">Welcome to<br/><span>SIM Racing NG!</span></h1>
-    <p class="splash-sub">Placeholder for motto</p>
-    <div class="splash-actions">
-      <button class="btn-join" onclick="openSocials()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Join the Club
-      </button>
-      <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-primary">View Platform</a>
-      <a href="merch.html" class="btn-outline">Shop Merch</a>
-    </div>
-  </div>
-</section>
+      <div class="navbar-links">
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
 
-<!-- ══ PLATFORM ══ -->
-<section class="section" id="platform">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <p class="section-eyebrow">Compete Online</p>
-        <h2 class="section-title">Participate in events</h2>
-        <p class="section-sub">Leaderboards, events, and championships across different titles.</p>
+      <div class="navbar-actions">
+        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
-    </div>
-    <div class="platform-card">
-      <div class="platform-card-left">
-        <h3 class="platform-title">SIM Racing Nigeria</h3>
-        <p class="platform-desc">Our dedicated platform for lap times, events, championships, and community profiles — all in one place.</p>
-        <a href="https://simracenigeria.vercel.app/" target="_blank" rel="noopener" class="btn-primary" style="margin-top:1.25rem;align-self:flex-start">Events →</a>
-      </div>
-      <div class="platform-card-right">
-        <div class="games-list-widget">
-          <div class="glw-header">🎮 Games We Play</div>
-          <div class="glw-item"><span class="glw-num">01</span><span class="glw-name">Assetto Corsa</span><span class="glw-tag">#AC</span></div>
-          <div class="glw-item"><span class="glw-num">02</span><span class="glw-name">Assetto Corsa Competizione</span><span class="glw-tag">#ACC</span></div>
-          <div class="glw-item"><span class="glw-num">03</span><span class="glw-name">Gran Turismo 7</span><span class="glw-tag">#GT7</span></div>
-          <div class="glw-item"><span class="glw-num">04</span><span class="glw-name">iRacing</span><span class="glw-tag">#iR</span></div>
-          <div class="glw-item"><span class="glw-num">05</span><span class="glw-name">Le Mans Ultimate</span><span class="glw-tag">#LMU</span></div>
-          <div class="glw-item"><span class="glw-num">06</span><span class="glw-name">Assoluto Racing</span><span class="glw-tag">#ASO</span></div>
-          <div class="glw-item"><span class="glw-num">07</span><span class="glw-name">F1 25</span><span class="glw-tag">#F1</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ══ NEWS ══ -->
-<section class="section section-alt" id="news">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <p class="section-eyebrow">Community</p>
-        <h2 class="section-title">Latest News</h2>
-        <p class="section-sub">Events, announcements, and community highlights.</p>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="postNewsBtn" class="btn-primary btn-sm" style="display:none" onclick="openPostNewsModal()">+ Post News</button>
-      </div>
-    </div>
-    <div class="news-grid" id="newsFeed"></div>
-  </div>
-</section>
-
-<!-- ══ NEWSLETTER ══ -->
-<section class="section newsletter-section">
-  <div class="container">
-    <div class="newsletter-card">
-      <div class="newsletter-left">
-        <div class="section-eyebrow">Stay Connected</div>
-        <h2 class="section-title" style="margin:0.3rem 0 0.5rem">Join the Newsletter</h2>
-        <p class="section-sub">Get race results, event announcements, and community news straight to your inbox.</p>
-      </div>
-      <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
-        <input type="email" class="notify-input" placeholder="your@email.com" required/>
-        <button type="submit" class="btn-primary">Subscribe →</button>
-      </form>
-    </div>
-  </div>
-</section>
-
-<!-- ══ MERCH PREVIEW ══ -->
-<section class="section section-alt" id="merch-preview">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <p class="section-eyebrow">Gear Up</p>
-        <h2 class="section-title">Official Merch</h2>
-        <p class="section-sub">Community Merch/Accessories/Misc.</p>
-      </div>
-      <a href="merch.html" class="btn-ghost">Full store →</a>
-    </div>
-    <div class="merch-preview-grid" id="homeMerchGrid"></div>
-  </div>
-</section>
-
-
-</main>
-
-<!-- ══ FOOTER ══ -->
-<footer class="site-footer">
-  <div class="container footer-inner">
-    <div class="footer-brand">
-      <img src="assets/logo.png" alt="SIM Racing NG" class="logo-img" style="height:30px"/>
-      <p class="footer-tagline">Nigeria's home for competitive sim racing.</p>
-    </div>
-    <div class="footer-links-group">
-      <div class="footer-col">
-        <h4>Site</h4>
-        <a href="index.html">Home</a>
-        <a href="#platform">Platform</a>
-        <a href="merch.html">Merch Store</a>
-        <a href="#news">News</a>
-      </div>
-      <div class="footer-col">
-        <h4>Community</h4>
-        <a href="#" onclick="openSocials();return false">Discord</a>
-        <a href="#" onclick="openSocials();return false">WhatsApp</a>
-        <a href="#" onclick="openSocials();return false">Instagram</a>
-      </div>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2026 SIM Racing NG. All rights reserved.</span>
-    <span>Built for Nigerian racers.</span>
-  </div>
-</footer>
-
-<!-- ══════════════════════════════════════════════════
-     ALL MODALS + PANELS
-     ══════════════════════════════════════════════════ -->
-
-<!-- AUTH MODAL -->
-<div class="modal-overlay" id="authModal">
-  <div class="modal-glass auth-modal">
-    <button class="modal-close" onclick="closeAuthModal()">✕</button>
-    <div style="text-align:center;margin-bottom:1.25rem">
-      <img src="assets/logo.png" alt="SRN" style="height:36px;margin:0 auto 0.75rem;display:block"/>
-      <h2 class="modal-title">SIM Racing NG</h2>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab-btn active" data-tab="signin">Sign In</button>
-      <button class="auth-tab-btn" data-tab="signup">Create Account</button>
-    </div>
-    <div id="authPane_signin">
-      <div class="mfield"><label>Username</label><input type="text" id="si_username" class="minput" placeholder="your_username" autocomplete="username"/></div>
-      <div class="mfield"><label>Password</label><input type="password" id="si_password" class="minput" placeholder="••••••••" autocomplete="current-password"/></div>
-      <div id="authErr_signin" class="merr" style="display:none"></div>
-      <button id="si_submitBtn" class="btn-primary msubmit">Sign In →</button>
-      <p class="mfootnote">Don't have an account? <a onclick="switchAuthTab('signup')" class="mlink">Create one</a></p>
-    </div>
-    <div id="authPane_signup" style="display:none">
-      <div class="mfield"><label>Display Name</label><input type="text" id="su_displayName" class="minput" placeholder="e.g. Lagos Racer" autocomplete="name"/></div>
-      <div class="mfield"><label>Username</label><input type="text" id="su_username" class="minput" placeholder="lowercase_no_spaces" autocomplete="username"/></div>
-      <div class="mfield"><label>Password</label><input type="password" id="su_password" class="minput" placeholder="min 6 characters" autocomplete="new-password"/></div>
-      <div class="mfield"><label>Confirm Password</label><input type="password" id="su_password2" class="minput" placeholder="repeat password" autocomplete="new-password"/></div>
-      <div id="authErr_signup" class="merr" style="display:none"></div>
-      <button id="su_submitBtn" class="btn-primary msubmit">Create Account →</button>
-      <p class="mfootnote">Already have an account? <a onclick="switchAuthTab('signin')" class="mlink">Sign in</a></p>
-    </div>
-  </div>
-</div>
-
-<!-- USER PANEL (right slide) -->
-<div id="upOverlay" class="up-overlay"></div>
-<aside id="userPanel" class="user-panel">
-  <div class="up-head">
-    <span class="up-title">My Account</span>
-    <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeUserPanel()">✕</button>
-  </div>
-  <div class="up-profile-card">
-    <div class="up-avatar-wrap">
-      <div id="upAvatarDisplay"></div>
-      <button class="up-avatar-edit" onclick="document.getElementById('upAvatarInput').click()" title="Change photo">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <input type="file" id="upAvatarInput" accept="image/*" style="display:none"/>
-    </div>
-    <div class="up-profile-info">
-      <div id="upNameDisplay" class="up-name"></div>
-      <div id="upUsernameDisplay" class="up-username"></div>
-      <div id="upRoleDisplay" style="margin-top:4px"></div>
-      <div id="upJoinedDisplay" class="up-joined"></div>
-    </div>
-  </div>
-  <!-- Stats row removed — no member count shown -->
-  <div id="upStatsRow"></div>
-  <!-- Cart shortcut -->
-  <div class="up-quick-actions">
-    <button id="upCartShortcut" class="up-quick-btn up-quick-cart"></button>
-  </div>
-  <div class="up-body">
-    <div class="up-section">
-      <div class="up-section-title">Edit Profile</div>
-      <div class="up-field"><label>Display Name</label><input type="text" id="upEditDisplayName" class="up-input" placeholder="How you appear to others"/></div>
-      <div class="up-field"><label>Bio</label><textarea id="upEditBio" class="up-input up-textarea" placeholder="Tell the community about yourself…"></textarea></div>
-      <button id="upSaveProfileBtn" class="btn-primary btn-sm" style="width:100%;justify-content:center">Save Profile</button>
-    </div>
-    <div class="up-section">
-      <div class="up-section-header">
-        <div class="up-section-title">Security</div>
-        <button id="upChangePassToggle" class="up-section-toggle">Change Password</button>
-      </div>
-      <div id="upChangePassForm" style="display:none;margin-top:10px">
-        <div class="up-field"><label>Current Password</label><input type="password" id="upOldPass" class="up-input" placeholder="Current password" autocomplete="current-password"/></div>
-        <div class="up-field"><label>New Password</label><input type="password" id="upNewPass" class="up-input" placeholder="Min 6 characters" autocomplete="new-password"/></div>
-        <div class="up-field"><label>Confirm New Password</label><input type="password" id="upNewPass2" class="up-input" placeholder="Repeat new password" autocomplete="new-password"/></div>
-        <div id="upPassErr" class="ap-error" style="display:none"></div>
-        <button id="upSavePassBtn" class="btn-primary btn-sm" style="width:100%;justify-content:center">Update Password</button>
-      </div>
-    </div>
-    <div class="up-section up-danger-zone">
-      <button id="upDangerToggle" class="up-danger-toggle">▸ Danger Zone</button>
-      <div id="upDangerContent" style="display:none;margin-top:10px">
-        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Permanently delete your account. Cannot be undone.</p>
-        <button id="upDeleteBtn" class="btn-danger btn-sm" style="width:100%;justify-content:center">Delete My Account</button>
-      </div>
-    </div>
-    <div style="padding:0 0 28px">
-      <button id="upLogoutBtn" class="btn-ghost btn-sm" style="width:100%;justify-content:center">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sign Out
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
       </button>
     </div>
-  </div>
-</aside>
 
-<!-- SOCIALS MODAL -->
-<div class="modal-overlay" id="socialsModal">
-  <div class="modal-glass socials-modal">
-    <button class="modal-close" onclick="closeSocials()">✕</button>
-    <div class="socials-header">
-      <img src="assets/logo.png" alt="SRN" class="socials-logo"/>
-      <h2 class="socials-title">Join the Club</h2>
-      <p class="socials-sub">Connect with the SIM Racing NG community.</p>
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
-    <div class="socials-grid">
-      <a href="https://discord.gg/REPLACE" target="_blank" rel="noopener" class="social-link social-discord">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-        <div class="social-info"><span class="social-name">Discord</span><span class="social-desc">Chat &amp; voice rooms</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-      <a href="https://wa.me/REPLACE" target="_blank" rel="noopener" class="social-link social-whatsapp">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-        <div class="social-info"><span class="social-name">WhatsApp</span><span class="social-desc">Community group</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-      <a href="https://instagram.com/REPLACE" target="_blank" rel="noopener" class="social-link social-instagram">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        <div class="social-info"><span class="social-name">Instagram</span><span class="social-desc">Photos &amp; reels</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-      <a href="https://twitter.com/REPLACE" target="_blank" rel="noopener" class="social-link social-twitter">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        <div class="social-info"><span class="social-name">Twitter / X</span><span class="social-desc">News &amp; updates</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-      <a href="https://tiktok.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-tiktok">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.23 8.23 0 0 0 4.83 1.55V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
-        <div class="social-info"><span class="social-name">TikTok</span><span class="social-desc">Race clips</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-      <a href="https://youtube.com/@REPLACE" target="_blank" rel="noopener" class="social-link social-youtube">
-        <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-        <div class="social-info"><span class="social-name">YouTube</span><span class="social-desc">Streams &amp; events</span></div>
-        <span class="social-arrow">↗</span>
-      </a>
-    </div>
-  </div>
-</div>
+  </nav>
 
-<!-- ADMIN PANEL -->
-<div id="apOverlay" class="ap-overlay"></div>
-<aside id="adminPanel" class="admin-panel">
-  <div class="ap-head">
-    <span class="ap-title">⚡ Admin Panel</span>
-    <button class="icon-round" style="width:28px;height:28px;font-size:13px" onclick="closeAdminPanel()">✕</button>
-  </div>
-  <div class="ap-tabs">
-    <button class="ap-tab-btn active" onclick="apSwitchTab('users',this)">Users</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('members',this)" aria-label="Members tab">Members</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('news',this)" aria-label="News tab">News</button>
-    <button class="ap-tab-btn" onclick="apSwitchTab('newsletter',this)" aria-label="Newsletter tab">📧</button>
-  </div>
-  <!-- USERS TAB -->
-  <div id="apTab_users" class="ap-tab-pane">
-    <div class="ap-sub-head">
-      <div class="ap-utabs">
-        <button class="ap-utab active" onclick="apSwitchUserTab('all',this)">All</button>
-        <button class="ap-utab" onclick="apSwitchUserTab('admins',this)">Admins</button>
-        <button class="ap-utab" onclick="apSwitchUserTab('racers',this)">Racers</button>
-        <button class="ap-utab" onclick="apSwitchUserTab('marketers',this)">Marketers</button>
-      </div>
-    </div>
-    <div class="ap-user-meta">
-      <span id="apOnlineBadge" class="ap-online-badge">0 online</span>
-      <span id="apUserCount" style="font-size:11px;color:var(--text-muted)">0 users</span>
-    </div>
-    <div id="apUserBody" class="ap-user-list"></div>
-    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:10px">
-      <button class="btn-outline btn-sm" style="width:100%;justify-content:center" onclick="apShowCreateAdmin()">+ Create Admin Account</button>
-    </div>
-    <div id="apCreateAdminForm" class="ap-product-form" style="display:none;margin-top:10px">
-      <div class="ap-form-head"><span class="ap-sub-title">New Admin</span><button class="icon-btn" onclick="apCloseCreateAdmin()">✕</button></div>
-      <div class="ap-field"><label>Display Name</label><input type="text" id="apCAName" class="ap-input" placeholder="e.g. Immanuel"/></div>
-      <div class="ap-field"><label>Username *</label><input type="text" id="apCAUsername" class="ap-input" placeholder="lowercase_only"/></div>
-      <div class="ap-field"><label>Password *</label><input type="password" id="apCAPassword" class="ap-input" placeholder="min 6 chars"/></div>
-      <div id="apCAError" class="ap-error" style="display:none"></div>
-      <div class="ap-form-footer"><button class="btn-ghost btn-sm" onclick="apCloseCreateAdmin()">Cancel</button><button class="btn-primary btn-sm" onclick="apCreateAdmin()">Create</button></div>
-    </div>
-  </div>
-  <!-- MEMBERS TAB -->
-  <div id="apTab_members" class="ap-tab-pane" style="display:none">
-    <div class="ap-user-meta" style="margin-bottom:10px">
-      <span id="apMemberCount" style="font-size:12px;color:var(--text-muted)">— members</span>
-    </div>
-    <div id="apMembersGrid" class="members-dir-grid" style="grid-template-columns:1fr"></div>
-  </div>
-  <!-- NEWS TAB -->
-  <div id="apTab_news" class="ap-tab-pane" style="display:none">
-    <button class="btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:12px" onclick="openPostNewsModal()">+ Post News</button>
-    <div id="apNewsList" class="ap-merch-grid"></div>
-  </div>
-  <!-- NEWSLETTER TAB -->
-  <div id="apTab_newsletter" class="ap-tab-pane" style="display:none">
-    <div class="ap-nl-head">
-      <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px">Send Newsletter</div>
-      <div id="nlRecipientCount" style="font-size:11px;color:var(--text-muted)">0 subscribers</div>
-    </div>
-    <div class="ap-field" style="margin-top:12px">
-      <label>Subject *</label>
-      <input type="text" id="nlSubject" class="ap-input" placeholder="e.g. April Race Results 🏁" oninput="nlUpdatePreview()"/>
-    </div>
-    <div class="ap-field">
-      <label>Banner Image <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-      <div class="nl-img-row">
-        <div class="ap-img-drop nl-img-drop" onclick="document.getElementById('nlBannerInput').click()">📷 Upload Banner</div>
-        <input type="file" id="nlBannerInput" accept="image/*" style="display:none"/>
-        <button id="nlBannerRemove" class="icon-btn danger btn-sm" style="display:none" onclick="nlRemoveBanner()">✕</button>
-      </div>
-      <img id="nlBannerPreview" src="" alt="" style="display:none;width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:6px"/>
-    </div>
-    <div class="ap-field">
-      <label>Message <span style="font-weight:400;color:var(--text-muted)">(one paragraph per line)</span></label>
-      <textarea id="nlBody" class="ap-input" rows="6" style="resize:vertical;font-size:12px;line-height:1.6" placeholder="Write your newsletter here...&#10;&#10;Each line becomes a paragraph." oninput="nlUpdatePreview()"></textarea>
-    </div>
-    <div class="ap-field">
-      <label>Preview</label>
-      <div id="nlPreviewBox" class="nl-preview-box"></div>
-    </div>
-    <div id="nlSendResult" class="nl-result" style="display:none"></div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-ghost btn-sm" onclick="nlResetCompose()">Clear</button>
-      <button id="nlSendBtn" class="btn-primary btn-sm" style="flex:1;justify-content:center" onclick="nlSend()">Send Newsletter</button>
-    </div>
-    <p style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.5">Configure <code>NEWSLETTER_API_ENDPOINT</code> + <code>NEWSLETTER_SECRET</code> in shared.js to enable sending.</p>
-  </div>
-</aside>
+  <main>
+    <!-- Hero Section -->
+    <section style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: #08080C;">
+      <img src="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format" alt="Sim racing setup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35;" />
+      <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(8,8,12,0.92) 0%, rgba(8,8,12,0.65) 60%, rgba(8,8,12,0.92) 100%);"></div>
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, #08080C 0%, transparent 40%);"></div>
 
-<!-- AP CONFIRM -->
-<div class="modal-overlay" id="apConfirmModal">
-  <div class="modal-glass confirm-modal">
-    <h3 id="apConfirmTitle" class="modal-title" style="font-size:17px">Are you sure?</h3>
-    <p id="apConfirmDesc" style="font-size:13px;color:var(--text-secondary);margin:8px 0 20px"></p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-ghost btn-sm" id="apConfirmNo">Cancel</button>
-      <button class="btn-danger btn-sm" id="apConfirmYes">Confirm</button>
-    </div>
-  </div>
-</div>
+      <div class="container" style="position: relative; z-index: 10; padding-top: 7rem; padding-bottom: 4rem;">
+        <div style="max-width: 48rem;">
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; border-radius: 9999px; border: 1px solid rgba(0,230,118,0.3); background: rgba(0,230,118,0.07); margin-bottom: 2rem;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--accent-green);"></span>
+            <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green);">Nigeria's Premier Sim Racing Community</span>
+          </div>
 
-<!-- NEWS READ MODAL -->
-<div class="modal-overlay" id="newsModal">
-  <div class="modal-glass news-read-modal">
-    <button class="modal-close" onclick="closeNewsModal()">✕</button>
-    <h2 id="newsModalTitle" class="modal-title" style="margin-bottom:1rem"></h2>
-    <div id="newsModalBody"></div>
-  </div>
-</div>
+          <h1 style="font-family: var(--font-display); font-weight: 900; line-height: 1; margin-bottom: 1.5rem;">
+            <span style="display: block; color: var(--text-white); font-size: clamp(2.4rem, 6vw, 5.5rem);">UNLEASH</span>
+            <span style="display: block; color: var(--accent-green); font-size: clamp(2.4rem, 6vw, 5.5rem);">YOUR SPEED.</span>
+            <span style="display: block; color: var(--text-white); font-size: clamp(1.4rem, 3.5vw, 3rem); font-weight: 700; margin-top: 0.35em; opacity: 0.9;">Nigerian Sim Racing Starts Here.</span>
+          </h1>
 
-<!-- POST NEWS MODAL -->
-<div class="modal-overlay" id="postNewsModal">
-  <div class="modal-glass post-news-modal">
-    <button class="modal-close" onclick="closePostNewsModal()">✕</button>
-    <h2 class="modal-title" style="margin-bottom:1.25rem">Post News</h2>
-    <div class="mfield"><label>Title *</label><input type="text" id="newsPostTitle" class="minput" placeholder="e.g. Season 2 Kickoff Announced"/></div>
-    <div class="mfield"><label>Tag</label><input type="text" id="newsPostTag" class="minput" placeholder="e.g. Announcement, Event, Results" value="News"/></div>
-    <div class="mfield"><label>Excerpt * <span style="font-weight:400;color:var(--text-muted)">(shown in card)</span></label><textarea id="newsPostExcerpt" class="minput" rows="2" style="resize:vertical" placeholder="Short summary…"></textarea></div>
-    <div class="mfield"><label>Full Body <span style="font-weight:400;color:var(--text-muted)">(optional — shown in read more)</span></label><textarea id="newsPostBody" class="minput" rows="4" style="resize:vertical" placeholder="Full article content…"></textarea></div>
-    <div class="mfield">
-      <label>Image <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-      <div class="ap-img-drop" onclick="document.getElementById('newsPostImgInput').click()">📁 Upload image<br/><span style="font-size:10px;color:var(--text-muted)">PNG/JPG/WebP · max 5MB</span></div>
-      <input type="file" id="newsPostImgInput" accept="image/*" style="display:none"/>
-      <img id="newsPostImgPreview" src="" alt="" style="display:none;width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-top:8px"/>
-    </div>
-    <div id="newsPostError" class="merr" style="display:none"></div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closePostNewsModal()">Cancel</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" onclick="newsPostSubmit()">Publish</button>
-    </div>
-  </div>
-</div>
+          <p style="color: var(--text-muted); font-size: clamp(0.95rem, 1.5vw, 1.15rem); line-height: 1.6; margin-bottom: 2.5rem; max-width: 36rem;">
+            Join 2,400+ drivers competing, connecting, and pushing limits — from Lagos to Abuja and beyond. Real passion. Real competition. Real community.
+          </p>
 
-<!-- CART MODAL -->
-<div class="modal-overlay" id="cartModal">
-  <div class="modal-glass cart-modal">
-    <button class="modal-close" onclick="closeCart()">✕</button>
-    <div class="cart-header">
-      <h2 class="cart-title">Your Cart</h2>
-      <span class="cart-count-badge" id="cartCountBadge">0 items</span>
-    </div>
-    <div id="cartItemsList" class="cart-items-list"></div>
-    <div class="cart-footer" id="cartFooter" style="display:none">
-      <div class="cart-summary">
-        <div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal" class="cart-subtotal">₦0</span></div>
-        <div class="cart-summary-row cart-summary-note"><span>Shipping calculated at checkout</span></div>
-      </div>
-      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="checkoutCart()">Proceed to Checkout →</button>
-      <button class="btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px" onclick="clearCartConfirm()">Clear Cart</button>
-    </div>
-    <div id="cartEmpty" class="cart-empty">
-      <div class="cart-empty-icon">🛒</div>
-      <p>Your cart is empty.</p>
-      <span>Add some gear from the store!</span>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="srnToast" class="srn-toast"></div>
-
-<!-- CATEGORIES MODAL -->
-<div class="modal-overlay" id="catModal">
-  <div class="modal-glass" style="width:min(460px,95vw);max-height:90vh;overflow-y:auto;padding:1.5rem">
-    <button class="modal-close" onclick="closeCatModal()">✕</button>
-    <h2 class="modal-title" style="margin-bottom:1rem">Edit Categories</h2>
-    <p style="font-size:12px;color:var(--text-muted);margin-bottom:1rem">These category labels appear in the filter bar and product form. Changes apply immediately.</p>
-    <div id="catList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
-    <button class="btn-outline btn-sm" style="width:100%;justify-content:center;margin-bottom:16px" onclick="addCatRow()">+ Add Category</button>
-    <div style="display:flex;gap:8px">
-      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="closeCatModal()">Cancel</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" onclick="saveCatModal()">Save</button>
-    </div>
-  </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', async ()=>{
-  // Merch preview — published items only
-  const grid = document.getElementById('homeMerchGrid');
-  if(grid){
-    const items = (await getMerch()).slice(0,3);
-    grid.innerHTML = items.map(i=>{
-      const thumb = i.image
-        ? `<img src="${i.image}" alt="${esc(i.name)}" style="width:80px;height:80px;object-fit:contain"/>`
-        : `<div class="merch-icon">${catEmoji(i.cat)}</div>`;
-      const badge = i.badge?`<span class="merch-tag merch-tag--${i.badge}">${i.badge==='new'?'New':'Ltd'}</span>`:'';
-      return `<div class="merch-card">
-        <div class="merch-thumb">${thumb}${badge}</div>
-        <div class="merch-body">
-          <h3 class="merch-name">${esc(i.name)}</h3>
-          <div class="merch-foot">
-            <span class="merch-price">${fmtPrice(i.price)}</span>
-            <button class="merch-add" onclick="addToCart(${i.id},null);this.textContent='✓';setTimeout(()=>this.textContent='+ Cart',1600)">+ Cart</button>
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+            <a href="members.html" class="btn btn-primary">
+              <span>START RACING</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="gallery.html" class="btn btn-outline-light">EXPLORE</a>
           </div>
         </div>
-      </div>`;
-    }).join('') + `<div class="merch-card merch-card--cta"><a href="merch.html" class="merch-see-all"><span>See all products</span><div class="merch-arrow">→</div></a></div>`;
-  }
+      </div>
+    </section>
 
-  // Post news button visibility
-  const s = getSession();
-  const pnb = document.getElementById('postNewsBtn');
-  if(pnb) pnb.style.display = isAdmin(s) ? '' : 'none';
-});
-</script>
+    <!-- Stats Bar -->
+    <section style="background-color: var(--bg-card); border-top: 1px solid rgba(0,230,118,0.12); border-bottom: 1px solid rgba(0,230,118,0.12); padding: 2.5rem 0;">
+      <div class="container grid grid-cols-3" style="text-align: center;">
+        <div>
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">2,400+</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Active Members</div>
+        </div>
+        <div style="border-left: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle);">
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">148</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Events Hosted</div>
+        </div>
+        <div>
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">12</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Partner Studios</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section-py" style="background-color: var(--bg-dark);">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">What We Offer</p>
+          <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">EVERYTHING SIM RACING</h2>
+        </div>
+
+        <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
+          <a href="gallery.html" class="card" style="padding: 1.5rem; display: block;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">🎮</div>
+            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Game Gallery</h3>
+            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Highlights from ACC, iRacing, and Assetto Corsa, curated by Nigerian drivers.</p>
+            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-green); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+          </a>
+
+          <a href="members.html" class="card" style="padding: 1.5rem; display: block;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">👥</div>
+            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Community</h3>
+            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">A growing home for every Nigerian sim racer — from beginners to champions.</p>
+            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+          </a>
+
+          <a href="activities.html" class="card" style="padding: 1.5rem; display: block;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📅</div>
+            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Events</h3>
+            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Weekly races, monthly championships, and live watch parties you can't miss.</p>
+            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-orange); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+          </a>
+
+          <a href="news.html" class="card" style="padding: 1.5rem; display: block;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📰</div>
+            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Latest News</h3>
+            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Race results, gear reviews, and everything happening in the Nigerian sim scene.</p>
+            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Spotlight -->
+    <section class="section-py" style="background-color: var(--bg-alt);">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <p style="color: var(--accent-orange); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Our Drivers</p>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">COMMUNITY SPOTLIGHT</h2>
+          </div>
+          <a href="members.html" class="btn btn-outline-light">View All Members →</a>
+        </div>
+
+        <div id="spotlight-grid" class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
+          <!-- Dynamically Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="section-py" style="background-color: var(--bg-dark);">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+          <div>
+            <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Latest</p>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">NEWS & UPDATES</h2>
+          </div>
+          <a href="news.html" style="color: var(--text-dim); font-size: 0.875rem; font-weight: 600;">All News →</a>
+        </div>
+
+        <div id="home-news-grid" class="grid grid-cols-1 grid-cols-3-lg">
+          <!-- Dynamically Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Rig Showcase -->
+    <section class="section-py" style="background-color: var(--bg-alt);">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <p style="color: var(--accent-orange); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Hardware</p>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">MEMBER RIGS</h2>
+          </div>
+          <a href="sim-rigs.html" class="btn btn-outline-orange">See All Rigs →</a>
+        </div>
+
+        <div id="home-rigs-grid" class="grid grid-cols-1 grid-cols-2-md">
+          <!-- Dynamically Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="section-py" style="background-color: var(--bg-card); position: relative; overflow: hidden; text-align: center;">
+      <div class="container container-narrow" style="position: relative; z-index: 10;">
+        <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem;">Stay in the race</p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white); margin-bottom: 1rem;">GET THE LATEST SIM RACING NEWS</h2>
+        <p style="color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem;">Race results, gear reviews, and community highlights — delivered to your inbox weekly.</p>
+
+        <div id="newsletter-form-container">
+          <form id="newsletter-form" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; max-width: 28rem; margin: 0 auto;">
+            <input type="email" id="newsletter-email" required placeholder="yourname@example.com" class="input-field" style="flex: 1; min-width: 200px; border-radius: 9999px;" />
+            <button type="submit" class="btn btn-primary" style="shrink: 0;">SUBSCRIBE</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html">
+            <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="45" height="45" rx="10" fill="#00E676"/>
+              <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+              <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+              <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+            </svg>
+          </a>
+          <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-dark); line-height: 1.6; max-width: 18rem;">
+            Nigeria's home for competitive sim racing. Built by the community, for the community.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigate</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="gallery.html" class="footer-link">Gallery</a></li>
+            <li><a href="activities.html" class="footer-link">Activities</a></li>
+            <li><a href="news.html" class="footer-link">News</a></li>
+            <li><a href="about.html" class="footer-link">About Us</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Community</h4>
+          <ul class="footer-links">
+            <li><a href="members.html" class="footer-link">Member Profiles</a></li>
+            <li><a href="sim-rigs.html" class="footer-link">Rig Showcase</a></li>
+            <li><a href="media.html" class="footer-link">Media Hub</a></li>
+            <li><a href="shop.html" class="footer-link">Shop</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Support</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+            <li><a href="sim-rigs.html" class="footer-link">Submit Your Rig</a></li>
+            <li><a href="activities.html" class="footer-link">Submit an Activity</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="#" style="font-size: 0.75rem; color: var(--text-dark);">Privacy Policy</a>
+          <a href="#" style="font-size: 0.75rem; color: var(--text-dark);">Terms of Service</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Populate Spotlight
+      const spotlightEl = document.getElementById('spotlight-grid');
+      if (spotlightEl) {
+        spotlightEl.innerHTML = MEMBERS.slice(0, 4).map((m, i) => `
+          <a href="member-profile.html?id=${m.id}" class="card card-alt" style="display: block;">
+            <div style="position: relative; height: 11rem; overflow: hidden; background: #1A1A24;">
+              <img src="${m.avatar}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, transparent 60%);"></div>
+              <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: var(--font-display); ${i === 0 ? 'background: var(--accent-green); color: #08080C;' : 'background: rgba(0,0,0,0.7); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);'}">${m.rank}</div>
+            </div>
+            <div style="padding: 1rem;">
+              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${m.name}</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem;">${m.city}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge badge-green">${m.sim}</span>
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">View →</span>
+              </div>
+            </div>
+          </a>
+        `).join('');
+      }
+
+      // Populate News
+      const newsEl = document.getElementById('home-news-grid');
+      if (newsEl) {
+        const featured = NEWS[0];
+        const rest = NEWS.slice(1, 4);
+
+        newsEl.innerHTML = `
+          <a href="news-article.html?slug=${featured.slug}" class="card" style="grid-column: span 2; display: block;">
+            <div style="position: relative; height: 16rem; overflow: hidden;">
+              <img src="${featured.img}" alt="${featured.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0E0E14 0%, transparent 60%);"></div>
+              <span class="badge badge-solid-green" style="position: absolute; top: 1rem; left: 1rem;">${featured.tag}</span>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${featured.date} · ${featured.readTime}</div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFF; margin-bottom: 0.75rem;">${featured.title}</h3>
+              <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.6;">${featured.excerpt}</p>
+              <div style="margin-top: 1.25rem; font-size: 0.875rem; font-weight: 600; color: var(--accent-green);">Read Story →</div>
+            </div>
+          </a>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            ${rest.map(n => `
+              <a href="news-article.html?slug=${n.slug}" class="card" style="padding: 1rem; display: flex; gap: 1rem;">
+                <img src="${n.img}" alt="${n.title}" style="width: 5rem; height: 4.5rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
+                <div>
+                  <div style="font-size: 10px; font-family: var(--font-display); font-weight: 700; color: var(--accent-orange); text-transform: uppercase;">${n.tag}</div>
+                  <h4 style="font-size: 0.875rem; font-weight: 600; color: #FFF; line-height: 1.3; margin-top: 0.25rem;">${n.title}</h4>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // Populate Rigs
+      const rigsEl = document.getElementById('home-rigs-grid');
+      if (rigsEl) {
+        rigsEl.innerHTML = RIGS.slice(0, 2).map(rig => `
+          <a href="sim-rigs.html?id=${rig.id}" class="card card-alt" style="display: block;">
+            <div style="position: relative; height: 13rem; overflow: hidden;">
+              <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, rgba(19,19,26,0.3) 100%);"></div>
+              <div style="position: absolute; bottom: 1rem; left: 1.25rem;">
+                <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; color: #FFF;">${rig.name}</div>
+                <div style="font-size: 0.875rem; color: var(--accent-green);">by ${rig.owner} · ${rig.city}</div>
+              </div>
+            </div>
+            <div style="padding: 1.25rem;">
+              ${rig.specs.map(s => `
+                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem;">
+                  <span style="font-family: var(--font-display); font-size: 11px; color: var(--text-dark); text-transform: uppercase;">${s.label}</span>
+                  <span style="font-weight: 600; color: #FFF;">${s.value}</span>
+                </div>
+              `).join('')}
+              <div style="margin-top: 1rem; text-align: center; padding: 0.6rem; border-radius: 8px; background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2); color: var(--accent-green); font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1px;">
+                SEE FULL BUILD
+              </div>
+            </div>
+          </a>
+        `).join('');
+      }
+
+      // Newsletter submit
+      const form = document.getElementById('newsletter-form');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          document.getElementById('newsletter-form-container').innerHTML = `
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 9999px; background: rgba(0,230,118,0.1); border: 1px solid var(--accent-green); color: var(--accent-green);">
+              ✓ You're in. Welcome to the grid!
+            </div>
+          `;
+        });
+      }
+    });
+  </script>
 </body>
 </html>
