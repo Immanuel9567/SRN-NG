@@ -113,7 +113,10 @@ const SRN = (() => {
     addGame: (payload) => request('POST', '/api/games', payload),
     removeGame: (id) => request('DELETE', `/api/games/${id}`),
     members: () => withFallback('/api/members', { members: mock('MEMBERS') }),
-    member: (id) => withFallback(`/api/members/${id}`, { member: mock('MEMBERS').find((m) => m.id === id) || null }),
+    member: (id) => {
+      if (!id) return Promise.resolve({ member: null });
+      return withFallback(`/api/members/${id}`, { member: mock('MEMBERS').find((m) => m.id === id) || null });
+    },
     merch: (scope) => withFallback(scope ? `/api/merch?scope=${scope}` : '/api/merch', { merch: mock('MERCH') }),
     listMerch: (payload) => request('POST', '/api/merch', payload),
     setMerchStatus: (id, status) => request('PATCH', `/api/merch/${id}/status`, { status }),
@@ -125,6 +128,12 @@ const SRN = (() => {
     // driver profile and interests
     updateProfile: (payload) => request('PATCH', '/api/members/me', payload),
     setInterests: (interests) => request('PATCH', '/api/auth/interests', { interests }),
+    friends: () => request('GET', '/api/friends'),
+    requestFriend: (memberId) => request('POST', '/api/friends', { memberId }),
+    acceptFriend: (id) => request('POST', `/api/friends/${id}/accept`),
+    dropFriend: (id) => request('DELETE', `/api/friends/${id}`),
+    notifications: () => request('GET', '/api/notifications'),
+    markNotification: (id) => request('PATCH', `/api/notifications/${id}/read`),
 
     // orders
     placeOrder: (items) => request('POST', '/api/orders', { items }),
@@ -151,20 +160,20 @@ const SRN = (() => {
           const center = stacked ? ' style="text-align: center;"' : '';
           const signIn = `<a href="account.html?mode=signin" class="btn btn-outline-light"${center}>SIGN IN</a>`;
           const signUp = `<a href="account.html" class="btn btn-primary"${center}>SIGN UP</a>`;
-          slot.innerHTML = stacked ? `${signUp}${signIn}` : `${signIn}${signUp}`;
+          slot.innerHTML = stacked ? `${signUp}${signIn}` : signIn;
           return;
         }
-        const href = user.role === 'admin' ? 'admin.html' : 'account.html';
-        const label = user.role === 'admin' ? `${user.username} (admin)` : user.username;
+        const avatar = esc(user.avatar || 'media/placeholder.png');
         slot.innerHTML =
-          `<a href="${href}" class="nav-link" title="Signed in as ${esc(user.username)}, role: ${esc(user.role)}">${esc(label)}</a>
-           <button class="btn btn-outline-green" data-logout style="padding: 0.5rem 0.9rem; font-size: 0.7rem;">SIGN OUT</button>`;
+          `<button type="button" class="nav-user" data-settings-open title="Signed in as ${esc(user.username)}">
+             <img class="nav-avatar" src="${avatar}" alt="">
+             <span>${esc(user.username)}</span>
+           </button>`;
       });
-      document.querySelectorAll('[data-logout]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          await SRN.logout();
-          toast('Signed out.', 'info');
-          setTimeout(() => location.reload(), 400);
+      document.querySelectorAll('[data-settings-open]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (typeof openSettingsPanel === 'function') openSettingsPanel(user);
         });
       });
       return user;

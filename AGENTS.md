@@ -123,7 +123,7 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (307), `check:inline` (33 blocks), `test:api` (160),
+   `check:skills` (62), `check:pages` (335), `check:inline` (33 blocks), `test:api` (161),
    `test:render` (84), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
@@ -201,7 +201,13 @@ use it, because it has caught a navbar bug that the API tests could not see.
 | POST | `/api/news` | admin | slug generated and de-duplicated |
 | DELETE | `/api/news/:slug` | admin | |
 | GET | `/api/games`, `/api/members`, `/api/merch`, `/api/rigs` | anyone | rigs and merch hide `pending` |
-| PATCH | `/api/members/me` | signed in | edits your own linked profile; creates it if missing |
+| PATCH | `/api/members/me` | signed in | city, sim, bio, avatar, socials, gamesPlayed; creates the profile if missing |
+| GET | `/api/friends` | signed in | friends, incoming, outgoing |
+| POST | `/api/friends` | signed in | `{ memberId }` sends a request |
+| POST | `/api/friends/:id/accept` | signed in | accept an incoming request |
+| DELETE | `/api/friends/:id` | signed in | unfriend or decline |
+| GET | `/api/notifications` | signed in | the caller's notification centre |
+| PATCH | `/api/notifications/:id/read` | signed in | marks one notification read |
 | PATCH | `/api/auth/interests` | signed in | sets your topic list; unknown game ids are 400 |
 | POST | `/api/games` | admin | adds a supported game |
 | DELETE | `/api/games/:id` | admin | removes a supported game |
@@ -370,17 +376,19 @@ if any page reintroduces a hardcoded white fill.
 
 ## 15. Skill library
 
-60 skills in six categories, all in `skills/master_skill_compilation.json`:
+62 skills in six categories, all in `skills/master_skill_compilation.json`:
 
 | Category | Count |
 | --- | --- |
 | `engineering_and_debugging` | 18 |
 | `design_and_frontend` | 9 |
 | `product_and_marketing` | 9 |
-| `workflow_process_and_meta` | 18 |
+| `workflow_process_and_meta` | 20 |
 | `documents_and_data` | 4 |
 | `career` | 2 |
-| **Total** | **60** |
+| **Total** | **62** |
+
+Compulsory before any new modification: skill `read-entire-tree` (list the whole working tree). Prose and UI copy: skill `no-ai-slop` is always on.
 
 Skills that do **not** apply here, and why:
 

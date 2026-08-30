@@ -22,7 +22,7 @@ function copyStaticAssets() {
     name: 'copy-static-assets',
     closeBundle() {
       const out = resolve(here, 'dist');
-      for (const dir of ['js', 'media']) {
+      for (const dir of ['js', 'media', 'vendor']) {
         const src = resolve(here, dir);
         if (existsSync(src)) cpSync(src, resolve(out, dir), { recursive: true });
       }

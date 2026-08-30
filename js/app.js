@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   initActivePageLinks();
   // Signed-in state in the navbar. Loaded from js/api.js, which must come first.
-  if (typeof SRN !== 'undefined') SRN.renderAccountState();
+  if (typeof SRN !== 'undefined') {
+    SRN.renderAccountState().then((user) => initHeaderChrome(user));
+  }
 });
 
 // Initialize Navbar Scroll & Mobile Menu Toggle
@@ -63,4 +65,118 @@ function initActivePageLinks() {
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(param);
+}
+
+async function initHeaderChrome(user) {
+  document.querySelectorAll('[data-admin-entry]').forEach((el) => {
+    el.hidden = !(user && user.role === 'admin');
+  });
+  const bells = document.querySelectorAll('[data-notify-open]');
+  if (!bells.length) return;
+  if (!user) {
+    bells.forEach((b) => { b.hidden = true; });
+    return;
+  }
+  bells.forEach((b) => { b.hidden = false; });
+  let data = { notifications: [], unread: 0 };
+  try { data = await SRN.notifications(); } catch { /* static build */ }
+  document.querySelectorAll('[data-notify-count]').forEach((dot) => {
+    if (data.unread) {
+      dot.hidden = false;
+      dot.textContent = data.unread > 9 ? '9+' : String(data.unread);
+    } else {
+      dot.hidden = true;
+      dot.textContent = '';
+    }
+  });
+  bells.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openNotifyPanel(data);
+    });
+  });
+}
+
+function openNotifyPanel(data) {
+  let panel = document.getElementById('srn-notify-panel');
+  if (panel) { panel.remove(); return; }
+  panel = document.createElement('div');
+  panel.id = 'srn-notify-panel';
+  panel.className = 'notify-panel';
+  const esc = SRN.esc;
+  const items = (data.notifications || []).slice(0, 12);
+  panel.innerHTML = `
+    <div class="notify-panel-head">Notifications</div>
+    <div class="notify-panel-list">
+      ${items.length ? items.map((n) => `
+        <a class="notify-item${n.read ? '' : ' unread'}" href="${esc(n.href || '#')}" data-note-id="${esc(n.id)}">
+          <span>${esc(n.text)}</span>
+          <time>${esc((n.createdAt || '').slice(0, 10))}</time>
+        </a>`).join('') : '<p class="notify-empty">Nothing yet.</p>'}
+    </div>`;
+  document.querySelector('.sticky-subhead')?.appendChild(panel);
+  panel.querySelectorAll('[data-note-id]').forEach((a) => {
+    a.addEventListener('click', () => { SRN.markNotification(a.dataset.noteId).catch(() => {}); });
+  });
+  const close = (ev) => {
+    if (panel.contains(ev.target) || ev.target.closest('[data-notify-open]')) return;
+    panel.remove();
+    document.removeEventListener('click', close);
+  };
+  setTimeout(() => document.addEventListener('click', close), 0);
+}
+
+function openSettingsPanel(user) {
+  let panel = document.getElementById('srn-settings-panel');
+  if (panel) { panel.remove(); return; }
+  panel = document.createElement('div');
+  panel.id = 'srn-settings-panel';
+  panel.className = 'settings-panel';
+  const esc = SRN.esc;
+  const avatar = esc(user.avatar || 'media/placeholder.png');
+  panel.innerHTML = `
+    <div class="settings-head">
+      <img class="nav-avatar" src="${avatar}" alt="">
+      <div>
+        <strong>${esc(user.username)}</strong>
+        <span>${esc(user.role)}</span>
+      </div>
+    </div>
+    <label class="settings-photo">Change photo
+      <input type="file" accept="image/png,image/jpeg,image/webp" data-settings-photo>
+    </label>
+    <a href="account.html">Account settings</a>
+    ${user.memberId ? `<a href="member-profile.html?id=${esc(user.memberId)}">Public profile</a>` : ''}
+    ${user.role === 'admin' ? '<a href="admin.html">Admin panel</a>' : ''}
+    <button type="button" data-logout>Sign out</button>`;
+  document.body.appendChild(panel);
+  panel.querySelector('[data-logout]').addEventListener('click', async () => {
+    await SRN.logout();
+    SRN.toast('Signed out.', 'info');
+    setTimeout(() => location.reload(), 400);
+  });
+  panel.querySelector('[data-settings-photo]').addEventListener('change', async (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+    try {
+      const out = await SRN.updateProfile({ photo: dataUrl });
+      panel.querySelector('.nav-avatar').src = out.member.avatar;
+      document.querySelectorAll('.nav-avatar').forEach((img) => { img.src = out.member.avatar; });
+      SRN.toast('Photo saved.', 'success');
+    } catch (err) {
+      SRN.toast(err.message, 'error');
+    }
+  });
+  const close = (ev) => {
+    if (panel.contains(ev.target) || ev.target.closest('[data-settings-open]')) return;
+    panel.remove();
+    document.removeEventListener('click', close);
+  };
+  setTimeout(() => document.addEventListener('click', close), 0);
 }

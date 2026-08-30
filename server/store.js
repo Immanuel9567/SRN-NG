@@ -69,7 +69,7 @@ export function saveUpload(dataUrl) {
     throw Object.assign(new Error('Photo must be under 2 MB.'), { status: 400 });
   }
   mkdirSync(UPLOAD_DIR, { recursive: true });
-  const name = `rig-${Date.now().toString(36)}-${randomBytes(4).toString('hex')}.${EXT_BY_MIME[match[1]]}`;
+  const name = `up-${Date.now().toString(36)}-${randomBytes(4).toString('hex')}.${EXT_BY_MIME[match[1]]}`;
   writeFileSync(join(UPLOAD_DIR, name), buffer);
   return `media/uploads/${name}`;
 }

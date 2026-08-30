@@ -22,7 +22,7 @@ const { write } = await import('../server/store.js');
 
 // Every collection empty. This is what `npm run seed` has not yet produced.
 for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs',
-  'messages', 'newsletter', 'orders']) write(name, []);
+  'messages', 'newsletter', 'orders', 'friends', 'notifications']) write(name, []);
 
 const server = spawn(process.execPath, [join(ROOT, 'server', 'index.js')], {
   cwd: ROOT,

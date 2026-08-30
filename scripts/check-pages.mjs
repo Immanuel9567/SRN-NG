@@ -32,6 +32,8 @@ for (const page of CONTENT_PAGES) {
 
   check(`${page}: has a nav`, /<nav/.test(html));
   check(`${page}: has a footer`, /<footer/.test(html));
+  check(`${page}: uses the full footer grid`, /class="footer-grid"/.test(html));
+  check(`${page}: drawer sits outside nav`, html.indexOf('class="mobile-menu"') > html.indexOf('</nav>'));
   check(`${page}: no link to the deleted README.md`, !/README\.md/.test(html));
 }
 
@@ -79,7 +81,11 @@ for (const page of CONTENT_PAGES) {
   for (const page of CONTENT_PAGES) {
     const html = readFileSync(join(ROOT, page), 'utf8');
     check(`${page}: no leftover JOIN NOW`, !/JOIN NOW/.test(html));
-    check(`${page}: offers SIGN UP`, />SIGN UP</.test(html));
+    check(`${page}: drawer offers SIGN UP`, /class="mobile-menu"[\s\S]*SIGN UP/.test(html));
+    {
+      const actions = html.match(/<div class="navbar-actions">[\s\S]*?<\/div>/);
+      check(`${page}: large navbar has no SIGN UP`, actions && !/SIGN UP/.test(actions[0]));
+    }
     check(`${page}: offers SIGN IN`, />SIGN IN</.test(html));
   }
 
@@ -110,12 +116,15 @@ for (const page of CONTENT_PAGES) {
   for (const page of CONTENT_PAGES) {
     const html = readFileSync(join(ROOT, page), 'utf8');
     check(`${page}: has a sticky sub-header`, /class="sticky-subhead"/.test(html));
+    check(`${page}: sticky header has the SRN logo`, /class="subhead-logo"/.test(html) && html.includes('media/logo.png'));
     check(`${page}: sub-header has a theme switcher`, /class="theme-switch"/.test(html));
     check(`${page}: offers light, dark and device themes`,
       /data-theme="light"/.test(html) && /data-theme="dark"/.test(html) && /data-theme="auto"/.test(html));
     check(`${page}: loads js/theme.js`, /<script src="js\/theme\.js"><\/script>/.test(html));
     check(`${page}: sets the theme before first paint`,
       /localStorage\.getItem\('srn-theme'\)/.test(html));
+    check(`${page}: header has an admin entry`, /data-admin-entry/.test(html));
+    check(`${page}: header has a notification bell`, /data-notify-open/.test(html));
   }
 
   const backPages = { 'news-article.html': 'news.html', 'member-profile.html': 'members.html', 'sim-rigs.html': 'sim-rigs.html' };
@@ -129,11 +138,14 @@ for (const page of CONTENT_PAGES) {
   check('rig form has a photo file input',
     /<input type="file" id="rig-photo"[^>]*accept="image\//.test(rigPage));
 
-  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
-  check('hero marketing badge removed', !/Nigeria's Premier Sim Racing Community/.test(index));
-  check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(index));
+  const landing = readFileSync(join(ROOT, 'about.html'), 'utf8');
+  check('hero marketing badge removed', !/Nigeria's Premier Sim Racing Community/.test(landing));
+  check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(landing));
   check('no large headline is left flat green',
-    !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(index));
+    !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(landing));
+  check('landing page is about.html', /id="hero-video"/.test(landing));
+  const home = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  check('home is a signed-in FYP', /id="fyp"/.test(home) && /id="spotlight-grid"/.test(home));
 }
 
 // ---- every hardcoded dark surface must have a light-theme bridge ------------
@@ -201,6 +213,9 @@ for (const page of CONTENT_PAGES) {
   check('signup has a topic picker step', /id="interests-panel"/.test(account) && /id="interests-chips"/.test(account));
   check('signup routes through the topic picker', /await showInterestsStep\(res\.user\)/.test(account));
   check('topics stay editable after signup', /id="member-interests"/.test(account));
+  check('account can edit socials', /id="socials-form"/.test(account));
+  check('account can edit games played', /id="games-played"/.test(account));
+  check('account shows a friend list', /id="friend-list"/.test(account));
 
   const admin = readFileSync(join(ROOT, 'admin.html'), 'utf8');
   check('admin can manage supported games', /id="game-form"/.test(admin) && /id="games-list"/.test(admin));
@@ -238,7 +253,7 @@ for (const page of CONTENT_PAGES) {
 
 // ---- hero uses the splash video -------------------------------------------
 {
-  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const index = readFileSync(join(ROOT, 'about.html'), 'utf8');
   check('hero uses media/splash.mp4', /<video[^>]*src="media\/splash\.mp4"/.test(index));
   check('hero video is muted, looped and playsinline',
     /<video[^>]*autoplay[^>]*muted[^>]*loop[^>]*playsinline/.test(index) ||
@@ -258,7 +273,7 @@ check('vite.config.js derives pages from the filesystem', /readdirSync/.test(vit
   'hardcoded input lists silently drop new pages');
 
 // The datastore must exist and be well formed, since the repo is the database.
-for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter']) {
+for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter', 'friends', 'notifications']) {
   const file = join(ROOT, 'data', `${name}.json`);
   if (!existsSync(file)) { check(`data/${name}.json exists`, false, 'run npm run seed'); continue; }
   try { JSON.parse(readFileSync(file, 'utf8')); }

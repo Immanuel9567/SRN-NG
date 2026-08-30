@@ -3,7 +3,7 @@
 //
 //   npm run dev   ->  http://0.0.0.0:5173
 
-import { createReadStream } from 'node:fs';
+import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { handleApi } from './api.js';
@@ -64,6 +64,24 @@ function sendStatic(res, file) {
   createReadStream(file).pipe(res);
 }
 
+function sendNotFound(res) {
+  const notFound = join(ROOT, '404.html');
+  res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+  createReadStream(notFound).on('error', () => res.end('Not found')).pipe(res);
+}
+
+function resolvePage(pathname) {
+  let file = safeStaticPath(pathname === '/' ? '/index.html' : pathname);
+  if (!file) return { forbidden: true };
+  if (existsSync(file) && statSync(file).isFile()) return { file };
+  // Extensionless hrefs (/gallery, /account) used to 404 even though gallery.html exists.
+  if (!extname(pathname)) {
+    const html = safeStaticPath(`${pathname === '/' ? '/index' : pathname}.html`);
+    if (html && existsSync(html) && statSync(html).isFile()) return { file: html };
+  }
+  return { missing: true };
+}
+
 const server = createServer(async (req, res) => {
   if (!hostAllowed(req.headers.host)) {
     res.writeHead(421, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -81,19 +99,17 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  let file = safeStaticPath(url.pathname === '/' ? '/index.html' : url.pathname);
-  if (!file) {
+  const resolved = resolvePage(url.pathname);
+  if (resolved.forbidden) {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Forbidden');
     return;
   }
-
-  createReadStream(file).on('error', () => {
-    // Unknown path: fall back to the project 404 page rather than a bare error.
-    const notFound = join(ROOT, '404.html');
-    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-    createReadStream(notFound).on('error', () => res.end('Not found')).pipe(res);
-  }).on('open', () => sendStatic(res, file));
+  if (resolved.missing) {
+    sendNotFound(res);
+    return;
+  }
+  sendStatic(res, resolved.file);
 });
 
 server.listen(PORT, HOST, () => {
