@@ -5,3 +5,4 @@ dist/
 
 # live session tokens must never be committed
 data/sessions.json
+media/uploads/

@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.9.0",
-    "previous_version": "1.8.0",
+    "version": "1.10.0",
+    "previous_version": "1.9.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -150,8 +150,8 @@
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
         "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
-        "tests": "npm run test:api (133), npm run test:render (72), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (149 checks), npm run check:inline (16 blocks), npm run check:skills",
+        "tests": "npm run test:api (138), npm run test:render (80), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
+        "static_checks": "npm run check:pages (228 checks), npm run check:inline (32 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -261,7 +261,10 @@
         "account.html and other pages must declare const esc = SRN.esc before using esc() in a template; check:pages enforces this and a missing declaration hides behind try/catch as a silent fallback.",
         "The nav is at the bottom, so nothing may assume a top bar. .page-header uses padding-top 5.5rem; do not restore the old 8rem.",
         "Pages must survive an empty datastore: a crash on an empty collection kills the rest of that DOMContentLoaded handler. npm run test:empty loads all 15 pages against empty data.",
-        "The sandbox can reset the local branch ref to an old commit while leaving the working tree intact. Compare git rev-parse HEAD with git ls-remote origin <branch> before committing, and recover with git reset --mixed origin/<branch>, which moves the pointer without touching files."
+        "The sandbox can reset the local branch ref to an old commit while leaving the working tree intact. Compare git rev-parse HEAD with git ls-remote origin <branch> before committing, and recover with git reset --mixed origin/<branch>, which moves the pointer without touching files.",
+        "matchMedia is not implemented in jsdom. Guard it in app code and polyfill it in the test harness.",
+        "The mobile drawer must stay outside <nav>. A backdrop-filter ancestor becomes the backdrop root and would stop the sheet from blurring the page.",
+        "Uploads go to media/uploads/, which is gitignored. Tests redirect it with SRN_UPLOAD_DIR so they never write into the working tree."
       ],
       "verification_protocol": {
         "before_claiming_done": [
@@ -271,7 +274,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60), check:pages (149), check:inline (16 blocks), test:api (133), test:render (72), test:hostguard (9), test:empty (29), test:build (22). Live server confirmed serving Roboto, glass-text, the segmented toggle and no JOIN NOW."
+        "last_verified": "npm run check exit 0: check:skills (60), check:pages (228), check:inline (32 blocks), test:api (138), test:render (80), test:hostguard (9), test:empty (29), test:build (22). Live server verified: drawer fixed with blur(28px), sticky sub-header and theme switcher on every page, badge removed, and a real 77-byte PNG uploaded, stored and served back at 200."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -301,11 +304,12 @@
         "accessibility": ":focus-visible green outline on every interactive element; prefers-reduced-motion disables animation.",
         "escaping": "Every page that interpolates into innerHTML declares const esc = SRN.esc. check:pages enforces it.",
         "navbar": "Floating pill fixed to the bottom centre: bottom 1rem, left 50%, translateX(-50%), width calc(100% - 2rem) so it never touches a screen edge, max-width 68rem, border-radius 9999px, backdrop-filter blur(20px) saturate(180%). A green-to-orange .navbar::after hairline fades in on scroll. @supports-not falls back to a solid pill.",
-        "mobile_drawer": ".mobile-menu is position absolute at bottom calc(100% + 0.75rem), z-index 3, border-radius 1.75rem, the same frosted-glass recipe and border as the pill navbar, a matching .mobile-menu::before hairline, an srn-drawer-pop entrance animation, and links styled as rounded pill rows. .mobile-toggle is position relative z-index 2 with pointer-events auto so nothing in the pill can swallow the click.",
+        "mobile_drawer": ".mobile-menu is position fixed at bottom 5.5rem and sits OUTSIDE <nav> in the DOM: a backdrop-filter ancestor becomes the backdrop root, so nesting it in the navbar stopped it from blurring the page. Centred with left/right/max-width so transform stays free for the pop animation. blur(28px) saturate(200%), radius 1.75rem.",
         "clearance": "body padding-bottom 6.5rem, toasts at bottom 6.5rem, shop cart bar at bottom 5.5rem. Any new fixed bottom element needs clearance.",
         "glass_text": ".glass-text clips a white-to-green gradient to the glyphs via background-clip: text and -webkit-text-fill-color: transparent, with an @supports fallback to solid green. Used on the hero headline, the three stat numbers and the 404 heading.",
         "glass_panel": ".glass-panel is the shared frosted panel. The navbar pill and the mobile drawer both use rgba(255,255,255,0.1) -> rgba(255,255,255,0.04) at blur(24px) saturate(200%).",
-        "auth_entry": "No \"Join Now\" anywhere. Signed-out visitors get SIGN UP (primary) and SIGN IN (outline) in the navbar and drawer. account.html is one card with a .srn-segmented toggle that alternates the visible fields; both forms stay in the DOM and ?mode=signin deep-links to sign-in."
+        "auth_entry": "No \"Join Now\" anywhere. Signed-out visitors get SIGN UP (primary) and SIGN IN (outline) in the navbar and drawer. account.html is one card with a .srn-segmented toggle that alternates the visible fields; both forms stay in the DOM and ?mode=signin deep-links to sign-in.",
+        "sticky_subhead": "Every content page opens with .sticky-subhead (position sticky, top 0) holding .subhead-back and the theme switcher. sim-rigs.html hides the back link unless ?id= is set."
       },
       "security": {
         "passwords": "scrypt, per-user 16-byte salt, timingSafeEqual comparison, no plaintext.",
@@ -321,6 +325,19 @@
         "fix": "vite.config.js has a copyStaticAssets plugin that copies js/ and media/ into dist/ on closeBundle.",
         "guard": "npm run test:build rebuilds dist/ and fails if any built page references a file missing from dist/.",
         "do_not": "Do not add type=\"module\" to the page scripts; the js/data.js globals would stop being shared."
+      },
+      "themes": {
+        "mechanism": "js/theme.js reads srn-theme from localStorage (light|dark|auto, default auto) and sets data-theme on <html>.",
+        "auto": "Resolved in JS via matchMedia so CSS only defines two states. matchMedia is guarded; jsdom lacks it.",
+        "pre_paint": "Each page has an inline script in <head> that applies the theme before first paint.",
+        "debt": "Many pages hardcode colours in inline style attributes. Two attribute-selector bridges patch the commonest cases; converting them to classes is the real fix."
+      },
+      "uploads": {
+        "endpoint": "POST /api/rigs accepts a photo field as a data: URL.",
+        "storage": "server/store.js saveUpload() validates PNG/JPEG/WebP, caps at 2 MB, writes to media/uploads/ so the static server serves it.",
+        "limits": "Request body limit is 4 MB because base64 inflates by about a third.",
+        "gitignored": "media/uploads/",
+        "tests": "SRN_UPLOAD_DIR redirects the directory so tests never write into the working tree."
       }
     },
     "categories": {

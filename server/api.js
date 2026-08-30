@@ -15,7 +15,7 @@ import {
   verifyPassword,
 } from './auth.js';
 import { clientKey, rateLimit } from './ratelimit.js';
-import { read, update } from './store.js';
+import { read, saveUpload, update } from './store.js';
 
 const USERS = 'users';
 const SESSIONS = 'sessions';
@@ -45,7 +45,7 @@ function readBody(req) {
     let size = 0;
     req.on('data', (chunk) => {
       size += chunk.length;
-      if (size > 1_000_000) {
+      if (size > 4_000_000) {
         reject(Object.assign(new Error('Request body too large'), { status: 413 }));
         req.destroy();
         return;
@@ -528,7 +528,8 @@ export async function handleApi(req, res, url, cookies) {
         owner: clean(body.owner, 60),
         ownerId: clean(body.ownerId, 40) || null,
         city: clean(body.city, 80),
-        img: clean(body.img, 500) || 'media/placeholder.png',
+        // An attached photo is stored on disk; a plain URL is used as given.
+        img: body.photo ? saveUpload(body.photo) : (clean(body.img, 500) || 'media/placeholder.png'),
         specs,
         notes: clean(body.notes, 1000),
         status: isAdmin ? 'approved' : 'pending',

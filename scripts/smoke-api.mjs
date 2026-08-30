@@ -22,6 +22,8 @@ const dataDir = mkdtempSync(join(tmpdir(), 'srn-data-'));
 // store.js resolves DATA_DIR at import time, so the env var must be set BEFORE the
 // dynamic imports below. A static import here would write into the repo's real data/.
 process.env.SRN_DATA_DIR = dataDir;
+const uploadDir = mkdtempSync(join(tmpdir(), 'srn-uploads-'));
+process.env.SRN_UPLOAD_DIR = uploadDir;
 const { hashPassword, newId } = await import('../server/auth.js');
 const { write } = await import('../server/store.js');
 
@@ -357,6 +359,24 @@ try {
   check('invalid order status 400',
     (await call(admin, 'PATCH', `/api/orders/${order.data.order.id}/status`, { status: 'shipped' })).status === 400);
 
+  // ---- rig photo attachment ------------------------------------------------
+  const PNG_1PX = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
+  const withPhoto = await call(vendor, 'POST', '/api/rigs', {
+    name: 'Photo Rig', owner: 'Wheel Shop',
+    photo: `data:image/png;base64,${PNG_1PX}`,
+  });
+  check('rig with a photo is accepted', withPhoto.status === 201, JSON.stringify(withPhoto.data));
+  check('photo is stored and referenced by path',
+    /^media\/uploads\/rig-[\w-]+\.png$/.test(withPhoto.data?.rig?.img || ''),
+    `img=${withPhoto.data?.rig?.img}`);
+  check('a bad data URL is rejected 400',
+    (await call(vendor, 'POST', '/api/rigs', { name: 'x', owner: 'y', photo: 'data:text/plain;base64,aGk=' })).status === 400);
+  check('a non-image data URL is rejected 400',
+    (await call(vendor, 'POST', '/api/rigs', { name: 'x', owner: 'y', photo: 'not a data url' })).status === 400);
+  const tooBig = 'A'.repeat(3 * 1024 * 1024);
+  const big = await call(vendor, 'POST', '/api/rigs', { name: 'x', owner: 'y', photo: `data:image/png;base64,${tooBig}` });
+  check('an oversized photo is rejected', big.status === 400 || big.status === 413, `got ${big.status}`);
+
   // ---- rate limiting (last: it exhausts a bucket shared with the tests above) --
   let loginBlockedAt = null;
   for (let i = 0; i < 25; i++) {
@@ -398,4 +418,5 @@ try {
 } finally {
   server.kill('SIGTERM');
   rmSync(dataDir, { recursive: true, force: true });
+  rmSync(uploadDir, { recursive: true, force: true });
 }

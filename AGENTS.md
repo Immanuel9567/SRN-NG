@@ -109,12 +109,12 @@ Invariants that are covered by tests, so do not break them:
 | Seed the datastore | `npm run seed` (idempotent; `-- --force` reseeds content) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
-| API tests only | `npm run test:api` (133 checks) |
-| DOM render tests only | `npm run test:render` (72 checks, uses jsdom) |
+| API tests only | `npm run test:api` (138 checks) |
+| DOM render tests only | `npm run test:render` (80 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (149 checks) |
+| Page consistency only | `npm run check:pages` (228 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -123,8 +123,8 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (149), `check:inline` (16 blocks), `test:api` (133),
-   `test:render` (72), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
+   `check:skills` (60), `check:pages` (228), `check:inline` (32 blocks), `test:api` (138),
+   `test:render` (80), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
 4. `git diff --stat` shows only intended files, and `data/` is unchanged unless you meant to change it.
@@ -174,6 +174,8 @@ use it, because it has caught a navbar bug that the API tests could not see.
 - **Pages must survive an empty datastore.** A fresh deployment has no content, and a crash on an
   empty collection kills the rest of that page's `DOMContentLoaded` handler. Guard every
   `COLLECTION[0]`. `npm run test:empty` loads all 15 pages against empty data and fails on any error.
+- **`matchMedia` is not implemented in jsdom.** Theme code must guard for it, and the test harness
+  polyfills it so the switcher is testable.
 - **`innerText` is not implemented in jsdom.** Assigning it does nothing under test and silently
   leaves `textContent` empty. Use `textContent`. Every such assignment in this repo has been converted.
 - **Node's `fetch` ignores a `Host` header override**, so it cannot test the host allowlist.
@@ -240,8 +242,18 @@ All in `css/style.css`, so a change lands on every page at once.
   `backdrop-filter: blur(20px) saturate(180%)` with a green-to-orange hairline
   (`.navbar::after`) that fades in on scroll. Always set `-webkit-backdrop-filter` alongside
   `backdrop-filter`; the `@supports not` block falls back to a solid pill.
-- **Mobile drawer.** `.mobile-menu` is `position: absolute; bottom: calc(100% + 0.75rem)` so it
-  floats as a rounded sheet **above** the pill. `js/app.js` toggles `.open` and swaps the icon.
+- **Mobile drawer.** `.mobile-menu` is `position: fixed` at `bottom: 5.5rem` and lives **outside**
+  `<nav>` in the DOM. That is deliberate: an ancestor with `backdrop-filter` becomes the backdrop
+  root, so a drawer nested inside the navbar could only blur the navbar, never the page behind it.
+  Do not move it back inside `<nav>`. It is centred with `left/right/max-width/margin: auto` rather
+  than `transform`, so `transform` stays free for the pop animation.
+- **Sticky sub-header.** Every content page opens with `.sticky-subhead` (`position: sticky; top: 0`)
+  holding the back link (`.subhead-back`) and the theme switcher. On `sim-rigs.html` the back link is
+  hidden by an inline script unless `?id=` is present.
+- **Theme switcher.** `js/theme.js` reads `srn-theme` from localStorage (`light` | `dark` | `auto`,
+  default `auto`) and sets `data-theme` on `<html>`. "Auto" is resolved in JS via `matchMedia`, so the
+  stylesheet only defines two states. Each page also carries an inline pre-paint script in `<head>`
+  to avoid a palette flash. `matchMedia` is guarded everywhere: jsdom does not implement it.
 - **Clearance.** `body { padding-bottom: 6.5rem }` keeps content out from under the pill. Toasts
   sit at `bottom: 6.5rem` and the shop cart bar at `bottom: 5.5rem` so nothing collides. If you add
   any new fixed bottom element, give it clearance too.
@@ -275,7 +287,23 @@ Dark theme only. There is no light mode and no theme toggle.
 - Frosted panels use `.glass-panel`; the navbar and drawer share the same
   `rgba(255,255,255,0.1) -> rgba(255,255,255,0.04)` gradient at `blur(24px) saturate(200%)`.
 
-## 12. Instruction precedence
+## 12. Themes and uploads
+
+**Themes.** `[data-theme="light"]` in `css/style.css` overrides the palette variables. Glass surfaces,
+the switcher, `.srn-segmented` and `.glass-text` each have light-mode variants.
+
+Known debt: many pages hardcode colours in inline `style` attributes (`color: #FFF`,
+`rgba(255,255,255,0.06)` borders), which cannot follow the variables. Two attribute-selector bridges
+patch the commonest cases. They are a stopgap; converting those inline styles to classes is the real
+fix, and the light theme will look inconsistent in places until then.
+
+**Rig photo uploads.** `POST /api/rigs` accepts a `photo` field as a `data:` URL. `saveUpload()` in
+`server/store.js` validates the MIME type (PNG/JPEG/WebP), enforces a 2 MB cap, and writes to
+`media/uploads/` so the static server can serve it. The request body limit is 4 MB because base64
+inflates by roughly a third. `media/uploads/` is gitignored. `SRN_UPLOAD_DIR` redirects it, which is
+how the tests avoid writing into the working tree.
+
+## 13. Instruction precedence
 
 1. Explicit user instruction in the current message.
 2. The repo facts in this file.
@@ -283,7 +311,7 @@ Dark theme only. There is no light mode and no theme toggle.
 4. The active skill's `key_rules_summary`.
 5. Default assistant behaviour.
 
-## 13. Skill library
+## 14. Skill library
 
 60 skills in six categories, all in `skills/master_skill_compilation.json`:
 

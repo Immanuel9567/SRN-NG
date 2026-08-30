@@ -66,7 +66,14 @@ try {
       resources: 'usable',
       pretendToBeVisual: true,
       virtualConsole: vc,
-      beforeParse(w) { w.fetch = (i, init = {}) => fetch(new URL(typeof i === 'string' ? i : i.url, BASE), init); },
+      beforeParse(w) {
+      // jsdom has no matchMedia; the theme code guards for it, but the switcher
+      // needs a working one to be testable at all.
+      w.matchMedia = w.matchMedia || ((query) => ({
+        matches: false, media: query,
+        addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
+      }));
+      w.fetch = (i, init = {}) => fetch(new URL(typeof i === 'string' ? i : i.url, BASE), init); },
     });
     await new Promise((r) => dom.window.addEventListener('load', r));
     await new Promise((r) => setTimeout(r, 350));

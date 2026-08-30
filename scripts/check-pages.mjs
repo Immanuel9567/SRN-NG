@@ -27,8 +27,8 @@ for (const page of CONTENT_PAGES) {
 
   // Script order matters: js/api.js defines SRN before js/app.js calls it.
   const order = [...html.matchAll(/<script src="(js\/[^"]+)"><\/script>/g)].map((m) => m[1]);
-  check(`${page}: script order is data.js, api.js, app.js`,
-    order.join(',') === 'js/data.js,js/api.js,js/app.js', order.join(','));
+  check(`${page}: script order is data.js, api.js, theme.js, app.js`,
+    order.join(',') === 'js/data.js,js/api.js,js/theme.js,js/app.js', order.join(','));
 
   check(`${page}: has a nav`, /<nav/.test(html));
   check(`${page}: has a footer`, /<footer/.test(html));
@@ -63,9 +63,12 @@ for (const page of CONTENT_PAGES) {
     /@supports not \(\(backdrop-filter/.test(css));
 
   const drawer = css.match(/\.mobile-menu \{([^}]*)\}/)?.[1] || '';
-  check('drawer floats above the pill', /bottom: calc\(100% \+ 0\.75rem\)/.test(drawer));
+  // The drawer must sit outside <nav>: a backdrop-filter ancestor becomes the
+  // backdrop root, which would stop the sheet from blurring the page behind it.
+  check('drawer is fixed, not nested in the navbar', /position: fixed/.test(drawer));
+  check('drawer sits above the pill', /bottom: 5\.5rem/.test(drawer));
   check('drawer has rounded corners', /border-radius: 1\.75rem/.test(drawer));
-  check('drawer is glassy like the navbar', /backdrop-filter: blur\(/.test(drawer));
+  check('drawer blurs the background', /backdrop-filter: blur\(28px\)/.test(drawer));
   check('page content clears the floating nav', /body \{[^}]*padding-bottom: 6\.5rem/.test(css));
 }
 
@@ -92,14 +95,42 @@ for (const page of CONTENT_PAGES) {
   const navBlock = css.match(/\.navbar \{([^}]*)\}/)?.[1] || '';
   check('navbar panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1\) 0%/.test(navBlock));
   const drawer = css.match(/\.mobile-menu \{([^}]*)\}/)?.[1] || '';
-  check('drawer panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1\) 0%/.test(drawer));
+  check('drawer panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1[0-9]?\) 0%/.test(drawer));
 
   const account = readFileSync(join(ROOT, 'account.html'), 'utf8');
   check('account page has a mode toggle', /id="auth-mode"/.test(account) && /srn-segmented/.test(account));
   check('account page keeps both forms for alternating fields',
     /id="signup-form"/.test(account) && /id="login-form"/.test(account));
 
+  // ---- sticky sub-header, theme switcher and the rig photo field ----------
+  check('.sticky-subhead is sticky', /\.sticky-subhead \{[^}]*position: sticky/.test(css));
+  check('a light theme is defined', /\[data-theme="light"\] \{/.test(css));
+  check('theme switcher styles exist', /\.theme-switch \{/.test(css));
+
+  for (const page of CONTENT_PAGES) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    check(`${page}: has a sticky sub-header`, /class="sticky-subhead"/.test(html));
+    check(`${page}: sub-header has a theme switcher`, /class="theme-switch"/.test(html));
+    check(`${page}: offers light, dark and device themes`,
+      /data-theme="light"/.test(html) && /data-theme="dark"/.test(html) && /data-theme="auto"/.test(html));
+    check(`${page}: loads js/theme.js`, /<script src="js\/theme\.js"><\/script>/.test(html));
+    check(`${page}: sets the theme before first paint`,
+      /localStorage\.getItem\('srn-theme'\)/.test(html));
+  }
+
+  const backPages = { 'news-article.html': 'news.html', 'member-profile.html': 'members.html', 'sim-rigs.html': 'sim-rigs.html' };
+  for (const [page, target] of Object.entries(backPages)) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    check(`${page}: back link lives in the sticky sub-header`,
+      new RegExp(`class="subhead-back" href="${target.replace('.', '\\.')}"`).test(html));
+  }
+
+  const rigPage = readFileSync(join(ROOT, 'sim-rigs.html'), 'utf8');
+  check('rig form has a photo file input',
+    /<input type="file" id="rig-photo"[^>]*accept="image\//.test(rigPage));
+
   const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  check('hero marketing badge removed', !/Nigeria's Premier Sim Racing Community/.test(index));
   check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(index));
   check('no large headline is left flat green',
     !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(index));

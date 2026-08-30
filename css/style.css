@@ -387,22 +387,26 @@ button, input, textarea, select {
 
 .mobile-menu {
   display: none;
-  position: absolute;
-  bottom: calc(100% + 0.75rem);
-  left: 0;
-  right: 0;
+  /* Sits outside <nav> on purpose: a backdrop-filter ancestor becomes the backdrop
+     root, which would stop this sheet from blurring the page behind it.
+     Centred with left/right/max-width so transform stays free for the animation. */
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  margin: 0 auto;
+  max-width: 28rem;
+  bottom: 5.5rem;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.875rem;
-  /* Same frosted-glass recipe as the pill navbar, so the sheet reads as one family. */
   border-radius: 1.75rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 60px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 24px 60px rgba(0, 0, 0, 0.6);
   transform-origin: bottom center;
-  z-index: 3;
+  z-index: 45;
 }
 
 .mobile-menu.open {
@@ -429,7 +433,7 @@ button, input, textarea, select {
 
 /* No backdrop-filter support: solid sheet instead of unreadable text. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .mobile-menu { background: rgba(12, 12, 18, 0.96); }
+  .mobile-menu { background: rgba(12, 12, 18, 0.97); }
 }
 
 .mobile-nav-link {
@@ -812,4 +816,135 @@ body {
 .srn-segmented button.active {
   background: rgba(0, 230, 118, 0.16);
   color: var(--accent-green);
+}
+
+/* ==========================================================================
+   Sticky sub-header: back link plus the theme switcher
+   ========================================================================== */
+.sticky-subhead {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3rem;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.subhead-back {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-green);
+  text-transform: uppercase;
+}
+
+.subhead-spacer { flex: 1; }
+
+/* ==========================================================================
+   Theme switcher
+   ========================================================================== */
+.theme-switch {
+  display: inline-flex;
+  padding: 0.1875rem;
+  gap: 0.1875rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.theme-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.625rem;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.theme-switch button.active {
+  background: rgba(0, 230, 118, 0.18);
+  color: var(--accent-green);
+}
+
+.theme-switch svg { display: block; }
+
+/* ==========================================================================
+   Light theme
+   Set on <html> as data-theme by js/theme.js. "Auto" resolves the device
+   preference in JS, so only these two states need styling.
+   ========================================================================== */
+[data-theme="light"] {
+  --bg-dark: #F3F5F7;
+  --bg-alt: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-alt: #EEF1F4;
+  --accent-green: #00914A;
+  --accent-green-rgb: 0, 145, 74;
+  --accent-orange: #D2500F;
+  --accent-blue: #2563EB;
+  --accent-purple: #6D28D9;
+  --text-white: #0B0B10;
+  --text-primary: #14141B;
+  --text-muted: #4B4B58;
+  --text-dim: #6C6C7A;
+  --text-dark: #9B9BA7;
+  --border-subtle: rgba(10, 10, 20, 0.1);
+  --border-light: rgba(10, 10, 20, 0.18);
+}
+
+/* Glass surfaces need a darker tint on a light page or they vanish. */
+[data-theme="light"] .navbar,
+[data-theme="light"] .mobile-menu,
+[data-theme="light"] .sticky-subhead {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.5) 100%);
+  border-color: rgba(10, 10, 20, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 16px 40px rgba(10, 10, 20, 0.14);
+}
+
+[data-theme="light"] .theme-switch,
+[data-theme="light"] .srn-segmented {
+  background: rgba(10, 10, 20, 0.06);
+  border-color: rgba(10, 10, 20, 0.12);
+}
+
+[data-theme="light"] .theme-switch button.active,
+[data-theme="light"] .srn-segmented button.active {
+  background: rgba(0, 145, 74, 0.16);
+  color: var(--accent-green);
+}
+
+[data-theme="light"] .glass-text {
+  background-image: linear-gradient(180deg,
+    rgba(0, 145, 74, 0.95) 0%,
+    rgba(0, 145, 74, 0.78) 55%,
+    rgba(0, 145, 74, 0.5) 100%);
+  text-shadow: none;
+}
+
+/* Inline styles across the pages hardcode white text and white-alpha borders.
+   Until those are converted to classes, bridge the most common ones. */
+[data-theme="light"] [style*="color: #FFF"],
+[data-theme="light"] [style*="color: #fff"],
+[data-theme="light"] [style*="color:#FFF"],
+[data-theme="light"] [style*="color:#fff"] {
+  color: #14141B !important;
+}
+
+[data-theme="light"] [style*="rgba(255,255,255,0.05)"],
+[data-theme="light"] [style*="rgba(255,255,255,0.06)"],
+[data-theme="light"] [style*="rgba(255,255,255,0.1)"] {
+  border-color: rgba(10, 10, 20, 0.12) !important;
 }

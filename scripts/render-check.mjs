@@ -18,6 +18,8 @@ const PORT = 5100 + Math.floor(Math.random() * 800);
 const BASE = `http://127.0.0.1:${PORT}`;
 const dataDir = mkdtempSync(join(tmpdir(), 'srn-render-'));
 process.env.SRN_DATA_DIR = dataDir;
+const uploadDir = mkdtempSync(join(tmpdir(), 'srn-uploads-'));
+process.env.SRN_UPLOAD_DIR = uploadDir;
 
 const { JSDOM, VirtualConsole } = await import('jsdom');
 const { hashPassword, newId } = await import('../server/auth.js');
@@ -146,7 +148,14 @@ async function loadPage(path, { cookie } = {}) {
     resources: 'usable',
     pretendToBeVisual: true,
     virtualConsole,
-    beforeParse(window) { window.fetch = makeFetch(cookie); },
+    beforeParse(window) {
+      // jsdom has no matchMedia; the theme code guards for it, but the switcher
+      // needs a working one to be testable at all.
+      window.matchMedia = window.matchMedia || ((query) => ({
+        matches: false, media: query,
+        addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
+      }));
+      window.fetch = makeFetch(cookie); },
   });
   await new Promise((r) => dom.window.addEventListener('load', r));
   await sleep(350);
@@ -443,6 +452,32 @@ try {
     && defaults.document.getElementById('login-form').style.display === 'none');
   defaults.window.close();
 
+  // ---- theme switcher ---------------------------------------------------------
+  const theme = await loadPage('/gallery.html');
+  const root = theme.document.documentElement;
+  check('theme is applied before interaction', ['light', 'dark'].includes(root.getAttribute('data-theme')),
+    `data-theme=${root.getAttribute('data-theme')}`);
+  theme.document.querySelector('.theme-switch button[data-theme="light"]').click();
+  check('clicking light sets data-theme=light', root.getAttribute('data-theme') === 'light');
+  check('the light button is marked active',
+    theme.document.querySelector('.theme-switch button[data-theme="light"]').classList.contains('active'));
+  theme.document.querySelector('.theme-switch button[data-theme="dark"]').click();
+  check('clicking dark sets data-theme=dark', root.getAttribute('data-theme') === 'dark');
+  theme.document.querySelector('.theme-switch button[data-theme="auto"]').click();
+  // The polyfill reports prefers-color-scheme: light as false, so auto resolves to dark.
+  check('auto follows the device preference', root.getAttribute('data-theme') === 'dark',
+    `data-theme=${root.getAttribute('data-theme')}`);
+  check('only one switcher button is active',
+    theme.document.querySelectorAll('.theme-switch button.active').length === 1);
+  theme.window.close();
+
+  // ---- rig submission with a photo --------------------------------------------
+  const rigPage = await loadPage('/sim-rigs.html', { cookie: await loginCookie('root@srn.ng', ADMIN_PASSWORD) });
+  check('rig form offers a photo field', !!rigPage.document.getElementById('rig-photo'));
+  check('photo field only accepts images',
+    /image\//.test(rigPage.document.getElementById('rig-photo').getAttribute('accept') || ''));
+  rigPage.window.close();
+
   console.log('');
   if (failures.length) {
     console.error(`${failures.length} of ${pass + failures.length} render checks FAILED:`);
@@ -458,4 +493,5 @@ try {
 } finally {
   server.kill('SIGTERM');
   rmSync(dataDir, { recursive: true, force: true });
+  rmSync(uploadDir, { recursive: true, force: true });
 }
