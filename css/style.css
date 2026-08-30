@@ -1057,3 +1057,125 @@ body {
   object-fit: cover;
   opacity: 0.45;
 }
+
+/* Shared section headings, media cards, icon tiles. */
+.section-kicker {
+  color: var(--accent-green);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.section-kicker-orange { color: var(--accent-orange); }
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 900;
+  color: var(--text-white);
+  line-height: 1.1;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-media {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card-alt);
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-media-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--bg-card) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.icon-tile {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 230, 118, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 230, 118, 0.22);
+}
+
+.icon-tile-blue {
+  background: rgba(96, 165, 250, 0.12);
+  color: var(--accent-blue);
+  border-color: rgba(96, 165, 250, 0.28);
+}
+
+.icon-tile-orange {
+  background: rgba(255, 107, 26, 0.12);
+  color: var(--accent-orange);
+  border-color: rgba(255, 107, 26, 0.28);
+}
+
+.icon-tile-purple {
+  background: rgba(167, 139, 250, 0.12);
+  color: var(--accent-purple);
+  border-color: rgba(167, 139, 250, 0.28);
+}
+
+.card-cta {
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 2.5rem;
+}
+
+.confirm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  font-size: 0.875rem;
+}
+
+a.card,
+button.card {
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: rgba(0, 230, 118, 0.28);
+}
+
+.stats-bar {
+  background-color: var(--bg-card);
+  border-top: 1px solid rgba(0, 230, 118, 0.12);
+  border-bottom: 1px solid rgba(0, 230, 118, 0.12);
+  padding: 2.5rem 0;
+}

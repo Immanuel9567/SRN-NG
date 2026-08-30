@@ -72,6 +72,8 @@
       </button>
     </div>
 
+  </nav>
+
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
       <a href="index.html" class="mobile-nav-link">Home</a>
@@ -88,7 +90,7 @@
         <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
       </div>
     </div>
-  </nav>
+
 
   <main>
     <!-- Hero Section -->
@@ -148,7 +150,7 @@
     </section>
 
     <!-- Stats Bar -->
-    <section style="background-color: var(--bg-card); border-top: 1px solid rgba(0,230,118,0.12); border-bottom: 1px solid rgba(0,230,118,0.12); padding: 2.5rem 0;">
+    <section class="stats-bar">
       <div class="container grid grid-cols-3" style="text-align: center;">
         <div>
           <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">2,400+</div>
@@ -169,37 +171,37 @@
     <section class="section-py" style="background-color: var(--bg-dark);">
       <div class="container">
         <div style="text-align: center; margin-bottom: 3rem;">
-          <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">What We Offer</p>
-          <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">EVERYTHING SIM RACING</h2>
+          <p class="section-kicker">What We Offer</p>
+          <h2 class="section-title">EVERYTHING SIM RACING</h2>
         </div>
 
         <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
           <a href="gallery.html" class="card" style="padding: 1.5rem; display: block;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">🎮</div>
+            <span class="icon-tile" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h.01M10 10v4M14 10v4M18 12h.01"/></svg></span>
             <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Game Gallery</h3>
             <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Highlights from ACC, iRacing, and Assetto Corsa, curated by Nigerian drivers.</p>
-            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-green); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+            <div class="card-cta">Explore →</div>
           </a>
 
           <a href="members.html" class="card" style="padding: 1.5rem; display: block;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">👥</div>
+            <span class="icon-tile icon-tile-blue" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
             <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Community</h3>
-            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">A growing home for every Nigerian sim racer — from beginners to champions.</p>
-            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">A growing home for every Nigerian sim racer, from first session to championship.</p>
+            <div class="card-cta" style="color: var(--accent-blue);">Explore →</div>
           </a>
 
           <a href="activities.html" class="card" style="padding: 1.5rem; display: block;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">📅</div>
+            <span class="icon-tile icon-tile-orange" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
             <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Events</h3>
             <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Weekly races, monthly championships, and live watch parties you can't miss.</p>
-            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-orange); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+            <div class="card-cta" style="color: var(--accent-orange);">Explore →</div>
           </a>
 
           <a href="news.html" class="card" style="padding: 1.5rem; display: block;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">📰</div>
+            <span class="icon-tile icon-tile-purple" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4H8v16a2 2 0 0 1-2 2H4z"/><path d="M16 2v4M8 2v2M12 10h6M12 14h6"/></svg></span>
             <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Latest News</h3>
             <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Race results, gear reviews, and everything happening in the Nigerian sim scene.</p>
-            <div style="margin-top: 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); display: flex; align-items: center; gap: 0.25rem;">Explore →</div>
+            <div class="card-cta" style="color: var(--accent-purple);">Explore →</div>
           </a>
         </div>
       </div>
@@ -230,7 +232,7 @@
             <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Latest</p>
             <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">NEWS & UPDATES</h2>
           </div>
-          <a href="news.html" style="color: var(--text-dim); font-size: 0.875rem; font-weight: 600;">All News →</a>
+          <a href="news.html" class="btn btn-outline-light">All News →</a>
         </div>
 
         <div id="home-news-grid" class="grid grid-cols-1 grid-cols-3-lg">
@@ -443,9 +445,7 @@
           try {
             const res = await SRN.subscribe(email);
             document.getElementById('newsletter-form-container').innerHTML = `
-              <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 9999px; background: rgba(0,230,118,0.1); border: 1px solid var(--accent-green); color: var(--accent-green);">
-                ✓ You're in. Welcome to the grid!
-              </div>
+              <div class="confirm-chip">You're in. Welcome to the grid.</div>
             `;
             SRN.toast(res.message, 'success');
           } catch (err) {

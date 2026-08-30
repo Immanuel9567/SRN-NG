@@ -123,7 +123,7 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (62), `check:pages` (307), `check:inline` (33 blocks), `test:api` (161),
+   `check:skills` (62), `check:pages` (335), `check:inline` (33 blocks), `test:api` (161),
    `test:render` (84), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
