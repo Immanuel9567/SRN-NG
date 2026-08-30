@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -86,9 +92,18 @@
               <input required type="text" id="act-title" placeholder="Activity title" class="input-field" />
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <input required type="date" id="act-date" class="input-field" />
+                <input required type="time" id="act-time" class="input-field" />
                 <input required type="text" id="act-location" placeholder="Location" class="input-field" />
+                <select required id="act-type" class="input-field">
+                  <option value="">Activity type</option>
+                  <option value="Race Night">Race Night</option>
+                  <option value="Championship">Championship</option>
+                  <option value="Meetup">Meetup</option>
+                  <option value="Watch Party">Watch Party</option>
+                </select>
               </div>
               <textarea required id="act-desc" placeholder="Description" rows="3" class="input-field"></textarea>
+              <p id="activity-form-status" style="font-size: 0.75rem; min-height: 1rem;"></p>
               <button type="submit" class="btn btn-primary">SUBMIT FOR REVIEW</button>
             </form>
           </div>
@@ -115,11 +130,16 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       let currentTab = 'upcoming';
-      const rsvps = {};
+      let events = [];
+      const esc = SRN.esc;
+      const me = await SRN.me();
+      const attending = (a) => Array.isArray(a.rsvps) && !!me && a.rsvps.includes(me.id);
+      const rsvpCount = (a) => (Array.isArray(a.rsvps) ? a.rsvps.length : 0);
 
       const typeColors = {
         'Race Night': 'var(--accent-green)',
@@ -130,24 +150,29 @@
 
       function renderActivities() {
         const container = document.getElementById('activities-list');
-        const list = ACTIVITIES.filter(a => a.status === currentTab);
+        const list = events.filter(a => a.status === currentTab);
+
+        if (!list.length) {
+          container.innerHTML = `<p style="color: var(--text-dim); font-size: 0.875rem;">Nothing here yet. Submitted events appear once an admin approves them.</p>`;
+          return;
+        }
 
         container.innerHTML = list.map(a => `
           <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;">
             <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 1.25rem; align-items: center;">
-              <img src="${a.img}" alt="${a.title}" style="width: 100%; max-width: 10rem; height: 6rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
+              <img src="${esc(a.img)}" alt="${esc(a.title)}" style="width: 100%; max-width: 10rem; height: 6rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
               <div style="flex: 1; min-width: 200px;">
-                <span class="badge" style="color: ${typeColors[a.type]}; background: rgba(255,255,255,0.05);">${a.type}</span>
-                <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${a.title}</h3>
-                <p style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 0.5rem;">${a.description}</p>
+                <span class="badge" style="color: ${typeColors[a.type]}; background: rgba(255,255,255,0.05);">${esc(a.type)}</span>
+                <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${esc(a.title)}</h3>
+                <p style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 0.5rem;">${esc(a.description)}</p>
                 <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 1rem;">
-                  <span>📅 ${a.date} · ${a.time}</span>
-                  <span>📍 ${a.location}</span>
+                  <span>📅 ${esc(a.date)} · ${esc(a.time)}</span>
+                  <span>📍 ${esc(a.location)}</span>
                 </div>
               </div>
               ${a.status === 'upcoming' ? `
-                <button class="btn ${rsvps[a.id] ? 'btn-primary' : 'btn-outline-green'} rsvp-btn" data-id="${a.id}">
-                  ${rsvps[a.id] ? "YOU'RE IN ✓" : 'RSVP'}
+                <button class="btn ${attending(a) ? 'btn-primary' : 'btn-outline-green'} rsvp-btn" data-id="${esc(a.id)}">
+                  ${attending(a) ? (rsvpCount(a) > 1 ? `YOU'RE IN ✓ (${rsvpCount(a)})` : "YOU'RE IN ✓") : (rsvpCount(a) ? `RSVP (${rsvpCount(a)})` : 'RSVP')}
                 </button>
               ` : ''}
             </div>
@@ -155,10 +180,21 @@
         `).join('');
 
         document.querySelectorAll('.rsvp-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', async () => {
             const id = btn.getAttribute('data-id');
-            rsvps[id] = !rsvps[id];
-            renderActivities();
+            if (!me) {
+              SRN.toast('Sign in to RSVP for an event.', 'info');
+              setTimeout(() => { window.location.href = 'account.html'; }, 1000);
+              return;
+            }
+            try {
+              const res = await SRN.toggleRsvp(id);
+              SRN.toast(res.attending ? "You're in. See you on track." : 'RSVP cancelled.', res.attending ? 'success' : 'info');
+              events = (await SRN.events()).events;
+              renderActivities();
+            } catch (err) {
+              SRN.toast(err.message, 'error');
+            }
           });
         });
       }
@@ -189,20 +225,36 @@
       toggleBtn.addEventListener('click', () => {
         formVisible = !formVisible;
         formCard.style.display = formVisible ? 'block' : 'none';
-        toggleBtn.innerText = formVisible ? 'CLOSE FORM' : '+ SUBMIT AN ACTIVITY';
+        toggleBtn.textContent = formVisible ? 'CLOSE FORM' : '+ SUBMIT AN ACTIVITY';
       });
 
       // Form submit
       const form = document.getElementById('activity-form');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        document.getElementById('activity-form-content').innerHTML = `
-          <p style="font-size: 0.875rem; color: var(--accent-green);">
-            Thanks — your activity has been submitted for review by the SRN team.
-          </p>
-        `;
+        const status = document.getElementById('activity-form-status');
+        status.textContent = '';
+        try {
+          const res = await SRN.submitEvent({
+            title: document.getElementById('act-title').value,
+            date: document.getElementById('act-date').value,
+            time: document.getElementById('act-time').value,
+            location: document.getElementById('act-location').value,
+            type: document.getElementById('act-type').value,
+            description: document.getElementById('act-desc').value,
+          });
+          document.getElementById('activity-form-content').innerHTML = `
+            <p style="font-size: 0.875rem; color: var(--accent-green);">${esc(res.message)}</p>
+          `;
+          events = (await SRN.events()).events;
+          renderActivities();
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
       });
 
+      events = (await SRN.events()).events;
       renderActivities();
     });
   </script>

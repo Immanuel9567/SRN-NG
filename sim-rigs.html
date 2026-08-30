@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -77,11 +83,16 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      const esc = SRN.esc;
       const id = getQueryParam('id');
       const view = document.getElementById('rigs-view');
+      const RIGS = (await SRN.rigs()).rigs;
+      // Shadows the js/data.js helper so the render code below is unchanged.
+      const getRig = (rigId) => RIGS.find(r => r.id === rigId);
 
       if (id) {
         renderDetail(id);
@@ -107,14 +118,14 @@
           <header class="page-header">
             <div class="container container-narrow">
               <a href="sim-rigs.html" style="display: inline-block; color: var(--text-dim); font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem;">← Back to Rigs</a>
-              <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-bottom: 0.5rem;">${rig.name}</h1>
-              <a href="member-profile.html?id=${rig.ownerId}" style="color: var(--accent-green); font-size: 0.875rem;">by ${rig.owner} · ${rig.city}</a>
+              <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-bottom: 0.5rem;">${esc(rig.name)}</h1>
+              <a href="member-profile.html?id=${rig.ownerId}" style="color: var(--accent-green); font-size: 0.875rem;">by ${esc(rig.owner)} · ${esc(rig.city)}</a>
             </div>
           </header>
 
           <div class="container container-narrow" style="padding-top: 2.5rem; padding-bottom: 5rem;">
             <div style="border-radius: 1rem; overflow: hidden; height: 20rem; margin-bottom: 2rem;">
-              <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="${esc(rig.img)}" alt="${esc(rig.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
             <div class="card" style="padding: 1.5rem;">
@@ -122,8 +133,8 @@
               <div class="grid grid-cols-1 grid-cols-2-sm" style="row-gap: 0.75rem; column-gap: 2rem;">
                 ${rig.specs.map(s => `
                   <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem;">
-                    <span style="font-family: var(--font-display); font-size: 11px; color: var(--text-dark); text-transform: uppercase;">${s.label}</span>
-                    <span style="font-weight: 600; color: #FFF;">${s.value}</span>
+                    <span style="font-family: var(--font-display); font-size: 11px; color: var(--text-dark); text-transform: uppercase;">${esc(s.label)}</span>
+                    <span style="font-weight: 600; color: #FFF;">${esc(s.value)}</span>
                   </div>
                 `).join('')}
               </div>
@@ -154,14 +165,16 @@
                 <div id="rig-form-content">
                   <form id="rig-form" style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1rem;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                      <input required placeholder="Rig name" class="input-field" />
-                      <input required placeholder="Your name" class="input-field" />
+                      <input required id="rig-name" placeholder="Rig name" class="input-field" />
+                      <input required id="rig-owner" placeholder="Your name" class="input-field" />
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                      <input required placeholder="Wheelbase / wheel" class="input-field" />
-                      <input required placeholder="Pedals" class="input-field" />
+                      <input id="rig-wheel" placeholder="Wheelbase / wheel" class="input-field" />
+                      <input id="rig-pedals" placeholder="Pedals" class="input-field" />
                     </div>
-                    <textarea placeholder="Anything else worth mentioning?" rows="3" class="input-field"></textarea>
+                    <input id="rig-city" placeholder="City (optional)" class="input-field" />
+                    <textarea id="rig-notes" placeholder="Anything else worth mentioning?" rows="3" class="input-field"></textarea>
+                    <p id="rig-form-status" style="font-size: 0.75rem; min-height: 1rem;"></p>
                     <button type="submit" class="btn btn-primary">SUBMIT FOR REVIEW</button>
                   </form>
                 </div>
@@ -169,20 +182,20 @@
 
               <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-3-lg">
                 ${RIGS.map(rig => `
-                  <a href="sim-rigs.html?id=${rig.id}" class="card card-alt" style="display: block;">
+                  <a href="sim-rigs.html?id=${encodeURIComponent(rig.id)}" class="card card-alt" style="display: block;">
                     <div style="position: relative; height: 12rem; overflow: hidden;">
-                      <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                      <img src="${esc(rig.img)}" alt="${esc(rig.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
                       <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, rgba(19,19,26,0.3) 100%);"></div>
                       <div style="position: absolute; bottom: 1rem; left: 1.25rem;">
-                        <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; color: #FFF;">${rig.name}</div>
-                        <div style="font-size: 0.75rem; color: var(--accent-green);">by ${rig.owner}</div>
+                        <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; color: #FFF;">${esc(rig.name)}</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-green);">by ${esc(rig.owner)}</div>
                       </div>
                     </div>
                     <div style="padding: 1.25rem;">
                       ${rig.specs.slice(0, 3).map(s => `
                         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.75rem;">
-                          <span style="font-family: var(--font-display); color: var(--text-dark);">${s.label}</span>
-                          <span style="font-weight: 600; color: #FFF;">${s.value}</span>
+                          <span style="font-family: var(--font-display); color: var(--text-dark);">${esc(s.label)}</span>
+                          <span style="font-weight: 600; color: #FFF;">${esc(s.value)}</span>
                         </div>
                       `).join('')}
                     </div>
@@ -201,16 +214,33 @@
         toggleBtn.addEventListener('click', () => {
           visible = !visible;
           formCard.style.display = visible ? 'block' : 'none';
-          toggleBtn.innerText = visible ? 'CLOSE FORM' : '+ SUBMIT YOUR RIG';
+          toggleBtn.textContent = visible ? 'CLOSE FORM' : '+ SUBMIT YOUR RIG';
         });
 
-        document.getElementById('rig-form').addEventListener('submit', (e) => {
+        document.getElementById('rig-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          document.getElementById('rig-form-content').innerHTML = `
-            <p style="font-size: 0.875rem; color: var(--accent-green);">
-              Thanks — your rig has been submitted for review.
-            </p>
-          `;
+          const status = document.getElementById('rig-form-status');
+          status.textContent = '';
+          const specs = [
+            { label: 'Wheel', value: document.getElementById('rig-wheel').value.trim() },
+            { label: 'Pedals', value: document.getElementById('rig-pedals').value.trim() },
+          ].filter(spec => spec.value);
+          try {
+            const res = await SRN.submitRig({
+              name: document.getElementById('rig-name').value,
+              owner: document.getElementById('rig-owner').value,
+              city: document.getElementById('rig-city').value,
+              notes: document.getElementById('rig-notes').value,
+              specs,
+            });
+            document.getElementById('rig-form-content').innerHTML = `
+              <p style="font-size: 0.875rem; color: var(--accent-green);">${esc(res.message)}</p>
+            `;
+            SRN.toast(res.message, 'success');
+          } catch (err) {
+            status.textContent = err.message;
+            status.style.color = '#FF6B6B';
+          }
         });
       }
     });

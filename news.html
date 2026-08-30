@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -98,28 +104,32 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       let searchQuery = '';
       let currentTag = 'All';
+      let articles = [];
+      const esc = SRN.esc;
 
-      const tags = ['All', ...Array.from(new Set(NEWS.map(n => n.tag)))];
-
-      // Render Tags
+      // Render Tags (rebuilt after the articles load, since tags come from the data)
       const tagsContainer = document.getElementById('news-tags');
-      tagsContainer.innerHTML = tags.map(t => `
-        <button class="btn-pill ${t === 'All' ? 'active' : ''}" data-tag="${t}">${t}</button>
-      `).join('');
+      function renderTags() {
+        const tags = ['All', ...Array.from(new Set(articles.map(n => n.tag)))];
+        tagsContainer.innerHTML = tags.map(t => `
+          <button class="btn-pill ${t === 'All' ? 'active' : ''}" data-tag="${esc(t)}">${esc(t)}</button>
+        `).join('');
 
-      document.querySelectorAll('#news-tags button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#news-tags button').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentTag = btn.getAttribute('data-tag');
-          renderNews();
+        document.querySelectorAll('#news-tags button').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#news-tags button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTag = btn.getAttribute('data-tag');
+            renderNews();
+          });
         });
-      });
+      }
 
       // Search Handler
       document.getElementById('news-search').addEventListener('input', (e) => {
@@ -129,7 +139,7 @@
 
       function renderNews() {
         const grid = document.getElementById('news-grid');
-        const filtered = NEWS.filter(n => {
+        const filtered = articles.filter(n => {
           const matchesTag = currentTag === 'All' || n.tag === currentTag;
           const matchesQuery = n.title.toLowerCase().includes(searchQuery);
           return matchesTag && matchesQuery;
@@ -141,21 +151,23 @@
         }
 
         grid.innerHTML = filtered.map(n => `
-          <a href="news-article.html?slug=${n.slug}" class="card" style="display: block;">
+          <a href="news-article.html?slug=${encodeURIComponent(n.slug)}" class="card" style="display: block;">
             <div style="position: relative; height: 11rem; overflow: hidden;">
-              <img src="${n.img}" alt="${n.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="${esc(n.img)}" alt="${esc(n.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0E0E14 0%, transparent 55%);"></div>
-              <span class="badge badge-solid-orange" style="position: absolute; top: 0.75rem; left: 0.75rem;">${n.tag}</span>
+              <span class="badge badge-solid-orange" style="position: absolute; top: 0.75rem; left: 0.75rem;">${esc(n.tag)}</span>
             </div>
             <div style="padding: 1.25rem;">
-              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${n.date} · ${n.readTime}</div>
-              <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-bottom: 0.5rem; line-height: 1.3;">${n.title}</h3>
-              <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.excerpt}</p>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${esc(n.date)} · ${esc(n.readTime)}</div>
+              <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-bottom: 0.5rem; line-height: 1.3;">${esc(n.title)}</h3>
+              <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${esc(n.excerpt)}</p>
             </div>
           </a>
         `).join('');
       }
 
+      articles = (await SRN.news()).articles;
+      renderTags();
       renderNews();
     });
   </script>

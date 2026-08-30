@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -77,11 +83,14 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      const esc = SRN.esc;
       const id = getQueryParam('id');
-      const member = getMember(id);
+      const RIGS = (await SRN.rigs()).rigs;
+      const member = (await SRN.member(id)).member;
       const container = document.getElementById('profile-container');
 
       if (!member) {
@@ -104,12 +113,12 @@
             <a href="members.html" style="display: inline-block; color: var(--text-dim); font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem;">← Back to Members</a>
             <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
               <div style="width: 7rem; height: 7rem; border-radius: 1rem; overflow: hidden; border: 2px solid rgba(0,230,118,0.4); shrink: 0;">
-                <img src="${member.avatar}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                <img src="${esc(member.avatar)}" alt="${esc(member.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>
               <div>
-                <span class="badge badge-solid-green">${member.rank}</span>
-                <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${member.name}</h1>
-                <p style="font-size: 0.875rem; color: var(--text-muted);">${member.city} · Primarily races ${member.sim} · Joined ${member.joined}</p>
+                <span class="badge badge-solid-green">${esc(member.rank)}</span>
+                <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${esc(member.name)}</h1>
+                <p style="font-size: 0.875rem; color: var(--text-muted);">${esc(member.city)} · Primarily races ${esc(member.sim)} · Joined ${esc(member.joined)}</p>
               </div>
             </div>
           </div>
@@ -120,16 +129,16 @@
             <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 2.5rem;">
               <div>
                 <h2 style="font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 1rem;">Bio</h2>
-                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;">${member.bio}</p>
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;">${esc(member.bio || '')}</p>
               </div>
 
               <div>
                 <h2 style="font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-orange); margin-bottom: 1rem;">Activity History</h2>
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
-                  ${member.activity.map(a => `
+                  ${(member.activity || []).map(a => `
                     <div style="display: flex; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem;">
-                      <span style="color: var(--text-dim); width: 6rem; shrink: 0;">${a.date}</span>
-                      <span style="color: var(--text-muted);">${a.text}</span>
+                      <span style="color: var(--text-dim); width: 6rem; shrink: 0;">${esc(a.date)}</span>
+                      <span style="color: var(--text-muted);">${esc(a.text)}</span>
                     </div>
                   `).join('')}
                 </div>
@@ -155,15 +164,15 @@
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.875rem; color: var(--text-muted);">Races</span>
-                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${member.stats.races}</span>
+                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${(member.stats || {}).races}</span>
                   </div>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.875rem; color: var(--text-muted);">Wins</span>
-                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${member.stats.wins}</span>
+                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${(member.stats || {}).wins}</span>
                   </div>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.875rem; color: var(--text-muted);">Podiums</span>
-                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${member.stats.podiums}</span>
+                    <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${(member.stats || {}).podiums}</span>
                   </div>
                 </div>
               </div>

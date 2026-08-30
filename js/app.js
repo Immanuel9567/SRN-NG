@@ -3,6 +3,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   initActivePageLinks();
+  // Signed-in state in the navbar. Loaded from js/api.js, which must come first.
+  if (typeof SRN !== 'undefined') SRN.renderAccountState();
 });
 
 // Initialize Navbar Scroll & Mobile Menu Toggle

@@ -4,11 +4,22 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "node server/index.js",
+    "dev:static": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed": "node scripts/seed.mjs",
+    "check:skills": "node scripts/validate-skills.mjs",
+    "test:api": "node scripts/smoke-api.mjs",
+    "test:render": "node scripts/render-check.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
+    "check:inline": "node scripts/check-inline-js.mjs",
+    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:hostguard",
+    "test:hostguard": "node scripts/check-host-guard.mjs",
+    "reset-admin": "node scripts/reset-admin.mjs"
   },
   "devDependencies": {
+    "jsdom": "^30.0.1",
     "vite": "^8.0.0"
   }
 }

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "srn-tee-black",
+    "name": "SRN Wordmark Tee — Black",
+    "price": 12000,
+    "category": "Apparel",
+    "img": "https://images.unsplash.com/photo-1699138346782-8a8b211c3da2?w=900&h=500&fit=crop&auto=format",
+    "description": "Heavyweight cotton tee with the SRN wordmark across the chest.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-hoodie",
+    "name": "SRN Pit Crew Hoodie",
+    "price": 28000,
+    "category": "Apparel",
+    "img": "https://images.unsplash.com/photo-1699138346491-d6f4c7e04b85?w=900&h=500&fit=crop&auto=format",
+    "description": "Fleece-lined hoodie with embroidered logo, built for late-night race nights.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-cap",
+    "name": "SRN Racing Cap",
+    "price": 9000,
+    "category": "Apparel",
+    "img": "https://images.unsplash.com/photo-1635414764966-682bd029bb01?w=900&h=500&fit=crop&auto=format",
+    "description": "Structured six-panel cap with the SRN circle logo.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-sticker-pack",
+    "name": "SRN Sticker Pack (5-piece)",
+    "price": 3500,
+    "category": "Stickers",
+    "img": "https://images.unsplash.com/photo-1771920800290-53f22e5ac3f8?w=900&h=600&fit=crop&auto=format",
+    "description": "Five die-cut stickers, perfect for a rig frame or laptop lid.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-decal-large",
+    "name": "SRN Large Vinyl Decal",
+    "price": 5000,
+    "category": "Stickers",
+    "img": "https://images.unsplash.com/photo-1620855522342-de6d0ad7c3d7?w=600&h=600&fit=crop&auto=format",
+    "description": "Large format vinyl decal for a car window, rig panel, or wall.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-mousepad",
+    "name": "SRN Deskmat",
+    "price": 15000,
+    "category": "Accessories",
+    "img": "https://images.unsplash.com/photo-1699138346782-8a8b211c3da2?w=900&h=500&fit=crop&auto=format",
+    "description": "Extended deskmat sized for a full wheel-and-keyboard setup.",
+    "status": "approved"
+  },
+  {
+    "id": "srn-lanyard",
+    "name": "SRN Event Lanyard",
+    "price": 4000,
+    "category": "Accessories",
+    "img": "https://images.unsplash.com/photo-1635414764966-682bd029bb01?w=900&h=500&fit=crop&auto=format",
+    "description": "Woven lanyard from the West Africa Sim Racing Cup watch party.",
+    "status": "approved"
+  }
+]

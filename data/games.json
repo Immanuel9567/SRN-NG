@@ -1,0 +1,34 @@
+[
+  {
+    "id": "iracing",
+    "name": "iRacing",
+    "shortName": "iRacing",
+    "genre": "GT & Endurance",
+    "img": "https://images.unsplash.com/photo-1699138346782-8a8b211c3da2?w=900&h=500&fit=crop&auto=format",
+    "description": "The backbone of SRN league racing — official series, a strict safety rating, and the deepest field of Nigerian drivers."
+  },
+  {
+    "id": "acc",
+    "name": "Assetto Corsa Competizione",
+    "shortName": "ACC",
+    "genre": "GT & Endurance",
+    "img": "https://images.unsplash.com/photo-1699138346491-d6f4c7e04b85?w=900&h=500&fit=crop&auto=format",
+    "description": "GT3 and GT4 focused, home to the community Endurance Series and the West Africa Sim Racing Cup."
+  },
+  {
+    "id": "ac",
+    "name": "Assetto Corsa",
+    "shortName": "AC",
+    "genre": "Touring & Classic",
+    "img": "https://images.unsplash.com/photo-1635414764966-682bd029bb01?w=900&h=500&fit=crop&auto=format",
+    "description": "The modding platform of choice — community liveries, touring cars, and custom car packs live here."
+  },
+  {
+    "id": "rfactor2",
+    "name": "rFactor 2",
+    "shortName": "rF2",
+    "genre": "Open Wheel",
+    "img": "https://images.unsplash.com/photo-1771920800290-53f22e5ac3f8?w=900&h=600&fit=crop&auto=format",
+    "description": "A smaller but dedicated group races Formula Pro and prototype classes, known for deep setup tuning."
+  }
+]

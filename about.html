@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -177,6 +183,7 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

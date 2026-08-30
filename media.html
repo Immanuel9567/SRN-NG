@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -105,9 +111,11 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const esc = SRN.esc;
       let activeTab = 'Photos';
 
       const PHOTOS = [IMGS.race1, IMGS.race2, IMGS.race3, IMGS.wheel, IMGS.hero, IMGS.member, IMGS.race1, IMGS.race2];
@@ -142,7 +150,7 @@
             <div class="grid grid-cols-2 grid-cols-4-lg" style="gap: 1rem;">
               ${PHOTOS.map((src, i) => `
                 <div class="card" style="height: 11rem; overflow: hidden;">
-                  <img src="${src}" alt="Photo ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <img src="${esc(src)}" alt="Photo ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;" />
                 </div>
               `).join('')}
             </div>
@@ -151,18 +159,18 @@
           content.innerHTML = `
             <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
               ${VIDEOS.map(v => `
-                <button class="card video-card" data-title="${v.title}" style="text-align: left; cursor: pointer;">
+                <button class="card video-card" data-title="${esc(v.title)}" style="text-align: left; cursor: pointer;">
                   <div style="position: relative; height: 9rem; overflow: hidden;">
-                    <img src="${v.img}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+                    <img src="${esc(v.img)}" alt="${esc(v.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
                     <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
                       <div style="width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="#08080C"><polygon points="6 3 20 12 6 21"/></svg>
                       </div>
                     </div>
-                    <span style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${v.duration}</span>
+                    <span style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${esc(v.duration)}</span>
                   </div>
                   <div style="padding: 1rem;">
-                    <h3 style="font-size: 0.875rem; font-weight: 600; color: #FFF;">${v.title}</h3>
+                    <h3 style="font-size: 0.875rem; font-weight: 600; color: #FFF;">${esc(v.title)}</h3>
                   </div>
                 </button>
               `).join('')}
@@ -196,7 +204,7 @@
       const playingTitle = document.getElementById('video-playing-title');
 
       function openVideoModal(title) {
-        playingTitle.innerText = `Playing: ${title}`;
+        playingTitle.textContent = `Playing: ${title}`;
         modal.classList.add('active');
       }
 

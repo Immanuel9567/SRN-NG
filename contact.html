@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -74,9 +80,10 @@
         <div class="card" style="grid-column: span 3; padding: 2rem;">
           <div id="contact-form-container">
             <form id="contact-form" style="display: flex; flex-direction: column; gap: 1rem;">
-              <input required type="text" placeholder="Your name" class="input-field" />
-              <input required type="email" placeholder="Email address" class="input-field" />
-              <textarea required placeholder="Your message" rows="5" class="input-field"></textarea>
+              <input required type="text" id="contact-name" placeholder="Your name" class="input-field" autocomplete="name" />
+              <input required type="email" id="contact-email" placeholder="Email address" class="input-field" autocomplete="email" />
+              <textarea required id="contact-message" placeholder="Your message" rows="5" class="input-field"></textarea>
+              <p id="contact-status" style="font-size: 0.75rem; min-height: 1rem;"></p>
               <button type="submit" class="btn btn-primary">SEND MESSAGE</button>
             </form>
           </div>
@@ -115,23 +122,43 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('contact-form');
-      if (form) {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
+      if (!form) return;
+
+      // Pre-fill from the signed-in account when there is one.
+      SRN.me().then((user) => {
+        if (!user) return;
+        document.getElementById('contact-email').value = user.email;
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('contact-status');
+        status.textContent = '';
+        try {
+          const res = await SRN.sendMessage({
+            name: document.getElementById('contact-name').value,
+            email: document.getElementById('contact-email').value,
+            message: document.getElementById('contact-message').value,
+          });
           document.getElementById('contact-form-container').innerHTML = `
             <div style="padding: 2.5rem 0; text-align: center;">
               <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent-green);">✓</div>
               <p style="font-size: 0.875rem; color: var(--accent-green);">
-                Thanks — we've got your message and will get back to you soon.
+                Thanks, we have your message and will get back to you soon.
               </p>
             </div>
           `;
-        });
-      }
+          SRN.toast(res.message, 'success');
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
     });
   </script>
 </body>

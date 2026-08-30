@@ -1,24 +1,28 @@
-import { resolve } from 'path';
+import { readdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
+const here = dirname(fileURLToPath(import.meta.url));
+
+// Every .html file at the repo root is a page. Deriving the list means a new page
+// is picked up automatically instead of being silently omitted from the build.
+const pages = Object.fromEntries(
+  readdirSync(here)
+    .filter((f) => f.endsWith('.html'))
+    .map((f) => [f.replace(/\.html$/, ''), resolve(here, f)]),
+);
+
 export default defineConfig({
+  // Vite's host guard blocks non-localhost origins by default, which breaks
+  // container/proxy previews. Allow e2b.app subdomains; keep everything else blocked.
+  server: {
+    host: '0.0.0.0',
+    allowedHosts: ['.e2b.app'],
+  },
   build: {
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
-        gallery: resolve(__dirname, 'gallery.html'),
-        activities: resolve(__dirname, 'activities.html'),
-        news: resolve(__dirname, 'news.html'),
-        newsArticle: resolve(__dirname, 'news-article.html'),
-        about: resolve(__dirname, 'about.html'),
-        members: resolve(__dirname, 'members.html'),
-        memberProfile: resolve(__dirname, 'member-profile.html'),
-        simRigs: resolve(__dirname, 'sim-rigs.html'),
-        media: resolve(__dirname, 'media.html'),
-        shop: resolve(__dirname, 'shop.html'),
-        contact: resolve(__dirname, 'contact.html'),
-        notFound: resolve(__dirname, '404.html'),
-      },
+      input: pages,
     },
   },
 });

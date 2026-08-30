@@ -34,6 +34,9 @@
       </div>
 
       <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+        </span>
         <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
@@ -56,7 +59,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+      </div>
+      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -77,11 +83,14 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      const esc = SRN.esc;
       const slug = getQueryParam('slug');
-      const article = getArticle(slug);
+      const { articles: all } = await SRN.news();
+      const article = all.find(n => n.slug === slug);
       const container = document.getElementById('article-content');
 
       if (!article) {
@@ -96,27 +105,27 @@
 
       document.title = `${article.title} — SIM Racing NG`;
 
-      const related = NEWS.filter(n => n.slug !== article.slug && n.tag === article.tag).slice(0, 3);
-      const fallbackRelated = related.length ? related : NEWS.filter(n => n.slug !== article.slug).slice(0, 3);
+      const related = all.filter(n => n.slug !== article.slug && n.tag === article.tag).slice(0, 3);
+      const fallbackRelated = related.length ? related : all.filter(n => n.slug !== article.slug).slice(0, 3);
 
       container.innerHTML = `
         <article>
           <header class="page-header" style="background-color: var(--bg-alt); border-bottom: none;">
             <div class="container container-narrow">
               <a href="news.html" style="display: inline-block; color: var(--text-dim); font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem;">← Back to News</a>
-              <div><span class="badge badge-solid-orange">${article.tag}</span></div>
-              <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 900; color: #FFF; margin-top: 1rem; margin-bottom: 1rem; line-height: 1.2;">${article.title}</h1>
-              <div style="font-size: 0.75rem; color: var(--text-dim);">By ${article.author} · ${article.date} · ${article.readTime}</div>
+              <div><span class="badge badge-solid-orange">${esc(article.tag)}</span></div>
+              <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 900; color: #FFF; margin-top: 1rem; margin-bottom: 1rem; line-height: 1.2;">${esc(article.title)}</h1>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">By ${esc(article.author)} · ${esc(article.date)} · ${esc(article.readTime)}</div>
             </div>
           </header>
 
           <div class="container container-narrow" style="padding-top: 2rem; padding-bottom: 4rem;">
             <div style="border-radius: 1rem; overflow: hidden; height: 22rem; margin-bottom: 2.5rem;">
-              <img src="${article.img}" alt="${article.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="${esc(article.img)}" alt="${esc(article.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;">
-              ${article.body.map(p => `<p>${p}</p>`).join('')}
+              ${article.body.map(p => `<p>${esc(p)}</p>`).join('')}
             </div>
           </div>
 
