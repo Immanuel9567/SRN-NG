@@ -236,12 +236,13 @@ button, input, textarea, select {
 /* Inputs & Form Fields */
 .input-field {
   width: 100%;
-  background: #08080C;
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  /* Themed, not hardcoded: the search bars used to stay near-black in light mode. */
+  background: var(--bg-dark);
+  border: 1.5px solid var(--border-light);
   border-radius: 12px;
   padding: 0.75rem 1.1rem;
   font-size: 0.875rem;
-  color: #F0F0F5;
+  color: var(--text-primary);
   font-family: var(--font-sans);
   outline: none;
   transition: border-color 0.2s ease;
@@ -311,9 +312,9 @@ button, input, textarea, select {
   justify-content: space-between;
   flex-wrap: nowrap;
   gap: 1rem;
-  /* Tight vertical padding so the pill reads as a bar, not a slab. */
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  /* 0.625rem gives the pill 4px more height than 0.5rem did. */
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 .navbar-brand {
@@ -829,8 +830,8 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 3rem;
-  padding: 0.5rem 1.25rem;
+  min-height: 3.25rem;
+  padding: 0.625rem 1.25rem;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
@@ -934,17 +935,115 @@ body {
   text-shadow: none;
 }
 
-/* Inline styles across the pages hardcode white text and white-alpha borders.
-   Until those are converted to classes, bridge the most common ones. */
-[data-theme="light"] [style*="color: #FFF"],
-[data-theme="light"] [style*="color: #fff"],
-[data-theme="light"] [style*="color:#FFF"],
-[data-theme="light"] [style*="color:#fff"] {
+/* Inline styles across the pages hardcode both white text AND dark surfaces.
+   Bridging only the text is what made it unreadable: dark text on a dark chip.
+   Both sides have to move together until these are converted to classes. */
+[data-theme="light"] [style*="color: #FFF" i],
+[data-theme="light"] [style*="color:#FFF" i] {
   color: #14141B !important;
 }
 
-[data-theme="light"] [style*="rgba(255,255,255,0.05)"],
-[data-theme="light"] [style*="rgba(255,255,255,0.06)"],
-[data-theme="light"] [style*="rgba(255,255,255,0.1)"] {
+[data-theme="light"] [style*="background: #1A1A24" i],
+[data-theme="light"] [style*="background:#1A1A24" i],
+[data-theme="light"] [style*="background: #08080C" i],
+[data-theme="light"] [style*="background:#08080C" i] {
+  background: #EEF1F4 !important;
+}
+
+[data-theme="light"] [style*="rgba(0,0,0,0.7)" i],
+[data-theme="light"] [style*="rgba(0,0,0,0.6)" i],
+[data-theme="light"] [style*="rgba(0,0,0,0.35)" i] {
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="light"] [style*="linear-gradient(to top, #0E0E14" i],
+[data-theme="light"] [style*="linear-gradient(to top, #13131A" i],
+[data-theme="light"] [style*="linear-gradient(to top, #08080C" i] {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.9) 0%, transparent 60%) !important;
+}
+
+[data-theme="light"] [style*="rgba(255,255,255,0.05)" i],
+[data-theme="light"] [style*="rgba(255,255,255,0.06)" i],
+[data-theme="light"] [style*="rgba(255,255,255,0.1)" i] {
   border-color: rgba(10, 10, 20, 0.12) !important;
+}
+
+/* Light surfaces read as flat without a shadow. */
+[data-theme="light"] .card,
+[data-theme="light"] .card-alt {
+  box-shadow: 0 1px 3px rgba(10, 10, 20, 0.06), 0 10px 26px rgba(10, 10, 20, 0.08);
+}
+
+[data-theme="light"] .srn-stat {
+  box-shadow: 0 1px 3px rgba(10, 10, 20, 0.06), 0 8px 20px rgba(10, 10, 20, 0.07);
+}
+
+[data-theme="light"] .btn {
+  box-shadow: 0 2px 8px rgba(10, 10, 20, 0.1);
+}
+
+[data-theme="light"] .input-field {
+  box-shadow: inset 0 1px 2px rgba(10, 10, 20, 0.06);
+}
+
+[data-theme="light"] .srn-toast {
+  box-shadow: 0 8px 28px rgba(10, 10, 20, 0.18);
+}
+
+[data-theme="light"] .glass-text {
+  text-shadow: 0 1px 2px rgba(0, 145, 74, 0.2);
+}
+
+[data-theme="light"] .sticky-subhead,
+[data-theme="light"] .page-header {
+  box-shadow: 0 1px 0 rgba(10, 10, 20, 0.06), 0 6px 18px rgba(10, 10, 20, 0.05);
+}
+
+/* ==========================================================================
+   Content that sits on top of imagery
+   Redefining the text variables on the container makes every descendant keep
+   its dark-theme colour, which is what you want over a photo or video in either
+   theme. Add class="on-media" to any such container.
+   ========================================================================== */
+[data-theme="light"] .on-media {
+  --text-white: #FFFFFF;
+  --text-primary: #F0F0F5;
+  --text-muted: #C6C6D2;
+  --text-dim: #9E9EAE;
+}
+
+.cart-bar {
+  position: fixed;
+  bottom: 5.5rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 40;
+  padding: 0.875rem 1.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+[data-theme="light"] .cart-bar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.68) 100%);
+  border-color: rgba(10, 10, 20, 0.12);
+  box-shadow: 0 12px 32px rgba(10, 10, 20, 0.16);
+}
+
+/* The hero scrims stay dark in both themes; their text is pinned light by
+   .on-media rather than by lightening the scrim over the video. */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(8, 8, 12, 0.92) 0%, rgba(8, 8, 12, 0.65) 60%, rgba(8, 8, 12, 0.92) 100%);
+}
+
+.hero-scrim-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #08080C 0%, transparent 40%);
 }

@@ -136,6 +136,58 @@ for (const page of CONTENT_PAGES) {
     !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(index));
 }
 
+// ---- every hardcoded dark surface must have a light-theme bridge ------------
+// Inline styles set both white text and dark backgrounds. Bridging only one side
+// is what made light mode unreadable, so audit both against the stylesheet.
+{
+  const css = readFileSync(join(ROOT, 'css', 'style.css'), 'utf8');
+  const lightBridges = css
+    .split('\n')
+    .filter((l) => l.includes('[data-theme="light"]'))
+    .join('\n')
+    .toLowerCase();
+
+  const surfaces = new Set();
+  const texts = new Set();
+
+  // Pull every colour literal out of a background declaration, including ones
+  // nested inside linear-gradient(...), and flag the dark, opaque ones.
+  const isDark = (value) => {
+    let r, g, b, a = 1;
+    const hex = /^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})$/.exec(value);
+    const rgb = /^rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)$/.exec(value);
+    if (hex) [r, g, b] = [hex[1], hex[2], hex[3]].map((h) => parseInt(h, 16));
+    else if (rgb) { [r, g, b] = [rgb[1], rgb[2], rgb[3]].map(Number); if (rgb[4] !== undefined) a = Number(rgb[4]); }
+    else return false;
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.3 && a > 0.3;
+  };
+
+  for (const page of pages) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    for (const m of html.matchAll(/style="([^"]*)"/g)) {
+      for (const decl of m[1].matchAll(/background(?:-color)?:\s*([^;"]+)/g)) {
+        for (const colour of decl[1].matchAll(/#[0-9A-Fa-f]{6}\b|rgba?\([^)]*\)/g)) {
+          const value = colour[0].replace(/\s+/g, ' ');
+          if (isDark(value)) surfaces.add(value);
+        }
+      }
+      for (const c of m[1].matchAll(/color:\s*(#F{6}|#FFF)\b/gi)) texts.add(c[1].toUpperCase());
+    }
+  }
+  check('audit found hardcoded dark surfaces', surfaces.size > 0, `found ${surfaces.size}`);
+
+  for (const value of surfaces) {
+    const needle = value.toLowerCase().replace(/\s+/g, ' ');
+    check(`light theme bridges dark surface ${value}`, lightBridges.includes(needle),
+      'no [data-theme="light"] rule covers it');
+  }
+  for (const value of texts) {
+    check(`light theme bridges ${value} text`, lightBridges.includes(value.toLowerCase()),
+      'no [data-theme="light"] rule covers it');
+  }
+  check('audited at least one hardcoded surface', surfaces.size > 0, `found ${surfaces.size}`);
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

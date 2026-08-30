@@ -114,7 +114,7 @@ Invariants that are covered by tests, so do not break them:
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (228 checks) |
+| Page consistency only | `npm run check:pages` (238 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -123,7 +123,7 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (228), `check:inline` (32 blocks), `test:api` (138),
+   `check:skills` (60), `check:pages` (238), `check:inline` (32 blocks), `test:api` (138),
    `test:render` (80), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
@@ -292,16 +292,33 @@ Dark theme only. There is no light mode and no theme toggle.
 **Themes.** `[data-theme="light"]` in `css/style.css` overrides the palette variables. Glass surfaces,
 the switcher, `.srn-segmented` and `.glass-text` each have light-mode variants.
 
-Known debt: many pages hardcode colours in inline `style` attributes (`color: #FFF`,
-`rgba(255,255,255,0.06)` borders), which cannot follow the variables. Two attribute-selector bridges
-patch the commonest cases. They are a stopgap; converting those inline styles to classes is the real
-fix, and the light theme will look inconsistent in places until then.
+**Content on imagery.** Add `class="on-media"` to any container that sits over a photo or video.
+In light mode it redefines `--text-white`, `--text-primary`, `--text-muted` and `--text-dim` back to
+their dark-theme values, and every descendant inherits them. The hero uses this, so its headline
+stays white over the video in both themes.
+
+**Light surfaces need shadows.** `.card`, `.card-alt`, `.srn-stat`, `.btn`, `.input-field`,
+`.srn-toast`, `.glass-text`, `.sticky-subhead` and `.page-header` all have `[data-theme="light"]`
+shadow variants; without them the light theme reads as flat.
+
+Known debt: pages still hardcode colours in inline `style` attributes. `[data-theme="light"]
+[style*=...]` bridges cover the dark surfaces and the white text **as a pair** — bridging only the
+text is what made light mode unreadable, because dark text landed on a dark chip. `npm run
+check:pages` audits every hardcoded dark colour in every inline style and fails if no light rule
+covers it, so this cannot silently regress. The real fix is still converting those inline styles to
+classes; `.cart-bar`, `.hero-scrim` and `.hero-scrim-fade` have already been moved over.
 
 **Rig photo uploads.** `POST /api/rigs` accepts a `photo` field as a `data:` URL. `saveUpload()` in
 `server/store.js` validates the MIME type (PNG/JPEG/WebP), enforces a 2 MB cap, and writes to
 `media/uploads/` so the static server can serve it. The request body limit is 4 MB because base64
 inflates by roughly a third. `media/uploads/` is gitignored. `SRN_UPLOAD_DIR` redirects it, which is
 how the tests avoid writing into the working tree.
+
+**Heights.** The navbar pill uses `padding: 0.625rem` vertically and `.sticky-subhead` uses
+`min-height: 3.25rem` with `padding: 0.625rem`. Both were `0.5rem` / `3rem` and read as too thin.
+
+**Inputs.** `.input-field` uses `var(--bg-dark)`, `var(--border-light)` and `var(--text-primary)`.
+It used to hardcode `background: #08080C`, which is why the search bars stayed black in light mode.
 
 ## 13. Instruction precedence
 

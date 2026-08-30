@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.10.0",
-    "previous_version": "1.9.0",
+    "version": "1.11.0",
+    "previous_version": "1.10.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -151,7 +151,7 @@
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
         "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
         "tests": "npm run test:api (138), npm run test:render (80), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (228 checks), npm run check:inline (32 blocks), npm run check:skills",
+        "static_checks": "npm run check:pages (238 checks), npm run check:inline (32 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -264,7 +264,9 @@
         "The sandbox can reset the local branch ref to an old commit while leaving the working tree intact. Compare git rev-parse HEAD with git ls-remote origin <branch> before committing, and recover with git reset --mixed origin/<branch>, which moves the pointer without touching files.",
         "matchMedia is not implemented in jsdom. Guard it in app code and polyfill it in the test harness.",
         "The mobile drawer must stay outside <nav>. A backdrop-filter ancestor becomes the backdrop root and would stop the sheet from blurring the page.",
-        "Uploads go to media/uploads/, which is gitignored. Tests redirect it with SRN_UPLOAD_DIR so they never write into the working tree."
+        "Uploads go to media/uploads/, which is gitignored. Tests redirect it with SRN_UPLOAD_DIR so they never write into the working tree.",
+        "Light-mode bridges must cover a dark surface and its light text together. Bridging only the text is what made light mode unreadable.",
+        "npm run check:pages audits every hardcoded dark colour in every inline style against the [data-theme=\"light\"] rules and fails on any gap."
       ],
       "verification_protocol": {
         "before_claiming_done": [
@@ -274,7 +276,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60), check:pages (228), check:inline (32 blocks), test:api (138), test:render (80), test:hostguard (9), test:empty (29), test:build (22). Live server verified: drawer fixed with blur(28px), sticky sub-header and theme switcher on every page, badge removed, and a real 77-byte PNG uploaded, stored and served back at 200."
+        "last_verified": "npm run check exit 0: check:skills (60), check:pages (238), check:inline (32 blocks), test:api (138), test:render (80), test:hostguard (9), test:empty (29), test:build (22). Live CSS confirmed: navbar 0.625rem, subhead 3.25rem, input-field themed, on-media and cart-bar classes present, light shadows present."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -330,7 +332,11 @@
         "mechanism": "js/theme.js reads srn-theme from localStorage (light|dark|auto, default auto) and sets data-theme on <html>.",
         "auto": "Resolved in JS via matchMedia so CSS only defines two states. matchMedia is guarded; jsdom lacks it.",
         "pre_paint": "Each page has an inline script in <head> that applies the theme before first paint.",
-        "debt": "Many pages hardcode colours in inline style attributes. Two attribute-selector bridges patch the commonest cases; converting them to classes is the real fix."
+        "debt": "Inline styles still hardcode colours. The light bridges must cover dark surfaces AND white text as a pair; bridging only the text put dark text on dark chips. check:pages audits every hardcoded dark colour and fails if no light rule covers it. .cart-bar, .hero-scrim and .hero-scrim-fade have been converted to classes.",
+        "on_media": "Add class=\"on-media\" to any container over imagery. In light mode it redefines the text variables back to their dark values and descendants inherit them. The hero uses it.",
+        "shadows": ".card, .card-alt, .srn-stat, .btn, .input-field, .srn-toast, .glass-text, .sticky-subhead and .page-header all have [data-theme=\"light\"] shadow variants.",
+        "inputs": ".input-field uses var(--bg-dark)/--border-light/--text-primary; it used to hardcode #08080C.",
+        "heights": "Navbar pill padding 0.625rem vertical; .sticky-subhead min-height 3.25rem. Both were 0.5rem/3rem and read as too thin."
       },
       "uploads": {
         "endpoint": "POST /api/rigs accepts a photo field as a data: URL.",
