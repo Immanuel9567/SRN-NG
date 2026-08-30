@@ -121,6 +121,13 @@ button, input, textarea, select {
   }
 }
 
+@media (min-width: 1024px) {
+  .page-header {
+    padding-top: 12rem;
+    padding-bottom: 6.5rem;
+  }
+}
+
 .page-header-eyebrow {
   color: var(--accent-green);
   font-family: var(--font-display);
@@ -836,6 +843,13 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 1024px) {
+  .sticky-subhead {
+    min-height: 4rem;
+    padding: 0.875rem 1.75rem;
+  }
 }
 
 .subhead-back {
