@@ -6,23 +6,46 @@
   <title>Media Hub — SIM Racing NG</title>
   <meta name="description" content="Photos, videos, highlights, and streams from the Nigerian sim racing community." />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container navbar-container">
-      <a href="index.html" class="navbar-brand">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
         <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="45" height="45" rx="10" fill="#00E676"/>
           <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
         </svg>
       </a>
 
       <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
         <a href="gallery.html" class="nav-link">Gallery</a>
         <a href="activities.html" class="nav-link">Activities</a>
         <a href="news.html" class="nav-link">News</a>
@@ -34,7 +57,10 @@
       </div>
 
       <div class="navbar-actions">
-        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
       </div>
 
       <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -48,6 +74,7 @@
 
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
       <a href="gallery.html" class="mobile-nav-link">Gallery</a>
       <a href="activities.html" class="mobile-nav-link">Activities</a>
       <a href="news.html" class="mobile-nav-link">News</a>
@@ -56,7 +83,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
     </div>
   </nav>
 
@@ -105,9 +135,12 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const esc = SRN.esc;
       let activeTab = 'Photos';
 
       const PHOTOS = [IMGS.race1, IMGS.race2, IMGS.race3, IMGS.wheel, IMGS.hero, IMGS.member, IMGS.race1, IMGS.race2];
@@ -142,7 +175,7 @@
             <div class="grid grid-cols-2 grid-cols-4-lg" style="gap: 1rem;">
               ${PHOTOS.map((src, i) => `
                 <div class="card" style="height: 11rem; overflow: hidden;">
-                  <img src="${src}" alt="Photo ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <img src="${esc(src)}" alt="Photo ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;" />
                 </div>
               `).join('')}
             </div>
@@ -151,18 +184,18 @@
           content.innerHTML = `
             <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
               ${VIDEOS.map(v => `
-                <button class="card video-card" data-title="${v.title}" style="text-align: left; cursor: pointer;">
+                <button class="card video-card" data-title="${esc(v.title)}" style="text-align: left; cursor: pointer;">
                   <div style="position: relative; height: 9rem; overflow: hidden;">
-                    <img src="${v.img}" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+                    <img src="${esc(v.img)}" alt="${esc(v.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
                     <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
                       <div style="width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="#08080C"><polygon points="6 3 20 12 6 21"/></svg>
                       </div>
                     </div>
-                    <span style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${v.duration}</span>
+                    <span style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${esc(v.duration)}</span>
                   </div>
                   <div style="padding: 1rem;">
-                    <h3 style="font-size: 0.875rem; font-weight: 600; color: #FFF;">${v.title}</h3>
+                    <h3 style="font-size: 0.875rem; font-weight: 600; color: #FFF;">${esc(v.title)}</h3>
                   </div>
                 </button>
               `).join('')}
@@ -196,7 +229,7 @@
       const playingTitle = document.getElementById('video-playing-title');
 
       function openVideoModal(title) {
-        playingTitle.innerText = `Playing: ${title}`;
+        playingTitle.textContent = `Playing: ${title}`;
         modal.classList.add('active');
       }
 

@@ -1,0 +1,188 @@
+[
+  {
+    "id": "lagos-beast",
+    "name": "The Lagos Beast",
+    "ownerId": "chidi-okonkwo",
+    "owner": "Chidi Okonkwo",
+    "city": "Abuja",
+    "img": "https://images.unsplash.com/photo-1771920800290-53f22e5ac3f8?w=900&h=600&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Intel i9-13900K"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4090 24GB"
+      },
+      {
+        "label": "Wheel",
+        "value": "Fanatec DD Pro"
+      },
+      {
+        "label": "Pedals",
+        "value": "Heusinkveld Sprint"
+      },
+      {
+        "label": "Sim",
+        "value": "iRacing + ACC"
+      }
+    ],
+    "status": "approved"
+  },
+  {
+    "id": "phantom-v2",
+    "name": "The Phantom V2",
+    "ownerId": "tunde-adeyemi",
+    "owner": "Tunde Adeyemi",
+    "city": "Ibadan",
+    "img": "https://images.unsplash.com/photo-1620855522342-de6d0ad7c3d7?w=600&h=600&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Ryzen 9 7950X"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4080 Super"
+      },
+      {
+        "label": "Wheel",
+        "value": "Moza R21"
+      },
+      {
+        "label": "Pedals",
+        "value": "Moza CRP Load Cell"
+      },
+      {
+        "label": "Sim",
+        "value": "iRacing"
+      }
+    ],
+    "status": "approved"
+  },
+  {
+    "id": "endurance-special",
+    "name": "Endurance Special",
+    "ownerId": "grace-udoh",
+    "owner": "Grace Udoh",
+    "city": "Abuja",
+    "img": "https://images.unsplash.com/photo-1699138346782-8a8b211c3da2?w=900&h=500&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Ryzen 7 7800X3D"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4070 Ti"
+      },
+      {
+        "label": "Wheel",
+        "value": "Simagic Alpha Mini"
+      },
+      {
+        "label": "Pedals",
+        "value": "Simagic P2000"
+      },
+      {
+        "label": "Sim",
+        "value": "iRacing"
+      }
+    ],
+    "status": "approved"
+  },
+  {
+    "id": "night-shift",
+    "name": "Night Shift",
+    "ownerId": "bola-afolabi",
+    "owner": "Bola Afolabi",
+    "city": "Lagos",
+    "img": "https://images.unsplash.com/photo-1699138346491-d6f4c7e04b85?w=900&h=500&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Intel i7-13700K"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4070"
+      },
+      {
+        "label": "Wheel",
+        "value": "Thrustmaster T300RS"
+      },
+      {
+        "label": "Pedals",
+        "value": "Thrustmaster T3PA"
+      },
+      {
+        "label": "Sim",
+        "value": "rFactor 2"
+      }
+    ],
+    "status": "approved"
+  },
+  {
+    "id": "clean-sweep-rig",
+    "name": "Clean Sweep Rig",
+    "ownerId": "adaeze-nwosu",
+    "owner": "Adaeze Nwosu",
+    "city": "Lagos",
+    "img": "https://images.unsplash.com/photo-1635414764966-682bd029bb01?w=900&h=500&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Ryzen 9 7900X"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4080"
+      },
+      {
+        "label": "Wheel",
+        "value": "Fanatec CSL DD"
+      },
+      {
+        "label": "Pedals",
+        "value": "Fanatec CSL Elite V2"
+      },
+      {
+        "label": "Sim",
+        "value": "ACC"
+      }
+    ],
+    "status": "approved"
+  },
+  {
+    "id": "first-build",
+    "name": "First Build",
+    "ownerId": "segun-bakare",
+    "owner": "Segun Bakare",
+    "city": "Ibadan",
+    "img": "https://images.unsplash.com/photo-1771920800290-53f22e5ac3f8?w=900&h=600&fit=crop&auto=format",
+    "specs": [
+      {
+        "label": "CPU",
+        "value": "Ryzen 5 7600"
+      },
+      {
+        "label": "GPU",
+        "value": "RTX 4060 Ti"
+      },
+      {
+        "label": "Wheel",
+        "value": "Logitech G923"
+      },
+      {
+        "label": "Pedals",
+        "value": "Logitech G923 (stock)"
+      },
+      {
+        "label": "Sim",
+        "value": "ACC"
+      }
+    ],
+    "status": "approved"
+  }
+]

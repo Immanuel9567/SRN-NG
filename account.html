@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account — SIM Racing NG</title>
+  <meta name="description" content="Create your SIM Racing Nigeria account or sign in." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <div class="container">
+        <div class="page-header-eyebrow">MEMBER ACCESS</div>
+        <h1 class="page-header-title">Your SRN Account</h1>
+        <p class="page-header-subtitle">Create an account to submit events and manage your membership. Every new account starts as a User; only an admin can promote you.</p>
+      </div>
+    </header>
+
+    <section class="section-py">
+      <div class="container container-medium">
+
+        <!-- Already signed in -->
+        <div id="signed-in-panel" class="card" style="display: none; padding: 2rem; text-align: center;">
+          <h2 id="signed-in-title" style="font-family: var(--font-display); font-size: 1.25rem; color: #FFF; margin-bottom: 0.75rem;"></h2>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Role: <span id="signed-in-role" class="badge badge-solid-green"></span>
+          </p>
+          <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+            <a href="activities.html" class="btn btn-primary">SUBMIT AN EVENT</a>
+            <a id="admin-link" href="admin.html" class="btn btn-outline-green" style="display: none;">ADMIN PANEL</a>
+            <button id="sign-out" class="btn btn-outline-light">SIGN OUT</button>
+          </div>
+        </div>
+
+        <!-- Step two of signup: pick the games you follow -->
+        <div id="interests-panel" class="card" style="display: none; padding: 2rem; margin-bottom: 1.5rem;">
+          <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHAT DO YOU RACE?</h2>
+          <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Pick the games you follow. Activities will be filtered to these, and you can change this any time.
+          </p>
+          <div id="interests-chips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;"></div>
+          <p id="interests-status" style="font-size: 0.75rem; min-height: 1rem; margin-bottom: 1rem;"></p>
+          <button id="interests-save" class="btn btn-primary">SAVE AND CONTINUE</button>
+        </div>
+
+        <!-- Driver profile and orders, shown when signed in -->
+        <div id="member-zone" style="display: none; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem;">
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">DRIVER PROFILE</h2>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">
+              This is how you appear in the member directory and on race entries.
+            </p>
+            <form id="profile-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem;">
+              <input id="profile-city" placeholder="City" class="input-field" />
+              <select id="profile-sim" class="input-field">
+                <option value="">Primary sim</option>
+                <option value="iRacing">iRacing</option>
+                <option value="ACC">ACC</option>
+                <option value="AC">Assetto Corsa</option>
+                <option value="rF2">rFactor 2</option>
+              </select>
+              <textarea id="profile-bio" placeholder="Short bio" rows="3" class="input-field" style="grid-column: 1 / -1;"></textarea>
+              <p id="profile-status" style="grid-column: 1 / -1; font-size: 0.75rem; min-height: 1rem;"></p>
+              <button type="submit" class="btn btn-primary" style="grid-column: 1 / -1;">SAVE PROFILE</button>
+            </form>
+            <p id="profile-link" style="font-size: 0.75rem; margin-top: 1rem;"></p>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">YOUR TOPICS</h2>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.25rem;">The games you follow.</p>
+            <div id="member-interests" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;"></div>
+            <button id="member-interests-save" class="btn btn-outline-green">SAVE TOPICS</button>
+            <p id="member-interests-status" style="font-size: 0.75rem; min-height: 1rem; margin-top: 0.75rem;"></p>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">YOUR ORDERS</h2>
+            <div id="orders-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+          </div>
+
+        </div>
+
+        <div id="auth-panel" class="card" style="padding: 2rem; max-width: 30rem; margin: 0 auto;">
+
+          <!-- Alternates the fields shown; both forms stay in the DOM. -->
+          <div class="srn-segmented" id="auth-mode" style="margin-bottom: 1.5rem;">
+            <button type="button" data-mode="signup" class="active">SIGN UP</button>
+            <button type="button" data-mode="signin">SIGN IN</button>
+          </div>
+
+          <h2 id="auth-heading" style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">CREATE ACCOUNT</h2>
+          <p id="auth-sub" style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Takes about ten seconds.</p>
+
+          <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
+            <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
+            <input required type="password" name="password" placeholder="Password (min 8 characters)" minlength="8" class="input-field" autocomplete="new-password" />
+
+            <label for="vendor-toggle" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 0.875rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+              <input type="checkbox" id="vendor-toggle" name="vendor" style="margin-top: 0.2rem; width: 1rem; height: 1rem; accent-color: var(--accent-green); cursor: pointer;" />
+              <span>
+                <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">I am a vendor</span>
+                <span style="display: block; font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.25rem;">Assigns the Salesperson tag for selling rigs and gear.</span>
+              </span>
+            </label>
+
+            <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+          </form>
+
+          <form id="login-form" style="display: none; flex-direction: column; gap: 1rem;">
+            <input type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
+            <input type="password" name="password" placeholder="Password" class="input-field" autocomplete="current-password" />
+            <button type="submit" class="btn btn-primary">SIGN IN</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+          </form>
+        </div>
+        </div>
+
+        <!-- Role explainer -->
+        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem;">
+          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
+            <div class="badge badge-green">USER</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Default for every new account. Can submit events for admin review.</p>
+          </div>
+          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
+            <div class="badge badge-orange">SALESPERSON</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Set by the vendor toggle at signup. For vendors listing rigs and gear.</p>
+          </div>
+          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
+            <div class="badge badge-solid-green">ADMIN</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Cannot be self-assigned. Granted only by an existing admin. Publishes news and approves events.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const esc = SRN.esc;
+      const authPanel = document.getElementById('auth-panel');
+      const signedIn = document.getElementById('signed-in-panel');
+      const signupForm = document.getElementById('signup-form');
+      const loginForm = document.getElementById('login-form');
+
+      // Alternates which fields are on screen. ?mode=signin deep-links straight to it.
+      function setAuthMode(mode) {
+        const isSignup = mode !== 'signin';
+        signupForm.style.display = isSignup ? 'flex' : 'none';
+        loginForm.style.display = isSignup ? 'none' : 'flex';
+        document.getElementById('auth-heading').textContent = isSignup ? 'CREATE ACCOUNT' : 'WELCOME BACK';
+        document.getElementById('auth-sub').textContent = isSignup
+          ? 'Takes about ten seconds.'
+          : 'Sign in to manage your events, rigs and orders.';
+        document.querySelectorAll('#auth-mode button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.mode === (isSignup ? 'signup' : 'signin'));
+        });
+      }
+      document.querySelectorAll('#auth-mode button').forEach((b) => {
+        b.addEventListener('click', () => setAuthMode(b.dataset.mode));
+      });
+      setAuthMode(new URLSearchParams(window.location.search).get('mode') === 'signin' ? 'signin' : 'signup');
+
+      function showMessage(form, text, isError) {
+        const el = form.querySelector('[data-form-message]');
+        el.textContent = text;
+        el.style.color = isError ? '#FF6B6B' : 'var(--accent-green)';
+      }
+
+      async function loadMemberZone(user) {
+        document.getElementById('member-zone').style.display = 'flex';
+
+        // Driver profile, matched to this account.
+        const { members } = await SRN.members();
+        const mine = members.find((m) => m.userId === user.id);
+        if (mine) {
+          document.getElementById('profile-city').value = mine.city || '';
+          document.getElementById('profile-sim').value = mine.sim || '';
+          document.getElementById('profile-bio').value = mine.bio || '';
+          document.getElementById('profile-link').innerHTML =
+            `<a href="member-profile.html?id=${encodeURIComponent(mine.id)}" style="color: var(--accent-green);">View your public profile</a>`;
+        }
+
+        // Topics, editable after the fact.
+        selected.clear();
+        (user.interests || []).forEach((id) => selected.add(id));
+        await loadGames();
+        renderChips(document.getElementById('member-interests'));
+        document.getElementById('member-interests-save').onclick = async () => {
+          const note = document.getElementById('member-interests-status');
+          try {
+            await SRN.setInterests([...selected]);
+            note.textContent = 'Topics saved.';
+            note.style.color = 'var(--accent-green)';
+            SRN.toast('Topics saved.', 'success');
+          } catch (err) {
+            note.textContent = err.message;
+            note.style.color = '#FF6B6B';
+          }
+        };
+
+        // Order history.
+        const list = document.getElementById('orders-list');
+        try {
+          const { orders } = await SRN.orders();
+          list.innerHTML = orders.length
+            ? orders.map((o) => `
+                <div style="padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between;">
+                    <span style="font-size: 0.8125rem; font-weight: 700; color: #FFF;">${esc(o.id)}</span>
+                    <span class="badge ${o.status === 'fulfilled' ? 'badge-solid-green' : o.status === 'cancelled' ? 'badge-orange' : 'badge-green'}">${esc(o.status)}</span>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    ${o.items.map((i) => `${esc(i.name)} x${i.qty}`).join(', ')}
+                  </div>
+                  <div style="font-size: 0.8125rem; color: var(--accent-green); font-weight: 700; margin-top: 0.5rem;">
+                    ${formatNaira(o.total)}
+                  </div>
+                </div>`).join('')
+            : '<p style="font-size: 0.8125rem; color: var(--text-dim);">No orders yet.</p>';
+        } catch {
+          list.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">Orders need the SRN server.</p>';
+        }
+      }
+
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('profile-status');
+        try {
+          const res = await SRN.updateProfile({
+            city: document.getElementById('profile-city').value,
+            sim: document.getElementById('profile-sim').value,
+            bio: document.getElementById('profile-bio').value,
+          });
+          // Publish the link straight away; a freshly created profile has no link yet.
+          document.getElementById('profile-link').innerHTML =
+            `<a href="member-profile.html?id=${encodeURIComponent(res.member.id)}" style="color: var(--accent-green);">View your public profile</a>`;
+          status.textContent = 'Profile saved.';
+          status.style.color = 'var(--accent-green)';
+          SRN.toast('Profile saved.', 'success');
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
+
+      // ---- interest chips -------------------------------------------------
+      let allGames = [];
+      const selected = new Set();
+
+      function renderChips(container) {
+        if (!allGames.length) {
+          container.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No supported games yet. An admin adds them.</p>';
+          return;
+        }
+        container.innerHTML = allGames.map((g) => `
+          <button type="button" class="btn-pill ${selected.has(g.id) ? 'active' : ''}" data-game="${esc(g.id)}">
+            ${esc(g.shortName || g.name)}
+          </button>`).join('');
+        container.querySelectorAll('[data-game]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.game;
+            if (selected.has(id)) selected.delete(id); else selected.add(id);
+            btn.classList.toggle('active', selected.has(id));
+          });
+        });
+      }
+
+      async function loadGames() {
+        allGames = (await SRN.games()).games;
+      }
+
+      async function showInterestsStep(user) {
+        authPanel.style.display = 'none';
+        signedIn.style.display = 'none';
+        document.getElementById('member-zone').style.display = 'none';
+        selected.clear();
+        (user.interests || []).forEach((id) => selected.add(id));
+        await loadGames();
+        renderChips(document.getElementById('interests-chips'));
+        document.getElementById('interests-panel').style.display = 'block';
+      }
+
+      document.getElementById('interests-save').addEventListener('click', async () => {
+        const status = document.getElementById('interests-status');
+        try {
+          await SRN.setInterests([...selected]);
+          status.textContent = 'Saved.';
+          status.style.color = 'var(--accent-green)';
+          document.getElementById('interests-panel').style.display = 'none';
+          showSignedIn(await SRN.me(true));
+          SRN.toast('Topics saved. Welcome aboard.', 'success');
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
+
+      function showSignedIn(user) {
+        authPanel.style.display = 'none';
+        signedIn.style.display = 'block';
+        loadMemberZone(user);
+        document.getElementById('signed-in-title').textContent = `Signed in as ${user.username}`;
+        const badge = document.getElementById('signed-in-role');
+        badge.textContent = user.role.toUpperCase();
+        badge.className = user.role === 'admin' ? 'badge badge-solid-green'
+          : user.role === 'salesperson' ? 'badge badge-orange' : 'badge badge-green';
+        document.getElementById('admin-link').style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+      }
+
+      async function refresh() {
+        const user = await SRN.me(true);
+        if (user) showSignedIn(user);
+        else {
+          authPanel.style.display = 'block';
+          signedIn.style.display = 'none';
+          document.getElementById('member-zone').style.display = 'none';
+          document.getElementById('interests-panel').style.display = 'none';
+        }
+      }
+
+      document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = Object.fromEntries(new FormData(form));
+        try {
+          const res = await SRN.signup({
+            username: data.username,
+            email: data.email,
+            password: data.password,
+            vendor: document.getElementById('vendor-toggle').checked,
+          });
+          showMessage(form, 'Account created.', false);
+          form.reset();
+          await SRN.renderAccountState();
+          // Registration is not finished until topics are chosen.
+          await showInterestsStep(res.user);
+        } catch (err) {
+          showMessage(form, err.message, true);
+        }
+      });
+
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = Object.fromEntries(new FormData(form));
+        try {
+          const res = await SRN.login({ email: data.email, password: data.password });
+          showMessage(form, 'Signed in.', false);
+          form.reset();
+          await SRN.renderAccountState();
+          showSignedIn(res.user);
+        } catch (err) {
+          showMessage(form, err.message, true);
+        }
+      });
+
+      document.getElementById('sign-out').addEventListener('click', async () => {
+        await SRN.logout();
+        await SRN.renderAccountState();
+        await refresh();
+      });
+
+      refresh();
+    });
+  </script>
+</body>
+</html>

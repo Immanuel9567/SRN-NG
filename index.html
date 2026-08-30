@@ -6,23 +6,46 @@
   <title>SIM Racing NG — Nigeria's Sim Racing Community</title>
   <meta name="description" content="Nigeria's home for competitive sim racing. Join 2,400+ drivers, follow news, join events, and show off your rig." />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container navbar-container">
-      <a href="index.html" class="navbar-brand">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
         <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="45" height="45" rx="10" fill="#00E676"/>
           <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
         </svg>
       </a>
 
       <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
         <a href="gallery.html" class="nav-link">Gallery</a>
         <a href="activities.html" class="nav-link">Activities</a>
         <a href="news.html" class="nav-link">News</a>
@@ -34,7 +57,10 @@
       </div>
 
       <div class="navbar-actions">
-        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
       </div>
 
       <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -48,6 +74,7 @@
 
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
       <a href="gallery.html" class="mobile-nav-link">Gallery</a>
       <a href="activities.html" class="mobile-nav-link">Activities</a>
       <a href="news.html" class="mobile-nav-link">News</a>
@@ -56,27 +83,52 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
     </div>
   </nav>
 
   <main>
     <!-- Hero Section -->
     <section style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: #08080C;">
-      <img src="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format" alt="Sim racing setup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35;" />
-      <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(8,8,12,0.92) 0%, rgba(8,8,12,0.65) 60%, rgba(8,8,12,0.92) 100%);"></div>
-      <div style="position: absolute; inset: 0; background: linear-gradient(to top, #08080C 0%, transparent 40%);"></div>
+      <video id="hero-video" class="hero-video" src="media/splash.mp4"
+             autoplay muted loop playsinline preload="metadata"
+             poster="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format"
+             aria-hidden="true" tabindex="-1"></video>
+      <div class="hero-scrim"></div>
+      <script>
+        // A hero video should not move for people who prefer reduced motion.
+        (function () {
+          var v = document.getElementById('hero-video');
+          if (!v) return;
+          var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+          // play()/pause() can be unavailable or non-promise in some environments
+          // (jsdom, very old browsers), so never let the hero script throw.
+          var safe = function (fn) {
+            try {
+              var r = fn();
+              if (r && typeof r.catch === 'function') r.catch(function () {});
+            } catch (e) {}
+          };
+          var sync = function () {
+            if (mq && mq.matches) { safe(function () { v.pause(); v.currentTime = 0; }); }
+            else { safe(function () { return v.play(); }); }
+          };
+          if (mq && mq.addEventListener) mq.addEventListener('change', sync);
+          else if (mq && mq.addListener) mq.addListener(sync);
+          sync();
+        })();
+      </script>
+      <div class="hero-scrim-fade"></div>
 
-      <div class="container" style="position: relative; z-index: 10; padding-top: 7rem; padding-bottom: 4rem;">
+      <div class="container on-media" style="position: relative; z-index: 10; padding-top: 7rem; padding-bottom: 4rem;">
         <div style="max-width: 48rem;">
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; border-radius: 9999px; border: 1px solid rgba(0,230,118,0.3); background: rgba(0,230,118,0.07); margin-bottom: 2rem;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--accent-green);"></span>
-            <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green);">Nigeria's Premier Sim Racing Community</span>
-          </div>
 
           <h1 style="font-family: var(--font-display); font-weight: 900; line-height: 1; margin-bottom: 1.5rem;">
             <span style="display: block; color: var(--text-white); font-size: clamp(2.4rem, 6vw, 5.5rem);">UNLEASH</span>
-            <span style="display: block; color: var(--accent-green); font-size: clamp(2.4rem, 6vw, 5.5rem);">YOUR SPEED.</span>
+            <span class="glass-text" style="display: block; font-size: clamp(2.4rem, 6vw, 5.5rem);">YOUR SPEED.</span>
             <span style="display: block; color: var(--text-white); font-size: clamp(1.4rem, 3.5vw, 3rem); font-weight: 700; margin-top: 0.35em; opacity: 0.9;">Nigerian Sim Racing Starts Here.</span>
           </h1>
 
@@ -99,15 +151,15 @@
     <section style="background-color: var(--bg-card); border-top: 1px solid rgba(0,230,118,0.12); border-bottom: 1px solid rgba(0,230,118,0.12); padding: 2.5rem 0;">
       <div class="container grid grid-cols-3" style="text-align: center;">
         <div>
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">2,400+</div>
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">2,400+</div>
           <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Active Members</div>
         </div>
         <div style="border-left: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle);">
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">148</div>
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">148</div>
           <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Events Hosted</div>
         </div>
         <div>
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; color: var(--accent-green);">12</div>
+          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">12</div>
           <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Partner Studios</div>
         </div>
       </div>
@@ -226,13 +278,13 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a href="index.html">
+          <a href="index.html" style="color: var(--text-white);">
             <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="45" height="45" rx="10" fill="#00E676"/>
               <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-              <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-              <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+              <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+              <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
             </svg>
           </a>
           <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-dark); line-height: 1.6; max-width: 18rem;">
@@ -283,21 +335,31 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      const esc = SRN.esc;
+      // Shadow the js/data.js globals so the render code below is unchanged.
+      const [MEMBERS, NEWS, RIGS] = await Promise.all([
+        SRN.members().then(r => r.members),
+        SRN.news().then(r => r.articles),
+        SRN.rigs().then(r => r.rigs),
+      ]);
+
       // Populate Spotlight
       const spotlightEl = document.getElementById('spotlight-grid');
       if (spotlightEl) {
         spotlightEl.innerHTML = MEMBERS.slice(0, 4).map((m, i) => `
-          <a href="member-profile.html?id=${m.id}" class="card card-alt" style="display: block;">
+          <a href="member-profile.html?id=${encodeURIComponent(m.id)}" class="card card-alt" style="display: block;">
             <div style="position: relative; height: 11rem; overflow: hidden; background: #1A1A24;">
-              <img src="${m.avatar}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" />
+              <img src="${esc(m.avatar)}" alt="${esc(m.name)}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" />
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, transparent 60%);"></div>
-              <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: var(--font-display); ${i === 0 ? 'background: var(--accent-green); color: #08080C;' : 'background: rgba(0,0,0,0.7); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);'}">${m.rank}</div>
+              <div style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: var(--font-display); ${i === 0 ? 'background: var(--accent-green); color: #08080C;' : 'background: rgba(0,0,0,0.7); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);'}">${esc(m.rank)}</div>
             </div>
             <div style="padding: 1rem;">
-              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${m.name}</div>
+              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${esc(m.name)}</div>
               <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem;">${m.city}</div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="badge badge-green">${m.sim}</span>
@@ -310,32 +372,33 @@
 
       // Populate News
       const newsEl = document.getElementById('home-news-grid');
-      if (newsEl) {
+      // An empty news collection must not abort the rest of this handler.
+      if (newsEl && NEWS.length) {
         const featured = NEWS[0];
         const rest = NEWS.slice(1, 4);
 
         newsEl.innerHTML = `
-          <a href="news-article.html?slug=${featured.slug}" class="card" style="grid-column: span 2; display: block;">
+          <a href="news-article.html?slug=${encodeURIComponent(featured.slug)}" class="card" style="grid-column: span 2; display: block;">
             <div style="position: relative; height: 16rem; overflow: hidden;">
-              <img src="${featured.img}" alt="${featured.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="${esc(featured.img)}" alt="${esc(featured.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0E0E14 0%, transparent 60%);"></div>
-              <span class="badge badge-solid-green" style="position: absolute; top: 1rem; left: 1rem;">${featured.tag}</span>
+              <span class="badge badge-solid-green" style="position: absolute; top: 1rem; left: 1rem;">${esc(featured.tag)}</span>
             </div>
             <div style="padding: 1.5rem;">
-              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${featured.date} · ${featured.readTime}</div>
-              <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFF; margin-bottom: 0.75rem;">${featured.title}</h3>
-              <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.6;">${featured.excerpt}</p>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${esc(featured.date)} · ${esc(featured.readTime)}</div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFF; margin-bottom: 0.75rem;">${esc(featured.title)}</h3>
+              <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.6;">${esc(featured.excerpt)}</p>
               <div style="margin-top: 1.25rem; font-size: 0.875rem; font-weight: 600; color: var(--accent-green);">Read Story →</div>
             </div>
           </a>
 
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             ${rest.map(n => `
-              <a href="news-article.html?slug=${n.slug}" class="card" style="padding: 1rem; display: flex; gap: 1rem;">
-                <img src="${n.img}" alt="${n.title}" style="width: 5rem; height: 4.5rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
+              <a href="news-article.html?slug=${encodeURIComponent(n.slug)}" class="card" style="padding: 1rem; display: flex; gap: 1rem;">
+                <img src="${esc(n.img)}" alt="${esc(n.title)}" style="width: 5rem; height: 4.5rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
                 <div>
-                  <div style="font-size: 10px; font-family: var(--font-display); font-weight: 700; color: var(--accent-orange); text-transform: uppercase;">${n.tag}</div>
-                  <h4 style="font-size: 0.875rem; font-weight: 600; color: #FFF; line-height: 1.3; margin-top: 0.25rem;">${n.title}</h4>
+                  <div style="font-size: 10px; font-family: var(--font-display); font-weight: 700; color: var(--accent-orange); text-transform: uppercase;">${esc(n.tag)}</div>
+                  <h4 style="font-size: 0.875rem; font-weight: 600; color: #FFF; line-height: 1.3; margin-top: 0.25rem;">${esc(n.title)}</h4>
                 </div>
               </a>
             `).join('')}
@@ -347,9 +410,9 @@
       const rigsEl = document.getElementById('home-rigs-grid');
       if (rigsEl) {
         rigsEl.innerHTML = RIGS.slice(0, 2).map(rig => `
-          <a href="sim-rigs.html?id=${rig.id}" class="card card-alt" style="display: block;">
+          <a href="sim-rigs.html?id=${encodeURIComponent(rig.id)}" class="card card-alt" style="display: block;">
             <div style="position: relative; height: 13rem; overflow: hidden;">
-              <img src="${rig.img}" alt="${rig.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="${esc(rig.img)}" alt="${esc(rig.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, rgba(19,19,26,0.3) 100%);"></div>
               <div style="position: absolute; bottom: 1rem; left: 1.25rem;">
                 <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; color: #FFF;">${rig.name}</div>
@@ -374,13 +437,20 @@
       // Newsletter submit
       const form = document.getElementById('newsletter-form');
       if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
           e.preventDefault();
-          document.getElementById('newsletter-form-container').innerHTML = `
-            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 9999px; background: rgba(0,230,118,0.1); border: 1px solid var(--accent-green); color: var(--accent-green);">
-              ✓ You're in. Welcome to the grid!
-            </div>
-          `;
+          const email = document.getElementById('newsletter-email').value;
+          try {
+            const res = await SRN.subscribe(email);
+            document.getElementById('newsletter-form-container').innerHTML = `
+              <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 9999px; background: rgba(0,230,118,0.1); border: 1px solid var(--accent-green); color: var(--accent-green);">
+                ✓ You're in. Welcome to the grid!
+              </div>
+            `;
+            SRN.toast(res.message, 'success');
+          } catch (err) {
+            SRN.toast(err.message, 'error');
+          }
         });
       }
     });

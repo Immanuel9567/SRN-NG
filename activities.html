@@ -6,23 +6,46 @@
   <title>Activities — SIM Racing NG</title>
   <meta name="description" content="Race nights, championships, meetups, and watch parties on the SRN calendar." />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container navbar-container">
-      <a href="index.html" class="navbar-brand">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
         <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="45" height="45" rx="10" fill="#00E676"/>
           <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
         </svg>
       </a>
 
       <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
         <a href="gallery.html" class="nav-link">Gallery</a>
         <a href="activities.html" class="nav-link">Activities</a>
         <a href="news.html" class="nav-link">News</a>
@@ -34,7 +57,10 @@
       </div>
 
       <div class="navbar-actions">
-        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
       </div>
 
       <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -48,6 +74,7 @@
 
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
       <a href="gallery.html" class="mobile-nav-link">Gallery</a>
       <a href="activities.html" class="mobile-nav-link">Activities</a>
       <a href="news.html" class="mobile-nav-link">News</a>
@@ -56,7 +83,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
     </div>
   </nav>
 
@@ -79,6 +109,9 @@
           <button id="toggle-form-btn" class="btn btn-outline-orange">+ SUBMIT AN ACTIVITY</button>
         </div>
 
+        <!-- Filter by supported game; admins manage the list from the admin panel -->
+        <div id="game-filters" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.5rem;"></div>
+
         <!-- Activity Submission Form -->
         <div id="activity-form-card" class="card" style="padding: 1.5rem; margin-bottom: 2.5rem; display: none;">
           <div id="activity-form-content">
@@ -86,9 +119,21 @@
               <input required type="text" id="act-title" placeholder="Activity title" class="input-field" />
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <input required type="date" id="act-date" class="input-field" />
+                <input required type="time" id="act-time" class="input-field" />
                 <input required type="text" id="act-location" placeholder="Location" class="input-field" />
+                <select id="act-game" class="input-field">
+                  <option value="general">Topic: General</option>
+                </select>
+                <select required id="act-type" class="input-field">
+                  <option value="">Activity type</option>
+                  <option value="Race Night">Race Night</option>
+                  <option value="Championship">Championship</option>
+                  <option value="Meetup">Meetup</option>
+                  <option value="Watch Party">Watch Party</option>
+                </select>
               </div>
               <textarea required id="act-desc" placeholder="Description" rows="3" class="input-field"></textarea>
+              <p id="activity-form-status" style="font-size: 0.75rem; min-height: 1rem;"></p>
               <button type="submit" class="btn btn-primary">SUBMIT FOR REVIEW</button>
             </form>
           </div>
@@ -115,11 +160,20 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       let currentTab = 'upcoming';
-      const rsvps = {};
+      let currentGame = 'all';
+      let events = [];
+      let games = [];
+      const esc = SRN.esc;
+      const gameName = (id) => (games.find(g => g.id === id) || {}).shortName || 'General';
+      const me = await SRN.me();
+      const attending = (a) => Array.isArray(a.rsvps) && !!me && a.rsvps.includes(me.id);
+      const rsvpCount = (a) => (Array.isArray(a.rsvps) ? a.rsvps.length : 0);
 
       const typeColors = {
         'Race Night': 'var(--accent-green)',
@@ -130,24 +184,32 @@
 
       function renderActivities() {
         const container = document.getElementById('activities-list');
-        const list = ACTIVITIES.filter(a => a.status === currentTab);
+        const list = events.filter(a =>
+          a.status === currentTab &&
+          (currentGame === 'all' || (a.game || 'general') === currentGame));
+
+        if (!list.length) {
+          container.innerHTML = `<p style="color: var(--text-dim); font-size: 0.875rem;">Nothing here yet. Submitted events appear once an admin approves them.</p>`;
+          return;
+        }
 
         container.innerHTML = list.map(a => `
           <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;">
             <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 1.25rem; align-items: center;">
-              <img src="${a.img}" alt="${a.title}" style="width: 100%; max-width: 10rem; height: 6rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
+              <img src="${esc(a.img)}" alt="${esc(a.title)}" style="width: 100%; max-width: 10rem; height: 6rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
               <div style="flex: 1; min-width: 200px;">
-                <span class="badge" style="color: ${typeColors[a.type]}; background: rgba(255,255,255,0.05);">${a.type}</span>
-                <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${a.title}</h3>
-                <p style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 0.5rem;">${a.description}</p>
+                <span class="badge" style="color: ${typeColors[a.type]}; background: rgba(255,255,255,0.05);">${esc(a.type)}</span>
+                <span class="badge badge-green" style="margin-left: 0.375rem;">${esc(gameName(a.game || 'general'))}</span>
+                <h3 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${esc(a.title)}</h3>
+                <p style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 0.5rem;">${esc(a.description)}</p>
                 <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 1rem;">
-                  <span>📅 ${a.date} · ${a.time}</span>
-                  <span>📍 ${a.location}</span>
+                  <span>📅 ${esc(a.date)} · ${esc(a.time)}</span>
+                  <span>📍 ${esc(a.location)}</span>
                 </div>
               </div>
               ${a.status === 'upcoming' ? `
-                <button class="btn ${rsvps[a.id] ? 'btn-primary' : 'btn-outline-green'} rsvp-btn" data-id="${a.id}">
-                  ${rsvps[a.id] ? "YOU'RE IN ✓" : 'RSVP'}
+                <button class="btn ${attending(a) ? 'btn-primary' : 'btn-outline-green'} rsvp-btn" data-id="${esc(a.id)}">
+                  ${attending(a) ? (rsvpCount(a) > 1 ? `YOU'RE IN ✓ (${rsvpCount(a)})` : "YOU'RE IN ✓") : (rsvpCount(a) ? `RSVP (${rsvpCount(a)})` : 'RSVP')}
                 </button>
               ` : ''}
             </div>
@@ -155,10 +217,21 @@
         `).join('');
 
         document.querySelectorAll('.rsvp-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', async () => {
             const id = btn.getAttribute('data-id');
-            rsvps[id] = !rsvps[id];
-            renderActivities();
+            if (!me) {
+              SRN.toast('Sign in to RSVP for an event.', 'info');
+              setTimeout(() => { window.location.href = 'account.html'; }, 1000);
+              return;
+            }
+            try {
+              const res = await SRN.toggleRsvp(id);
+              SRN.toast(res.attending ? "You're in. See you on track." : 'RSVP cancelled.', res.attending ? 'success' : 'info');
+              events = (await SRN.events()).events;
+              renderActivities();
+            } catch (err) {
+              SRN.toast(err.message, 'error');
+            }
           });
         });
       }
@@ -189,20 +262,63 @@
       toggleBtn.addEventListener('click', () => {
         formVisible = !formVisible;
         formCard.style.display = formVisible ? 'block' : 'none';
-        toggleBtn.innerText = formVisible ? 'CLOSE FORM' : '+ SUBMIT AN ACTIVITY';
+        toggleBtn.textContent = formVisible ? 'CLOSE FORM' : '+ SUBMIT AN ACTIVITY';
       });
 
       // Form submit
       const form = document.getElementById('activity-form');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        document.getElementById('activity-form-content').innerHTML = `
-          <p style="font-size: 0.875rem; color: var(--accent-green);">
-            Thanks — your activity has been submitted for review by the SRN team.
-          </p>
-        `;
+        const status = document.getElementById('activity-form-status');
+        status.textContent = '';
+        try {
+          const res = await SRN.submitEvent({
+            title: document.getElementById('act-title').value,
+            date: document.getElementById('act-date').value,
+            time: document.getElementById('act-time').value,
+            location: document.getElementById('act-location').value,
+            type: document.getElementById('act-type').value,
+            game: document.getElementById('act-game').value || 'general',
+            description: document.getElementById('act-desc').value,
+          });
+          document.getElementById('activity-form-content').innerHTML = `
+            <p style="font-size: 0.875rem; color: var(--accent-green);">${esc(res.message)}</p>
+          `;
+          events = (await SRN.events()).events;
+          renderActivities();
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
       });
 
+      games = (await SRN.games()).games;
+
+      // Filter row: everything, general, then each supported game.
+      const filterRow = document.getElementById('game-filters');
+      const options = [{ id: 'all', shortName: 'All games' }, { id: 'general', shortName: 'General' }, ...games];
+      filterRow.innerHTML = options.map(g => `
+        <button class="btn-pill ${g.id === 'all' ? 'active' : ''}" data-game-filter="${esc(g.id)}">${esc(g.shortName || g.name)}</button>
+      `).join('');
+      filterRow.querySelectorAll('[data-game-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterRow.querySelectorAll('[data-game-filter]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentGame = btn.getAttribute('data-game-filter');
+          renderActivities();
+        });
+      });
+
+      // Topic dropdown on the submission form: general, or a specific supported game.
+      const topicSelect = document.getElementById('act-game');
+      games.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.id;
+        opt.textContent = `Topic: ${g.shortName || g.name}`;
+        topicSelect.appendChild(opt);
+      });
+
+      events = (await SRN.events()).events;
       renderActivities();
     });
   </script>

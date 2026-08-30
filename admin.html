@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — SIM Racing NG</title>
+  <meta name="description" content="SRN admin panel: manage member roles, approve events, publish news." />
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
+        <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="45" height="45" rx="10" fill="#00E676"/>
+          <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+        </svg>
+      </a>
+
+      <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="activities.html" class="nav-link">Activities</a>
+        <a href="news.html" class="nav-link">News</a>
+        <a href="members.html" class="nav-link">Members</a>
+        <a href="sim-rigs.html" class="nav-link">Rigs</a>
+        <a href="media.html" class="nav-link">Media</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+
+      <div class="navbar-actions">
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
+      <a href="gallery.html" class="mobile-nav-link">Gallery</a>
+      <a href="activities.html" class="mobile-nav-link">Activities</a>
+      <a href="news.html" class="mobile-nav-link">News</a>
+      <a href="members.html" class="mobile-nav-link">Members</a>
+      <a href="sim-rigs.html" class="mobile-nav-link">Rigs</a>
+      <a href="media.html" class="mobile-nav-link">Media</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <div class="container">
+        <div class="page-header-eyebrow">STAFF ONLY</div>
+        <h1 class="page-header-title">Admin Panel</h1>
+        <p class="page-header-subtitle">Assign member roles, approve community events, and publish news.</p>
+      </div>
+    </header>
+
+    <section class="section-py">
+      <div class="container container-medium">
+
+        <!-- Not authorized -->
+        <div id="denied" class="card" style="display: none; padding: 2.5rem; text-align: center;">
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; color: #FFF; margin-bottom: 0.75rem;">Admins only</h2>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">Sign in with an admin account to reach this page.</p>
+          <a href="account.html" class="btn btn-primary">SIGN IN</a>
+        </div>
+
+        <div id="admin-body" style="display: none; flex-direction: column; gap: 2rem;">
+
+          <!-- Stats -->
+          <div class="srn-stats" id="stats-row"></div>
+
+          <!-- Inbox -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              INBOX <span id="unread-count" style="color: var(--accent-orange);"></span>
+            </h2>
+            <div id="inbox-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+          </div>
+
+          <!-- Supported games: these drive the topic lists everywhere -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              SUPPORTED GAMES <span id="games-count" style="color: var(--text-dim);"></span>
+            </h2>
+            <form id="game-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+              <input required id="game-name" placeholder="Game name" class="input-field" />
+              <input id="game-short" placeholder="Short name (optional)" class="input-field" />
+              <input id="game-genre" placeholder="Genre (optional)" class="input-field" />
+              <p id="game-status" style="grid-column: 1 / -1; font-size: 0.75rem; min-height: 1rem;"></p>
+              <button type="submit" class="btn btn-primary" style="grid-column: 1 / -1;">ADD SUPPORTED GAME</button>
+            </form>
+            <div id="games-list" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+          </div>
+
+          <!-- Orders -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              ORDERS <span id="new-orders-count" style="color: var(--accent-orange);"></span>
+            </h2>
+            <div id="orders-queue" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+          </div>
+
+          <!-- Listing queue -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              LISTING QUEUE <span id="merch-pending-count" style="color: var(--accent-orange);"></span>
+            </h2>
+            <div id="merch-queue" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+          </div>
+
+          <!-- Rig queue -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              RIG QUEUE <span id="rig-pending-count" style="color: var(--accent-orange);"></span>
+            </h2>
+            <div id="rig-queue" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+          </div>
+
+          <!-- Members -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              MEMBERS <span id="member-count" style="color: var(--text-dim);"></span>
+            </h2>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem;">
+                <thead>
+                  <tr style="text-align: left; color: var(--text-dim); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                    <th style="padding: 0.5rem;">Username</th>
+                    <th style="padding: 0.5rem;">Email</th>
+                    <th style="padding: 0.5rem;">Vendor</th>
+                    <th style="padding: 0.5rem;">Role</th>
+                  </tr>
+                </thead>
+                <tbody id="users-rows"></tbody>
+              </table>
+            </div>
+            <p data-panel-message="users" style="font-size: 0.75rem; margin-top: 0.75rem; min-height: 1rem;"></p>
+          </div>
+
+          <!-- Event queue -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">
+              EVENT QUEUE <span id="pending-count" style="color: var(--accent-orange);"></span>
+            </h2>
+            <div id="event-queue" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+            <p data-panel-message="events" style="font-size: 0.75rem; margin-top: 0.75rem; min-height: 1rem;"></p>
+          </div>
+
+          <!-- News composer -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">PUBLISH NEWS</h2>
+            <form id="news-form" style="display: flex; flex-direction: column; gap: 1rem;">
+              <input required type="text" name="title" placeholder="Headline" class="input-field" />
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem;">
+                <input required type="text" name="tag" placeholder="Tag (e.g. Championship)" class="input-field" />
+                <input type="text" name="date" placeholder="Date (YYYY-MM-DD)" class="input-field" />
+              </div>
+              <input required type="text" name="excerpt" placeholder="Excerpt shown on the news grid" class="input-field" />
+              <textarea required name="body" rows="8" placeholder="Article body. Separate paragraphs with a blank line." class="input-field"></textarea>
+              <input type="text" name="img" placeholder="Image path or URL (optional)" class="input-field" />
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--text-muted); cursor: pointer;">
+                <input type="checkbox" name="featured" style="accent-color: var(--accent-green); width: 1rem; height: 1rem;" />
+                Feature this article
+              </label>
+              <button type="submit" class="btn btn-primary">PUBLISH ARTICLE</button>
+              <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+            </form>
+          </div>
+
+          <!-- Published news -->
+          <div class="card" style="padding: 1.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #FFF; margin-bottom: 1rem;">PUBLISHED ARTICLES</h2>
+            <div id="news-list" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size: 0.75rem; color: var(--text-dark);">© 2026 SIM Racing Nigeria. All rights reserved.</p>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="index.html" style="font-size: 0.75rem; color: var(--text-dark);">Home</a>
+          <a href="contact.html" style="font-size: 0.75rem; color: var(--text-dark);">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const esc = SRN.esc;
+      const me = await SRN.me(true);
+
+      if (!me || me.role !== 'admin') {
+        document.getElementById('denied').style.display = 'block';
+        return;
+      }
+      document.getElementById('admin-body').style.display = 'flex';
+
+      function note(panel, text, isError) {
+        const el = document.querySelector(`[data-panel-message="${panel}"]`);
+        if (!el) return;
+        el.textContent = text;
+        el.style.color = isError ? '#FF6B6B' : 'var(--accent-green)';
+      }
+
+      // ---- members ---------------------------------------------------------
+      async function loadUsers() {
+        const { users } = await SRN.users();
+        document.getElementById('member-count').textContent = `(${users.length})`;
+        document.getElementById('users-rows').innerHTML = users.map((u) => `
+          <tr style="border-top: 1px solid var(--border-subtle);">
+            <td style="padding: 0.5rem; color: var(--text-primary); font-weight: 600;">${esc(u.username)}</td>
+            <td style="padding: 0.5rem; color: var(--text-muted);">${esc(u.email)}</td>
+            <td style="padding: 0.5rem; color: var(--text-muted);">${u.vendor ? 'Yes' : 'No'}</td>
+            <td style="padding: 0.5rem;">
+              <select data-role-select data-id="${esc(u.id)}" class="input-field" style="padding: 0.375rem 0.5rem; font-size: 0.75rem; width: auto;">
+                ${['user', 'salesperson', 'admin'].map((r) => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`).join('')}
+              </select>
+            </td>
+          </tr>
+        `).join('');
+
+        document.querySelectorAll('[data-role-select]').forEach((select) => {
+          select.addEventListener('change', async () => {
+            try {
+              const res = await SRN.setRole(select.dataset.id, select.value);
+              note('users', `${res.user.username} is now ${res.user.role}.`, false);
+              await loadUsers();
+              await SRN.renderAccountState();
+            } catch (err) {
+              note('users', err.message, true);
+              await loadUsers();
+            }
+          });
+        });
+      }
+
+      // ---- event queue -----------------------------------------------------
+      async function loadEvents() {
+        const { events } = await SRN.events('all');
+        const pending = events.filter((e) => e.status === 'pending');
+        document.getElementById('pending-count').textContent = pending.length ? `(${pending.length} pending)` : '(none pending)';
+        const queue = document.getElementById('event-queue');
+
+        if (!pending.length) {
+          queue.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No events waiting for review.</p>';
+          return;
+        }
+        queue.innerHTML = pending.map((e) => `
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+            <div style="flex: 1; min-width: 12rem;">
+              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${esc(e.title)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">
+                ${esc(e.type)} · ${esc(e.date)} ${esc(e.time)} · ${esc(e.location)}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">${esc(e.description)}</div>
+              <div style="font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.5rem;">Submitted by ${esc(e.submittedBy || 'unknown')}</div>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-primary" data-approve="${esc(e.id)}">APPROVE</button>
+              <button class="btn btn-outline-light" data-reject="${esc(e.id)}">REJECT</button>
+            </div>
+          </div>
+        `).join('');
+
+        const act = async (id, status) => {
+          try {
+            await SRN.setEventStatus(id, status);
+            note('events', `Event ${status === 'upcoming' ? 'approved' : 'rejected'}.`, false);
+            await loadEvents();
+          } catch (err) { note('events', err.message, true); }
+        };
+        queue.querySelectorAll('[data-approve]').forEach((b) => b.addEventListener('click', () => act(b.dataset.approve, 'upcoming')));
+        queue.querySelectorAll('[data-reject]').forEach((b) => b.addEventListener('click', () => act(b.dataset.reject, 'rejected')));
+      }
+
+      // ---- news ------------------------------------------------------------
+      async function loadNews() {
+        const { articles } = await SRN.news();
+        document.getElementById('news-list').innerHTML = articles.length
+          ? articles.map((a) => `
+              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; padding: 0.75rem; border-top: 1px solid var(--border-subtle);">
+                <div>
+                  <div style="font-size: 0.8125rem; color: var(--text-primary); font-weight: 600;">${esc(a.title)}</div>
+                  <div style="font-size: 0.6875rem; color: var(--text-dim);">${esc(a.tag)} · ${esc(a.date)} · by ${esc(a.author)}</div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a class="btn btn-outline-light" href="news-article.html?slug=${encodeURIComponent(a.slug)}" style="padding: 0.375rem 0.75rem; font-size: 0.6875rem;">VIEW</a>
+                  <button class="btn btn-outline-orange" data-delete="${esc(a.slug)}" style="padding: 0.375rem 0.75rem; font-size: 0.6875rem;">DELETE</button>
+                </div>
+              </div>`).join('')
+          : '<p style="font-size: 0.8125rem; color: var(--text-dim);">Nothing published yet.</p>';
+
+        document.querySelectorAll('[data-delete]').forEach((b) => {
+          b.addEventListener('click', async () => {
+            await SRN.deleteNews(b.dataset.delete);
+            await loadNews();
+          });
+        });
+      }
+
+      const newsForm = document.getElementById('news-form');
+      newsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const el = newsForm.querySelector('[data-form-message]');
+        const data = Object.fromEntries(new FormData(newsForm));
+        try {
+          const res = await SRN.publishNews({
+            title: data.title,
+            tag: data.tag,
+            date: data.date || undefined,
+            excerpt: data.excerpt,
+            body: data.body,
+            img: data.img || undefined,
+            featured: newsForm.querySelector('[name="featured"]').checked,
+          });
+          el.textContent = `Published at news-article.html?slug=${res.article.slug}`;
+          el.style.color = 'var(--accent-green)';
+          newsForm.reset();
+          await loadNews();
+        } catch (err) {
+          el.textContent = err.message;
+          el.style.color = '#FF6B6B';
+        }
+      });
+
+      // ---- stats and inbox -------------------------------------------------
+      async function loadInbox() {
+        const { messages, subscribers, stats } = await SRN.inbox();
+
+        document.getElementById('stats-row').innerHTML = [
+          [stats.members, 'Members'],
+          [stats.pendingEvents, 'Events pending'],
+          [stats.pendingRigs, 'Rigs pending'],
+          [stats.pendingMerch, 'Listings pending'],
+          [stats.newOrders, 'New orders'],
+          [stats.messages, 'Messages'],
+          [stats.subscribers, 'Subscribers'],
+        ].map(([value, label]) => `
+          <div class="srn-stat">
+            <div class="srn-stat-value">${value}</div>
+            <div class="srn-stat-label">${label}</div>
+          </div>`).join('');
+
+        document.getElementById('unread-count').textContent = stats.unread ? `(${stats.unread} unread)` : '';
+        const list = document.getElementById('inbox-list');
+        list.innerHTML = messages.length
+          ? messages.map((m) => `
+              <div style="padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt); ${m.read ? '' : 'border-left: 3px solid var(--accent-green);'}">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between;">
+                  <div style="font-weight: 700; color: #FFF; font-size: 0.8125rem;">${esc(m.name)} <span style="color: var(--text-dim); font-weight: 400;">&lt;${esc(m.email)}&gt;</span></div>
+                  <div style="font-size: 0.6875rem; color: var(--text-dim);">${esc(m.createdAt.slice(0, 10))}</div>
+                </div>
+                <p style="font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.5rem; white-space: pre-wrap;">${esc(m.message)}</p>
+                ${m.read ? '' : `<button class="btn btn-outline-light" data-mark-read="${esc(m.id)}" style="margin-top: 0.75rem; padding: 0.375rem 0.75rem; font-size: 0.6875rem;">MARK READ</button>`}
+              </div>`).join('')
+          : '<p style="font-size: 0.8125rem; color: var(--text-dim);">No messages yet.</p>';
+
+        document.querySelectorAll('[data-mark-read]').forEach((b) => {
+          b.addEventListener('click', async () => { await SRN.markRead(b.dataset.markRead); await loadInbox(); });
+        });
+      }
+
+      // ---- rig queue --------------------------------------------------------
+      async function loadRigs() {
+        const { rigs } = await SRN.rigs('all');
+        const pending = rigs.filter((r) => r.status === 'pending');
+        document.getElementById('rig-pending-count').textContent = pending.length ? `(${pending.length} pending)` : '(none pending)';
+        const queue = document.getElementById('rig-queue');
+
+        if (!pending.length) {
+          queue.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No rigs waiting for review.</p>';
+          return;
+        }
+        queue.innerHTML = pending.map((r) => `
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+            <div style="flex: 1; min-width: 12rem;">
+              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${esc(r.name)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">by ${esc(r.owner)}${r.city ? ` · ${esc(r.city)}` : ''}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                ${(r.specs || []).map((spec) => `${esc(spec.label)}: ${esc(spec.value)}`).join(' · ')}
+              </div>
+              ${r.notes ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem;">${esc(r.notes)}</div>` : ''}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-primary" data-rig-approve="${esc(r.id)}">APPROVE</button>
+              <button class="btn btn-outline-light" data-rig-reject="${esc(r.id)}">REJECT</button>
+            </div>
+          </div>`).join('');
+
+        const act = async (id, status) => {
+          await SRN.setRigStatus(id, status);
+          SRN.toast(`Rig ${status}.`, status === 'approved' ? 'success' : 'info');
+          await Promise.all([loadRigs(), loadInbox()]);
+        };
+        queue.querySelectorAll('[data-rig-approve]').forEach((b) => b.addEventListener('click', () => act(b.dataset.rigApprove, 'approved')));
+        queue.querySelectorAll('[data-rig-reject]').forEach((b) => b.addEventListener('click', () => act(b.dataset.rigReject, 'rejected')));
+      }
+
+      // ---- orders -----------------------------------------------------------
+      async function loadOrders() {
+        const { orders } = await SRN.orders('all');
+        const fresh = orders.filter((o) => o.status === 'new');
+        document.getElementById('new-orders-count').textContent = fresh.length ? `(${fresh.length} new)` : '';
+        const queue = document.getElementById('orders-queue');
+
+        if (!orders.length) {
+          queue.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No orders yet.</p>';
+          return;
+        }
+        queue.innerHTML = orders.map((o) => `
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+            <div style="flex: 1; min-width: 14rem;">
+              <div style="font-weight: 700; color: #FFF; font-size: 0.8125rem;">${esc(o.username)} <span style="color: var(--text-dim); font-weight: 400;">&lt;${esc(o.email)}&gt;</span></div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.375rem;">
+                ${o.items.map((i) => `${esc(i.name)} x${i.qty}`).join(', ')}
+              </div>
+              <div style="font-size: 0.8125rem; color: var(--accent-green); font-weight: 700; margin-top: 0.375rem;">${formatNaira(o.total)} · ${esc(o.status)}</div>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              ${o.status === 'new' ? `<button class="btn btn-primary" data-order-fulfil="${esc(o.id)}">FULFIL</button>` : ''}
+              ${o.status !== 'cancelled' ? `<button class="btn btn-outline-light" data-order-cancel="${esc(o.id)}">CANCEL</button>` : ''}
+            </div>
+          </div>`).join('');
+
+        const act = async (id, status) => {
+          await SRN.setOrderStatus(id, status);
+          SRN.toast(`Order marked ${status}.`, status === 'fulfilled' ? 'success' : 'info');
+          await Promise.all([loadOrders(), loadInbox()]);
+        };
+        queue.querySelectorAll('[data-order-fulfil]').forEach((b) => b.addEventListener('click', () => act(b.dataset.orderFulfil, 'fulfilled')));
+        queue.querySelectorAll('[data-order-cancel]').forEach((b) => b.addEventListener('click', () => act(b.dataset.orderCancel, 'cancelled')));
+      }
+
+      // ---- listing queue ------------------------------------------------------
+      async function loadMerchQueue() {
+        const { merch } = await SRN.merch('all');
+        const pending = merch.filter((m) => m.status === 'pending');
+        document.getElementById('merch-pending-count').textContent = pending.length ? `(${pending.length} pending)` : '(none pending)';
+        const queue = document.getElementById('merch-queue');
+
+        if (!pending.length) {
+          queue.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No listings waiting for review.</p>';
+          return;
+        }
+        queue.innerHTML = pending.map((m) => `
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+            <div style="flex: 1; min-width: 14rem;">
+              <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${esc(m.name)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">
+                ${esc(m.category)} · ${formatNaira(m.price)} · listed by ${esc(m.listedBy)}
+              </div>
+              ${m.description ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">${esc(m.description)}</div>` : ''}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-primary" data-merch-approve="${esc(m.id)}">APPROVE</button>
+              <button class="btn btn-outline-light" data-merch-reject="${esc(m.id)}">REJECT</button>
+            </div>
+          </div>`).join('');
+
+        const act = async (id, status) => {
+          await SRN.setMerchStatus(id, status);
+          SRN.toast(`Listing ${status}.`, status === 'approved' ? 'success' : 'info');
+          await Promise.all([loadMerchQueue(), loadInbox()]);
+        };
+        queue.querySelectorAll('[data-merch-approve]').forEach((b) => b.addEventListener('click', () => act(b.dataset.merchApprove, 'approved')));
+        queue.querySelectorAll('[data-merch-reject]').forEach((b) => b.addEventListener('click', () => act(b.dataset.merchReject, 'rejected')));
+      }
+
+      // ---- supported games ------------------------------------------------------
+      async function loadGames() {
+        const { games } = await SRN.games();
+        document.getElementById('games-count').textContent = `(${games.length})`;
+        const list = document.getElementById('games-list');
+        list.innerHTML = games.length
+          ? games.map((g) => `
+              <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; padding: 0.75rem; border-top: 1px solid var(--border-subtle);">
+                <div>
+                  <div style="font-size: 0.8125rem; font-weight: 700; color: #FFF;">${esc(g.name)}</div>
+                  <div style="font-size: 0.6875rem; color: var(--text-dim);">${esc(g.shortName || '')} · ${esc(g.genre || '')}</div>
+                </div>
+                <button class="btn btn-outline-orange" data-game-delete="${esc(g.id)}" style="padding: 0.375rem 0.75rem; font-size: 0.6875rem;">REMOVE</button>
+              </div>`).join('')
+          : '<p style="font-size: 0.8125rem; color: var(--text-dim);">No supported games yet.</p>';
+
+        list.querySelectorAll('[data-game-delete]').forEach((b) => {
+          b.addEventListener('click', async () => {
+            await SRN.removeGame(b.dataset.gameDelete);
+            SRN.toast('Game removed.', 'info');
+            await loadGames();
+          });
+        });
+      }
+
+      document.getElementById('game-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('game-status');
+        status.textContent = '';
+        try {
+          await SRN.addGame({
+            name: document.getElementById('game-name').value,
+            shortName: document.getElementById('game-short').value,
+            genre: document.getElementById('game-genre').value,
+          });
+          status.textContent = 'Added.';
+          status.style.color = 'var(--accent-green)';
+          e.target.reset();
+          SRN.toast('Supported game added.', 'success');
+          await loadGames();
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
+
+      await Promise.all([loadUsers(), loadEvents(), loadNews(), loadInbox(), loadRigs(), loadOrders(), loadMerchQueue(), loadGames()]);
+    });
+  </script>
+</body>
+</html>

@@ -6,23 +6,46 @@
   <title>Contact Us — SIM Racing NG</title>
   <meta name="description" content="Get in touch with SIM Racing Nigeria." />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // Apply the saved theme before first paint so the palette never flashes.
+    (function () {
+      var mode = 'auto';
+      try { mode = localStorage.getItem('srn-theme') || 'auto'; } catch (e) {}
+      var light = mode === 'light' ||
+        (mode === 'auto' && typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- Sticky sub-header: back link and theme switcher -->
+  <div class="sticky-subhead">
+    <span class="subhead-spacer"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button type="button" data-theme="auto" aria-label="Match device theme" title="Match device theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container navbar-container">
-      <a href="index.html" class="navbar-brand">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
         <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="45" height="45" rx="10" fill="#00E676"/>
           <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
         </svg>
       </a>
 
       <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
         <a href="gallery.html" class="nav-link">Gallery</a>
         <a href="activities.html" class="nav-link">Activities</a>
         <a href="news.html" class="nav-link">News</a>
@@ -34,7 +57,10 @@
       </div>
 
       <div class="navbar-actions">
-        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
+        <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
+        </span>
       </div>
 
       <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -48,6 +74,7 @@
 
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
       <a href="gallery.html" class="mobile-nav-link">Gallery</a>
       <a href="activities.html" class="mobile-nav-link">Activities</a>
       <a href="news.html" class="mobile-nav-link">News</a>
@@ -56,7 +83,10 @@
       <a href="media.html" class="mobile-nav-link">Media</a>
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="members.html" class="btn btn-primary" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
+      <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
+      </div>
     </div>
   </nav>
 
@@ -74,9 +104,10 @@
         <div class="card" style="grid-column: span 3; padding: 2rem;">
           <div id="contact-form-container">
             <form id="contact-form" style="display: flex; flex-direction: column; gap: 1rem;">
-              <input required type="text" placeholder="Your name" class="input-field" />
-              <input required type="email" placeholder="Email address" class="input-field" />
-              <textarea required placeholder="Your message" rows="5" class="input-field"></textarea>
+              <input required type="text" id="contact-name" placeholder="Your name" class="input-field" autocomplete="name" />
+              <input required type="email" id="contact-email" placeholder="Email address" class="input-field" autocomplete="email" />
+              <textarea required id="contact-message" placeholder="Your message" rows="5" class="input-field"></textarea>
+              <p id="contact-status" style="font-size: 0.75rem; min-height: 1rem;"></p>
               <button type="submit" class="btn btn-primary">SEND MESSAGE</button>
             </form>
           </div>
@@ -115,23 +146,44 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('contact-form');
-      if (form) {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
+      if (!form) return;
+
+      // Pre-fill from the signed-in account when there is one.
+      SRN.me().then((user) => {
+        if (!user) return;
+        document.getElementById('contact-email').value = user.email;
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('contact-status');
+        status.textContent = '';
+        try {
+          const res = await SRN.sendMessage({
+            name: document.getElementById('contact-name').value,
+            email: document.getElementById('contact-email').value,
+            message: document.getElementById('contact-message').value,
+          });
           document.getElementById('contact-form-container').innerHTML = `
             <div style="padding: 2.5rem 0; text-align: center;">
               <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent-green);">✓</div>
               <p style="font-size: 0.875rem; color: var(--accent-green);">
-                Thanks — we've got your message and will get back to you soon.
+                Thanks, we have your message and will get back to you soon.
               </p>
             </div>
           `;
-        });
-      }
+          SRN.toast(res.message, 'success');
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
     });
   </script>
 </body>
