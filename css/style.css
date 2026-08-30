@@ -878,6 +878,23 @@ body {
   }
 }
 
+.subhead-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.subhead-logo img {
+  height: 2rem;
+  width: auto;
+  max-width: none;
+  border-radius: 0.4rem;
+}
+
+@media (min-width: 1024px) {
+  .subhead-logo img { height: 2.5rem; }
+}
+
 .subhead-back {
   font-size: 0.75rem;
   font-weight: 700;

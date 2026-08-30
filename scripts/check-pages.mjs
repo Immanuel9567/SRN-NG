@@ -116,6 +116,7 @@ for (const page of CONTENT_PAGES) {
   for (const page of CONTENT_PAGES) {
     const html = readFileSync(join(ROOT, page), 'utf8');
     check(`${page}: has a sticky sub-header`, /class="sticky-subhead"/.test(html));
+    check(`${page}: sticky header has the SRN logo`, /class="subhead-logo"/.test(html) && html.includes('media/logo.png'));
     check(`${page}: sub-header has a theme switcher`, /class="theme-switch"/.test(html));
     check(`${page}: offers light, dark and device themes`,
       /data-theme="light"/.test(html) && /data-theme="dark"/.test(html) && /data-theme="auto"/.test(html));
