@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.7.0",
-    "previous_version": "1.6.0",
+    "version": "1.8.0",
+    "previous_version": "1.7.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -149,9 +149,9 @@
         "dev_static": "npm run dev:static  (vite only; no API, pages fall back to mock data)",
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
-        "check": "npm run check  (check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty; exits non-zero on any failure)",
-        "tests": "npm run test:api (133), npm run test:render (67 jsdom DOM checks), npm run test:hostguard (9), npm run test:empty (29 across 15 pages)",
-        "static_checks": "npm run check:pages (86 checks), npm run check:inline (16 blocks), npm run check:skills",
+        "check": "npm run check  (check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build; exits non-zero on any failure)",
+        "tests": "npm run test:api (133), npm run test:render (67), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
+        "static_checks": "npm run check:pages (95 checks), npm run check:inline (16 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -246,10 +246,10 @@
         "New page checklist: create <page>.html with the shared nav, footer and both account slots, then run npm run check:pages and npm run build. No vite.config.js edit is needed."
       ],
       "gotchas": [
+        "vite build warns that the page scripts cannot be bundled without type=\"module\". That warning is NOT harmless: without the copyStaticAssets plugin, dist/ ships with no js/ and a static deployment runs no JavaScript at all. npm run test:build guards it.",
         "There is no README.md. Do not recreate it. AGENTS.md is canonical.",
         "node_modules is gitignored and gets wiped between sessions. Run npm ci first or test:render fails with Cannot find package 'jsdom'.",
         "Both test scripts boot a real server on a random port and wait for its stdout banner. They previously polled fetch() until anything answered, which silently attached to an orphaned server from a killed run and produced false failures. Check for a stray node server/index.js before debugging the app.",
-        "npm run build warns that js/data.js and js/app.js can't be bundled without type=\"module\". Expected. As a classic script typeof MEMBERS is 'object'; as an ES module it is undefined with 0 exports and every page renders empty.",
         "Vite serves js/data.js at 101,982 bytes against 18,367 on disk: an appended inline base64 sourcemap, not a transform.",
         "dist/ is static and has no API. Pages fall back to js/data.js via SRN.withFallback, but account.html and admin.html need the Node server.",
         "data/sessions.json must never be committed; it holds live session tokens.",
@@ -269,7 +269,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60 skills), check:pages (86), check:inline (16 blocks), test:api (133), test:render (67), test:hostguard (9), test:empty (29). Build emitted 15 pages."
+        "last_verified": "npm run check exit 0: check:skills (60 skills), check:pages (95), check:inline (16 blocks), test:api (133), test:render (67), test:hostguard (9), test:empty (29), test:build (22). dist/ contains js/ and media/."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -299,7 +299,7 @@
         "accessibility": ":focus-visible green outline on every interactive element; prefers-reduced-motion disables animation.",
         "escaping": "Every page that interpolates into innerHTML declares const esc = SRN.esc. check:pages enforces it.",
         "navbar": "Floating pill fixed to the bottom centre: bottom 1rem, left 50%, translateX(-50%), width calc(100% - 2rem) so it never touches a screen edge, max-width 68rem, border-radius 9999px, backdrop-filter blur(20px) saturate(180%). A green-to-orange .navbar::after hairline fades in on scroll. @supports-not falls back to a solid pill.",
-        "mobile_drawer": ".mobile-menu is position absolute at bottom calc(100% + 0.75rem), a rounded sheet above the pill. js/app.js toggles .open, sets aria-expanded and swaps the icon.",
+        "mobile_drawer": ".mobile-menu is position absolute at bottom calc(100% + 0.75rem), z-index 3, border-radius 1.75rem, the same frosted-glass recipe and border as the pill navbar, a matching .mobile-menu::before hairline, an srn-drawer-pop entrance animation, and links styled as rounded pill rows. .mobile-toggle is position relative z-index 2 with pointer-events auto so nothing in the pill can swallow the click.",
         "clearance": "body padding-bottom 6.5rem, toasts at bottom 6.5rem, shop cart bar at bottom 5.5rem. Any new fixed bottom element needs clearance."
       },
       "security": {
@@ -309,6 +309,13 @@
         "host_allowlist": "SRN_ALLOWED_HOSTS, comma separated, leading dot matches subdomains, 421 otherwise. Unset allows all.",
         "pricing": "Order totals recomputed from data/merch.json; client prices ignored.",
         "still_absent": "CSRF tokens, email verification, password reset, audit log."
+      },
+      "build": {
+        "warning": "vite build prints \"can't be bundled without type=\\\"module\\\"\" for the page scripts.",
+        "consequence": "The scripts are classic, so Vite neither bundles nor copies them. Before the copyStaticAssets plugin, dist/ shipped with no js/ at all: a static deployment loaded zero JavaScript, the hamburger had no handler, and no page rendered. This was misreported as a harmless warning for several iterations.",
+        "fix": "vite.config.js has a copyStaticAssets plugin that copies js/ and media/ into dist/ on closeBundle.",
+        "guard": "npm run test:build rebuilds dist/ and fails if any built page references a file missing from dist/.",
+        "do_not": "Do not add type=\"module\" to the page scripts; the js/data.js globals would stop being shared."
       }
     },
     "categories": {

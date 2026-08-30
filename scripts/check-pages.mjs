@@ -47,6 +47,28 @@ for (const page of CONTENT_PAGES) {
   }
 }
 
+// Design invariants the nav is specified against: a bottom-centre pill, and a drawer
+// that matches it. These are easy to break with a careless CSS edit.
+{
+  const css = readFileSync(join(ROOT, 'css', 'style.css'), 'utf8');
+  const navBlock = css.match(/\.navbar \{([^}]*)\}/)?.[1] || '';
+  check('navbar is fixed to the bottom', /position: fixed/.test(navBlock) && /bottom: 1rem/.test(navBlock));
+  check('navbar is centred and inset from the screen edge',
+    /left: 50%/.test(navBlock) && /transform: translateX\(-50%\)/.test(navBlock)
+    && /width: calc\(100% - 2rem\)/.test(navBlock));
+  check('navbar is a rounded pill', /border-radius: 9999px/.test(navBlock));
+  check('navbar is glassy', /backdrop-filter: blur\(/.test(navBlock)
+    && /-webkit-backdrop-filter/.test(navBlock));
+  check('navbar has a solid fallback where blur is unsupported',
+    /@supports not \(\(backdrop-filter/.test(css));
+
+  const drawer = css.match(/\.mobile-menu \{([^}]*)\}/)?.[1] || '';
+  check('drawer floats above the pill', /bottom: calc\(100% \+ 0\.75rem\)/.test(drawer));
+  check('drawer has rounded corners', /border-radius: 1\.75rem/.test(drawer));
+  check('drawer is glassy like the navbar', /backdrop-filter: blur\(/.test(drawer));
+  check('page content clears the floating nav', /body \{[^}]*padding-bottom: 6\.5rem/.test(css));
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

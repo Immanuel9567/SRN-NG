@@ -14,10 +14,11 @@
     "test:render": "node scripts/render-check.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:inline": "node scripts/check-inline-js.mjs",
-    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:hostguard && npm run test:empty",
+    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:hostguard && npm run test:empty && npm run test:build",
     "test:hostguard": "node scripts/check-host-guard.mjs",
     "reset-admin": "node scripts/reset-admin.mjs",
-    "test:empty": "node scripts/check-empty-state.mjs"
+    "test:empty": "node scripts/check-empty-state.mjs",
+    "test:build": "node scripts/check-build.mjs"
   },
   "devDependencies": {
     "jsdom": "^30.0.1",

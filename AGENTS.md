@@ -112,6 +112,7 @@ Invariants that are covered by tests, so do not break them:
 | API tests only | `npm run test:api` (133 checks) |
 | DOM render tests only | `npm run test:render` (67 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
+| Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
 | Page consistency only | `npm run check:pages` (86 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
@@ -134,10 +135,15 @@ use it, because it has caught a navbar bug that the API tests could not see.
 
 ## 7. Gotchas
 
-- **`npm run build` warns** `can't be bundled without type="module"` for `js/data.js` and `js/app.js`.
-  Pre-existing and expected. Do not add `type="module"`: verified in a VM, `js/data.js` as a classic
-  script leaves `typeof MEMBERS === 'object'` in shared scope, but as an ES module it is `undefined`
-  with 0 exports, and every page would render empty.
+- **`npm run build` warns** `can't be bundled without type="module"` for the page scripts. **That
+  warning is not harmless.** Because the scripts are classic, Vite neither bundles nor copies them,
+  so `dist/` used to ship with no `js/` at all: a static deployment loaded zero JavaScript, the
+  hamburger had no handler, and no page rendered. `vite.config.js` now has a `copyStaticAssets`
+  plugin that copies `js/` and `media/` into `dist/`, and `npm run test:build` fails if any built
+  page references a file missing from `dist/`. Do not remove either.
+- **Still do not add `type="module"`** to the page scripts: verified in a VM, `js/data.js` as a
+  classic script leaves `typeof MEMBERS === 'object'` in shared scope, but as an ES module it is
+  `undefined` with 0 exports, and every page would render empty.
 - **Vite serves `js/data.js` at 101,982 bytes although it is 18,367 on disk.** That is an appended
   inline base64 sourcemap, not a transform. The served file has 0 `import`/`export` statements.
 - **Nav and footer are duplicated verbatim in all 14 content pages** (not `404.html`, which has no
