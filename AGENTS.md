@@ -110,7 +110,8 @@ Invariants that are covered by tests, so do not break them:
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
 | API tests only | `npm run test:api` (133 checks) |
-| DOM render tests only | `npm run test:render` (57 checks, uses jsdom) |
+| DOM render tests only | `npm run test:render` (67 checks, uses jsdom) |
+| Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
 | Page consistency only | `npm run check:pages` (86 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
@@ -157,6 +158,11 @@ use it, because it has caught a navbar bug that the API tests could not see.
   to poll `fetch()` until anything answered, which silently connected to an orphaned server from a
   previous run and produced false failures. If a check fails mysteriously, look for a stray
   `node server/index.js` process before debugging the app.
+- **The nav is at the bottom, so nothing may assume a top bar.** `.page-header` uses
+  `padding-top: 5.5rem`; do not restore the old 8rem top offset.
+- **Pages must survive an empty datastore.** A fresh deployment has no content, and a crash on an
+  empty collection kills the rest of that page's `DOMContentLoaded` handler. Guard every
+  `COLLECTION[0]`. `npm run test:empty` loads all 15 pages against empty data and fails on any error.
 - **`innerText` is not implemented in jsdom.** Assigning it does nothing under test and silently
   leaves `textContent` empty. Use `textContent`. Every such assignment in this repo has been converted.
 - **Node's `fetch` ignores a `Host` header override**, so it cannot test the host allowlist.
@@ -217,10 +223,17 @@ use it, because it has caught a navbar bug that the API tests could not see.
 
 All in `css/style.css`, so a change lands on every page at once.
 
-- **Frosted navbar.** Translucent gradient plus `backdrop-filter: blur(18px) saturate(170%)`, a
-  hairline edge, and a brand green-to-orange hairline (`.navbar::after`) that fades in on scroll.
-  Always set `-webkit-backdrop-filter` alongside `backdrop-filter`. The `@supports not` block falls
-  back to a solid bar where blur is unavailable, so text stays readable.
+- **Floating pill navbar.** Fixed to the **bottom centre**, not the top: `bottom: 1rem`,
+  `left: 50%`, `transform: translateX(-50%)`, `width: calc(100% - 2rem)` so it never touches a
+  screen edge, `max-width: 68rem`, `border-radius: 9999px`. Frosted glass via
+  `backdrop-filter: blur(20px) saturate(180%)` with a green-to-orange hairline
+  (`.navbar::after`) that fades in on scroll. Always set `-webkit-backdrop-filter` alongside
+  `backdrop-filter`; the `@supports not` block falls back to a solid pill.
+- **Mobile drawer.** `.mobile-menu` is `position: absolute; bottom: calc(100% + 0.75rem)` so it
+  floats as a rounded sheet **above** the pill. `js/app.js` toggles `.open` and swaps the icon.
+- **Clearance.** `body { padding-bottom: 6.5rem }` keeps content out from under the pill. Toasts
+  sit at `bottom: 6.5rem` and the shop cart bar at `bottom: 5.5rem` so nothing collides. If you add
+  any new fixed bottom element, give it clearance too.
 - **Toasts.** `SRN.toast(message, 'success' | 'error' | 'info')` appends to `#srn-toasts`, which is
   created on demand with `role="status"` and `aria-live="polite"`.
 - **Skeletons.** `SRN.skeleton(count, height)` emits `.srn-skeleton` shimmer blocks for loading states.

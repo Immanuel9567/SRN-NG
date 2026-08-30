@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.6.0",
-    "previous_version": "1.5.0",
+    "version": "1.7.0",
+    "previous_version": "1.6.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -149,8 +149,8 @@
         "dev_static": "npm run dev:static  (vite only; no API, pages fall back to mock data)",
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
-        "check": "npm run check  (check:skills, check:pages, check:inline, test:api, test:render, test:hostguard; exits non-zero on any failure)",
-        "tests": "npm run test:api (133 checks), npm run test:render (57 jsdom DOM checks), npm run test:hostguard (9 checks)",
+        "check": "npm run check  (check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty; exits non-zero on any failure)",
+        "tests": "npm run test:api (133), npm run test:render (67 jsdom DOM checks), npm run test:hostguard (9), npm run test:empty (29 across 15 pages)",
         "static_checks": "npm run check:pages (86 checks), npm run check:inline (16 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
@@ -257,7 +257,9 @@
         "Always escape user content with SRN.esc() before innerHTML. check:pages enforces it.",
         "innerText is not implemented in jsdom: assigning it does nothing under test. Use textContent; all such assignments here have been converted.",
         "Node's fetch ignores a Host header override, so the host allowlist must be tested with node:http (npm run test:hostguard).",
-        "account.html and other pages must declare const esc = SRN.esc before using esc() in a template; check:pages enforces this and a missing declaration hides behind try/catch as a silent fallback."
+        "account.html and other pages must declare const esc = SRN.esc before using esc() in a template; check:pages enforces this and a missing declaration hides behind try/catch as a silent fallback.",
+        "The nav is at the bottom, so nothing may assume a top bar. .page-header uses padding-top 5.5rem; do not restore the old 8rem.",
+        "Pages must survive an empty datastore: a crash on an empty collection kills the rest of that DOMContentLoaded handler. npm run test:empty loads all 15 pages against empty data."
       ],
       "verification_protocol": {
         "before_claiming_done": [
@@ -267,7 +269,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60 skills), check:pages (86 checks), check:inline (16 blocks), test:api (133 checks), test:render (57 checks), test:hostguard (9 checks). Build emitted 15 pages."
+        "last_verified": "npm run check exit 0: check:skills (60 skills), check:pages (86), check:inline (16 blocks), test:api (133), test:render (67), test:hostguard (9), test:empty (29). Build emitted 15 pages."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -295,7 +297,10 @@
         "skeletons": "SRN.skeleton(count, height) emits .srn-skeleton shimmer blocks.",
         "stat_tiles": ".srn-stat / .srn-stats, used on the admin dashboard.",
         "accessibility": ":focus-visible green outline on every interactive element; prefers-reduced-motion disables animation.",
-        "escaping": "Every page that interpolates into innerHTML declares const esc = SRN.esc. check:pages enforces it."
+        "escaping": "Every page that interpolates into innerHTML declares const esc = SRN.esc. check:pages enforces it.",
+        "navbar": "Floating pill fixed to the bottom centre: bottom 1rem, left 50%, translateX(-50%), width calc(100% - 2rem) so it never touches a screen edge, max-width 68rem, border-radius 9999px, backdrop-filter blur(20px) saturate(180%). A green-to-orange .navbar::after hairline fades in on scroll. @supports-not falls back to a solid pill.",
+        "mobile_drawer": ".mobile-menu is position absolute at bottom calc(100% + 0.75rem), a rounded sheet above the pill. js/app.js toggles .open, sets aria-expanded and swaps the icon.",
+        "clearance": "body padding-bottom 6.5rem, toasts at bottom 6.5rem, shop cart bar at bottom 5.5rem. Any new fixed bottom element needs clearance."
       },
       "security": {
         "passwords": "scrypt, per-user 16-byte salt, timingSafeEqual comparison, no plaintext.",

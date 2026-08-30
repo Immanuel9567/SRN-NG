@@ -395,6 +395,31 @@ try {
   check('listing queue renders', orders.document.getElementById('merch-queue').textContent.length > 0);
   orders.window.close();
 
+  // ---- mobile nav: the hamburger must open and close the drawer -------------
+  const navPage = await loadPage('/activities.html');
+  const toggle = navPage.document.querySelector('.mobile-toggle');
+  const drawer = navPage.document.querySelector('.mobile-menu');
+  check('hamburger button exists', !!toggle);
+  check('drawer exists', !!drawer);
+  check('drawer starts closed', !drawer.classList.contains('open'));
+  toggle.click();
+  check('clicking the hamburger opens the drawer', drawer.classList.contains('open'));
+  check('hamburger sets aria-expanded=true', toggle.getAttribute('aria-expanded') === 'true');
+  check('hamburger icon becomes a close icon', toggle.querySelectorAll('line').length === 2,
+    `${toggle.querySelectorAll('line').length} lines`);
+  toggle.click();
+  check('clicking again closes the drawer', !drawer.classList.contains('open'));
+  check('hamburger resets aria-expanded', toggle.getAttribute('aria-expanded') === 'false');
+  navPage.window.close();
+
+  // ---- a page with no content at all must still run its scripts -------------
+  const emptyNews = await loadPage('/index.html');
+  check('index.html survives with no page errors', emptyNews.pageErrors.length === 0,
+    emptyNews.pageErrors.join(' | '));
+  check('index.html still renders the navbar with an empty news list',
+    !!emptyNews.document.querySelector('.navbar .mobile-toggle'));
+  emptyNews.window.close();
+
   console.log('');
   if (failures.length) {
     console.error(`${failures.length} of ${pass + failures.length} render checks FAILED:`);

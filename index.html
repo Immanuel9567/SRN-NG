@@ -325,7 +325,8 @@
 
       // Populate News
       const newsEl = document.getElementById('home-news-grid');
-      if (newsEl) {
+      // An empty news collection must not abort the rest of this handler.
+      if (newsEl && NEWS.length) {
         const featured = NEWS[0];
         const rest = NEWS.slice(1, 4);
 
