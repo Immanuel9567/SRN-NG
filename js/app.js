@@ -125,3 +125,58 @@ function openNotifyPanel(data) {
   };
   setTimeout(() => document.addEventListener('click', close), 0);
 }
+
+function openSettingsPanel(user) {
+  let panel = document.getElementById('srn-settings-panel');
+  if (panel) { panel.remove(); return; }
+  panel = document.createElement('div');
+  panel.id = 'srn-settings-panel';
+  panel.className = 'settings-panel';
+  const esc = SRN.esc;
+  const avatar = esc(user.avatar || 'media/placeholder.png');
+  panel.innerHTML = `
+    <div class="settings-head">
+      <img class="nav-avatar" src="${avatar}" alt="">
+      <div>
+        <strong>${esc(user.username)}</strong>
+        <span>${esc(user.role)}</span>
+      </div>
+    </div>
+    <label class="settings-photo">Change photo
+      <input type="file" accept="image/png,image/jpeg,image/webp" data-settings-photo>
+    </label>
+    <a href="account.html">Account settings</a>
+    ${user.memberId ? `<a href="member-profile.html?id=${esc(user.memberId)}">Public profile</a>` : ''}
+    ${user.role === 'admin' ? '<a href="admin.html">Admin panel</a>' : ''}
+    <button type="button" data-logout>Sign out</button>`;
+  document.body.appendChild(panel);
+  panel.querySelector('[data-logout]').addEventListener('click', async () => {
+    await SRN.logout();
+    SRN.toast('Signed out.', 'info');
+    setTimeout(() => location.reload(), 400);
+  });
+  panel.querySelector('[data-settings-photo]').addEventListener('change', async (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+    try {
+      const out = await SRN.updateProfile({ photo: dataUrl });
+      panel.querySelector('.nav-avatar').src = out.member.avatar;
+      document.querySelectorAll('.nav-avatar').forEach((img) => { img.src = out.member.avatar; });
+      SRN.toast('Photo saved.', 'success');
+    } catch (err) {
+      SRN.toast(err.message, 'error');
+    }
+  });
+  const close = (ev) => {
+    if (panel.contains(ev.target) || ev.target.closest('[data-settings-open]')) return;
+    panel.remove();
+    document.removeEventListener('click', close);
+  };
+  setTimeout(() => document.addEventListener('click', close), 0);
+}

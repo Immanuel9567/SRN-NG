@@ -337,18 +337,27 @@ try {
   check('rig list rendered from the API', rigList.document.getElementById('rigs-view').textContent.includes('Render Rig'));
   rigList.window.close();
 
-  // ---- home page: three collections plus the newsletter form ---------------
-  const home = await loadPage('/index.html');
-  check('index.html has no page errors', home.pageErrors.length === 0, home.pageErrors.join(' | '));
+  // ---- landing (about) plus the signed-in FYP -------------------------------
+  const landing = await loadPage('/about.html');
+  check('about.html has no page errors', landing.pageErrors.length === 0, landing.pageErrors.join(' | '));
+  check('landing rigs rendered from the API', landing.document.getElementById('home-rigs-grid').textContent.includes('Render Rig'));
+  landing.document.getElementById('newsletter-email').value = 'home-fan@srn.ng';
+  fireSubmit(landing.window, landing.document.getElementById('newsletter-form'));
+  await waitFor(() => landing.document.getElementById('newsletter-form-container').textContent.includes("You're in"), 'newsletter confirmation');
+  check('newsletter form confirms the subscription',
+    landing.document.getElementById('newsletter-form-container').textContent.includes("You're in"),
+    landing.document.getElementById('newsletter-form-container').textContent.slice(0, 80));
+  landing.window.close();
+
+  const homeOut = await loadPage('/index.html');
+  check('index.html has no page errors', homeOut.pageErrors.length === 0, homeOut.pageErrors.join(' | '));
+  check('signed-out home shows the FYP gate', homeOut.document.getElementById('fyp-gate').style.display === 'block');
+  homeOut.window.close();
+
+  const home = await loadPage('/index.html', { cookie: await loginCookie('root@srn.ng', ADMIN_PASSWORD) });
+  await waitFor(() => home.document.getElementById('spotlight-grid').textContent.includes('Render Driver'), 'fyp spotlight');
   check('home spotlight rendered from the API', home.document.getElementById('spotlight-grid').textContent.includes('Render Driver'));
   check('home news rendered from the API', home.document.getElementById('home-news-grid').textContent.includes('Render Check Article'));
-  check('home rigs rendered from the API', home.document.getElementById('home-rigs-grid').textContent.includes('Render Rig'));
-  home.document.getElementById('newsletter-email').value = 'home-fan@srn.ng';
-  fireSubmit(home.window, home.document.getElementById('newsletter-form'));
-  await waitFor(() => home.document.getElementById('newsletter-form-container').textContent.includes("You're in"), 'newsletter confirmation');
-  check('newsletter form confirms the subscription',
-    home.document.getElementById('newsletter-form-container').textContent.includes("You're in"),
-    home.document.getElementById('newsletter-form-container').textContent.slice(0, 80));
   home.window.close();
 
   // ---- contact page ---------------------------------------------------------

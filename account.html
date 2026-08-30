@@ -67,7 +67,6 @@
       <div class="navbar-actions">
         <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
           <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
-          <a href="account.html" class="btn btn-primary">SIGN UP</a>
         </span>
       </div>
 
@@ -154,6 +153,9 @@
                 <option value="rF2">rFactor 2</option>
               </select>
               <textarea id="profile-bio" placeholder="Short bio" rows="3" class="input-field" style="grid-column: 1 / -1;"></textarea>
+              <label style="grid-column: 1 / -1; font-size: 0.75rem; color: var(--text-dim);">Profile photo
+                <input type="file" id="profile-photo" accept="image/png,image/jpeg,image/webp" class="input-field" style="margin-top: 0.4rem;" />
+              </label>
               <p id="profile-status" style="grid-column: 1 / -1; font-size: 0.75rem; min-height: 1rem;"></p>
               <button type="submit" class="btn btn-primary" style="grid-column: 1 / -1;">SAVE PROFILE</button>
             </form>
@@ -217,7 +219,13 @@
           <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
             <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
             <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
-            <input required type="password" name="password" placeholder="Password (min 8 characters)" minlength="8" class="input-field" autocomplete="new-password" />
+            <input required type="password" id="signup-password" name="password" placeholder="Password" minlength="8" class="input-field" autocomplete="new-password" />
+            <ul class="pw-rules" id="pw-rules" aria-live="polite">
+              <li data-pw="len">8 or more characters</li>
+              <li data-pw="letter">A letter</li>
+              <li data-pw="number">A number</li>
+              <li data-pw="symbol">A symbol (optional)</li>
+            </ul>
 
             <label for="vendor-toggle" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 0.875rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
               <input type="checkbox" id="vendor-toggle" name="vendor" style="margin-top: 0.2rem; width: 1rem; height: 1rem; accent-color: var(--accent-green); cursor: pointer;" />
@@ -454,11 +462,21 @@
         e.preventDefault();
         const status = document.getElementById('profile-status');
         try {
-          const res = await SRN.updateProfile({
+          const payload = {
             city: document.getElementById('profile-city').value,
             sim: document.getElementById('profile-sim').value,
             bio: document.getElementById('profile-bio').value,
-          });
+          };
+          const file = document.getElementById('profile-photo').files[0];
+          if (file) {
+            payload.photo = await new Promise((res, rej) => {
+              const r = new FileReader();
+              r.onload = () => res(r.result);
+              r.onerror = rej;
+              r.readAsDataURL(file);
+            });
+          }
+          const res = await SRN.updateProfile(payload);
           // Publish the link straight away; a freshly created profile has no link yet.
           document.getElementById('profile-link').innerHTML =
             `<a href="member-profile.html?id=${encodeURIComponent(res.member.id)}" style="color: var(--accent-green);">View your public profile</a>`;
@@ -547,10 +565,35 @@
         }
       }
 
+      const pwInput = document.getElementById('signup-password');
+      const pwRules = document.getElementById('pw-rules');
+      function scorePassword(value) {
+        return {
+          len: value.length >= 8,
+          letter: /[A-Za-z]/.test(value),
+          number: /[0-9]/.test(value),
+          symbol: /[^A-Za-z0-9]/.test(value),
+        };
+      }
+      function paintPassword() {
+        const s = scorePassword(pwInput.value);
+        pwRules.querySelectorAll('[data-pw]').forEach((li) => {
+          const ok = s[li.dataset.pw];
+          li.classList.toggle('ok', !!ok);
+          li.classList.toggle('bad', li.dataset.pw !== 'symbol' && !ok && pwInput.value.length > 0);
+        });
+        return s.len && s.letter && s.number;
+      }
+      pwInput.addEventListener('input', paintPassword);
+
       document.getElementById('signup-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
+        if (!paintPassword()) {
+          showMessage(form, 'Password needs 8+ characters, a letter and a number.', true);
+          return;
+        }
         try {
           const res = await SRN.signup({
             username: data.username,

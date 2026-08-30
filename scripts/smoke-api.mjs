@@ -393,7 +393,7 @@ try {
   });
   check('rig with a photo is accepted', withPhoto.status === 201, JSON.stringify(withPhoto.data));
   check('photo is stored and referenced by path',
-    /^media\/uploads\/rig-[\w-]+\.png$/.test(withPhoto.data?.rig?.img || ''),
+    /^media\/uploads\/up-[\w-]+\.png$/.test(withPhoto.data?.rig?.img || ''),
     `img=${withPhoto.data?.rig?.img}`);
   check('a bad data URL is rejected 400',
     (await call(vendor, 'POST', '/api/rigs', { name: 'x', owner: 'y', photo: 'data:text/plain;base64,aGk=' })).status === 400);

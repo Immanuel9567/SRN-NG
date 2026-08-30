@@ -67,7 +67,6 @@
       <div class="navbar-actions">
         <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
           <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
-          <a href="account.html" class="btn btn-primary">SIGN UP</a>
         </span>
       </div>
 
@@ -101,120 +100,16 @@
 
 
   <main>
-    <!-- Hero Section -->
-    <section style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: #08080C;">
-      <video id="hero-video" class="hero-video" src="media/splash.mp4"
-             autoplay muted loop playsinline preload="metadata"
-             poster="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format"
-             aria-hidden="true" tabindex="-1"></video>
-      <div class="hero-scrim"></div>
-      <script>
-        // A hero video should not move for people who prefer reduced motion.
-        (function () {
-          var v = document.getElementById('hero-video');
-          if (!v) return;
-          var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-          // play()/pause() can be unavailable or non-promise in some environments
-          // (jsdom, very old browsers), so never let the hero script throw.
-          var safe = function (fn) {
-            try {
-              var r = fn();
-              if (r && typeof r.catch === 'function') r.catch(function () {});
-            } catch (e) {}
-          };
-          var sync = function () {
-            if (mq && mq.matches) { safe(function () { v.pause(); v.currentTime = 0; }); }
-            else { safe(function () { return v.play(); }); }
-          };
-          if (mq && mq.addEventListener) mq.addEventListener('change', sync);
-          else if (mq && mq.addListener) mq.addListener(sync);
-          sync();
-        })();
-      </script>
-      <div class="hero-scrim-fade"></div>
-
-      <div class="container on-media" style="position: relative; z-index: 10; padding-top: 7rem; padding-bottom: 4rem;">
-        <div style="max-width: 48rem;">
-
-          <h1 style="font-family: var(--font-display); font-weight: 900; line-height: 1; margin-bottom: 1.5rem;">
-            <span style="display: block; color: var(--text-white); font-size: clamp(2.4rem, 6vw, 5.5rem);">UNLEASH</span>
-            <span class="glass-text" style="display: block; font-size: clamp(2.4rem, 6vw, 5.5rem);">YOUR SPEED.</span>
-            <span style="display: block; color: var(--text-white); font-size: clamp(1.4rem, 3.5vw, 3rem); font-weight: 700; margin-top: 0.35em; opacity: 0.9;">Nigerian Sim Racing Starts Here.</span>
-          </h1>
-
-          <p style="color: var(--text-muted); font-size: clamp(0.95rem, 1.5vw, 1.15rem); line-height: 1.6; margin-bottom: 2.5rem; max-width: 36rem;">
-            Join 2,400+ drivers competing, connecting, and pushing limits — from Lagos to Abuja and beyond. Real passion. Real competition. Real community.
-          </p>
-
-          <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
-            <a href="members.html" class="btn btn-primary">
-              <span>START RACING</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-            <a href="gallery.html" class="btn btn-outline-light">EXPLORE</a>
-          </div>
-        </div>
+    <section id="fyp-gate" class="section-py" style="display:none; text-align:center;">
+      <div class="container container-narrow">
+        <p class="section-kicker">For you</p>
+        <h1 class="section-title">YOUR FEED</h1>
+        <p style="color: var(--text-muted); margin: 1rem 0 1.5rem;">Sign in to see community spotlight and news picked for you.</p>
+        <a href="account.html?mode=signin" class="btn btn-primary">SIGN IN</a>
+        <a href="about.html" class="btn btn-outline-light" style="margin-left:0.5rem;">ABOUT SRN</a>
       </div>
     </section>
-
-    <!-- Stats Bar -->
-    <section class="stats-bar">
-      <div class="container grid grid-cols-3" style="text-align: center;">
-        <div>
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">2,400+</div>
-          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Active Members</div>
-        </div>
-        <div style="border-left: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle);">
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">148</div>
-          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Events Hosted</div>
-        </div>
-        <div>
-          <div style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;" class="glass-text">12</div>
-          <div style="font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.35rem;">Partner Studios</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="section-py" style="background-color: var(--bg-dark);">
-      <div class="container">
-        <div style="text-align: center; margin-bottom: 3rem;">
-          <p class="section-kicker">What We Offer</p>
-          <h2 class="section-title">EVERYTHING SIM RACING</h2>
-        </div>
-
-        <div class="grid grid-cols-1 grid-cols-2-sm grid-cols-4-lg">
-          <a href="gallery.html" class="card" style="padding: 1.5rem; display: block;">
-            <span class="icon-tile" aria-hidden="true"><iconify-icon icon="mdi:gamepad-variant" width="18" height="18"></iconify-icon></span>
-            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Game Gallery</h3>
-            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Highlights from ACC, iRacing, and Assetto Corsa, curated by Nigerian drivers.</p>
-            <div class="card-cta">Explore →</div>
-          </a>
-
-          <a href="members.html" class="card" style="padding: 1.5rem; display: block;">
-            <span class="icon-tile icon-tile-blue" aria-hidden="true"><iconify-icon icon="line-md:account" width="18" height="18"></iconify-icon></span>
-            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Community</h3>
-            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">A growing home for every Nigerian sim racer, from first session to championship.</p>
-            <div class="card-cta" style="color: var(--accent-blue);">Explore →</div>
-          </a>
-
-          <a href="activities.html" class="card" style="padding: 1.5rem; display: block;">
-            <span class="icon-tile icon-tile-orange" aria-hidden="true"><iconify-icon icon="line-md:calendar" width="18" height="18"></iconify-icon></span>
-            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Events</h3>
-            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Weekly races, monthly championships, and live watch parties you can't miss.</p>
-            <div class="card-cta" style="color: var(--accent-orange);">Explore →</div>
-          </a>
-
-          <a href="news.html" class="card" style="padding: 1.5rem; display: block;">
-            <span class="icon-tile icon-tile-purple" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4H8v16a2 2 0 0 1-2 2H4z"/><path d="M16 2v4M8 2v2M12 10h6M12 14h6"/></svg></span>
-            <h3 style="font-family: var(--font-display); font-size: 1rem; color: var(--text-white); margin-bottom: 0.5rem;">Latest News</h3>
-            <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.5;">Race results, gear reviews, and everything happening in the Nigerian sim scene.</p>
-            <div class="card-cta" style="color: var(--accent-purple);">Explore →</div>
-          </a>
-        </div>
-      </div>
-    </section>
-
+    <div id="fyp" style="display:none;">
     <!-- Community Spotlight -->
     <section class="section-py" style="background-color: var(--bg-alt);">
       <div class="container">
@@ -249,38 +144,7 @@
       </div>
     </section>
 
-    <!-- Rig Showcase -->
-    <section class="section-py" style="background-color: var(--bg-alt);">
-      <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
-          <div>
-            <p style="color: var(--accent-orange); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Hardware</p>
-            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">MEMBER RIGS</h2>
-          </div>
-          <a href="sim-rigs.html" class="btn btn-outline-orange">See All Rigs →</a>
-        </div>
-
-        <div id="home-rigs-grid" class="grid grid-cols-1 grid-cols-2-md">
-          <!-- Dynamically Populated by JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section class="section-py" style="background-color: var(--bg-card); position: relative; overflow: hidden; text-align: center;">
-      <div class="container container-narrow" style="position: relative; z-index: 10;">
-        <p style="color: var(--accent-green); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem;">Stay in the race</p>
-        <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white); margin-bottom: 1rem;">GET THE LATEST SIM RACING NEWS</h2>
-        <p style="color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem;">Race results, gear reviews, and community highlights — delivered to your inbox weekly.</p>
-
-        <div id="newsletter-form-container">
-          <form id="newsletter-form" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; max-width: 28rem; margin: 0 auto;">
-            <input type="email" id="newsletter-email" required placeholder="yourname@example.com" class="input-field" style="flex: 1; min-width: 200px; border-radius: 9999px;" />
-            <button type="submit" class="btn btn-primary" style="shrink: 0;">SUBSCRIBE</button>
-          </form>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -351,14 +215,18 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const esc = SRN.esc;
-      // Shadow the js/data.js globals so the render code below is unchanged.
-      const [MEMBERS, NEWS, RIGS] = await Promise.all([
+      const user = await SRN.me();
+      const gate = document.getElementById('fyp-gate');
+      const fyp = document.getElementById('fyp');
+      if (!user) {
+        if (gate) gate.style.display = 'block';
+        return;
+      }
+      if (fyp) fyp.style.display = 'block';
+      const [MEMBERS, NEWS] = await Promise.all([
         SRN.members().then(r => r.members),
         SRN.news().then(r => r.articles),
-        SRN.rigs().then(r => r.rigs),
       ]);
-
-      // Populate Spotlight
       const spotlightEl = document.getElementById('spotlight-grid');
       if (spotlightEl) {
         spotlightEl.innerHTML = MEMBERS.slice(0, 4).map((m, i) => `
@@ -370,23 +238,19 @@
             </div>
             <div style="padding: 1rem;">
               <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">${esc(m.name)}</div>
-              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem;">${m.city}</div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem;">${esc(m.city)}</div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span class="badge badge-green">${m.sim}</span>
+                <span class="badge badge-green">${esc(m.sim)}</span>
                 <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">View →</span>
               </div>
             </div>
           </a>
         `).join('');
       }
-
-      // Populate News
       const newsEl = document.getElementById('home-news-grid');
-      // An empty news collection must not abort the rest of this handler.
       if (newsEl && NEWS.length) {
         const featured = NEWS[0];
         const rest = NEWS.slice(1, 4);
-
         newsEl.innerHTML = `
           <a href="news-article.html?slug=${encodeURIComponent(featured.slug)}" class="card" style="grid-column: span 2; display: block;">
             <div style="position: relative; height: 16rem; overflow: hidden;">
@@ -398,14 +262,12 @@
               <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">${esc(featured.date)} · ${esc(featured.readTime)}</div>
               <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFF; margin-bottom: 0.75rem;">${esc(featured.title)}</h3>
               <p style="font-size: 0.875rem; color: var(--text-dim); line-height: 1.6;">${esc(featured.excerpt)}</p>
-              <div style="margin-top: 1.25rem; font-size: 0.875rem; font-weight: 600; color: var(--accent-green);">Read Story →</div>
             </div>
           </a>
-
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             ${rest.map(n => `
               <a href="news-article.html?slug=${encodeURIComponent(n.slug)}" class="card" style="padding: 1rem; display: flex; gap: 1rem;">
-                <img src="${esc(n.img)}" alt="${esc(n.title)}" style="width: 5rem; height: 4.5rem; object-fit: cover; border-radius: 8px; shrink: 0;" />
+                <img src="${esc(n.img)}" alt="${esc(n.title)}" style="width: 5rem; height: 4.5rem; object-fit: cover; border-radius: 8px;" />
                 <div>
                   <div style="font-size: 10px; font-family: var(--font-display); font-weight: 700; color: var(--accent-orange); text-transform: uppercase;">${esc(n.tag)}</div>
                   <h4 style="font-size: 0.875rem; font-weight: 600; color: #FFF; line-height: 1.3; margin-top: 0.25rem;">${esc(n.title)}</h4>
@@ -414,52 +276,6 @@
             `).join('')}
           </div>
         `;
-      }
-
-      // Populate Rigs
-      const rigsEl = document.getElementById('home-rigs-grid');
-      if (rigsEl) {
-        rigsEl.innerHTML = RIGS.slice(0, 2).map(rig => `
-          <a href="sim-rigs.html?id=${encodeURIComponent(rig.id)}" class="card card-alt" style="display: block;">
-            <div style="position: relative; height: 13rem; overflow: hidden;">
-              <img src="${esc(rig.img)}" alt="${esc(rig.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
-              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #13131A 0%, rgba(19,19,26,0.3) 100%);"></div>
-              <div style="position: absolute; bottom: 1rem; left: 1.25rem;">
-                <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; color: #FFF;">${rig.name}</div>
-                <div style="font-size: 0.875rem; color: var(--accent-green);">by ${rig.owner} · ${rig.city}</div>
-              </div>
-            </div>
-            <div style="padding: 1.25rem;">
-              ${rig.specs.map(s => `
-                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem;">
-                  <span style="font-family: var(--font-display); font-size: 11px; color: var(--text-dark); text-transform: uppercase;">${s.label}</span>
-                  <span style="font-weight: 600; color: #FFF;">${s.value}</span>
-                </div>
-              `).join('')}
-              <div style="margin-top: 1rem; text-align: center; padding: 0.6rem; border-radius: 8px; background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2); color: var(--accent-green); font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1px;">
-                SEE FULL BUILD
-              </div>
-            </div>
-          </a>
-        `).join('');
-      }
-
-      // Newsletter submit
-      const form = document.getElementById('newsletter-form');
-      if (form) {
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const email = document.getElementById('newsletter-email').value;
-          try {
-            const res = await SRN.subscribe(email);
-            document.getElementById('newsletter-form-container').innerHTML = `
-              <div class="confirm-chip">You're in. Welcome to the grid.</div>
-            `;
-            SRN.toast(res.message, 'success');
-          } catch (err) {
-            SRN.toast(err.message, 'error');
-          }
-        });
       }
     });
   </script>

@@ -81,7 +81,11 @@ for (const page of CONTENT_PAGES) {
   for (const page of CONTENT_PAGES) {
     const html = readFileSync(join(ROOT, page), 'utf8');
     check(`${page}: no leftover JOIN NOW`, !/JOIN NOW/.test(html));
-    check(`${page}: offers SIGN UP`, />SIGN UP</.test(html));
+    check(`${page}: drawer offers SIGN UP`, /class="mobile-menu"[\s\S]*SIGN UP/.test(html));
+    {
+      const actions = html.match(/<div class="navbar-actions">[\s\S]*?<\/div>/);
+      check(`${page}: large navbar has no SIGN UP`, actions && !/SIGN UP/.test(actions[0]));
+    }
     check(`${page}: offers SIGN IN`, />SIGN IN</.test(html));
   }
 
@@ -133,11 +137,14 @@ for (const page of CONTENT_PAGES) {
   check('rig form has a photo file input',
     /<input type="file" id="rig-photo"[^>]*accept="image\//.test(rigPage));
 
-  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
-  check('hero marketing badge removed', !/Nigeria's Premier Sim Racing Community/.test(index));
-  check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(index));
+  const landing = readFileSync(join(ROOT, 'about.html'), 'utf8');
+  check('hero marketing badge removed', !/Nigeria's Premier Sim Racing Community/.test(landing));
+  check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(landing));
   check('no large headline is left flat green',
-    !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(index));
+    !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(landing));
+  check('landing page is about.html', /id="hero-video"/.test(landing));
+  const home = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  check('home is a signed-in FYP', /id="fyp"/.test(home) && /id="spotlight-grid"/.test(home));
 }
 
 // ---- every hardcoded dark surface must have a light-theme bridge ------------
@@ -245,7 +252,7 @@ for (const page of CONTENT_PAGES) {
 
 // ---- hero uses the splash video -------------------------------------------
 {
-  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const index = readFileSync(join(ROOT, 'about.html'), 'utf8');
   check('hero uses media/splash.mp4', /<video[^>]*src="media\/splash\.mp4"/.test(index));
   check('hero video is muted, looped and playsinline',
     /<video[^>]*autoplay[^>]*muted[^>]*loop[^>]*playsinline/.test(index) ||

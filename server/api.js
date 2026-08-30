@@ -187,8 +187,8 @@ export async function handleApi(req, res, url, cookies) {
         return json(400, { error: 'Username must be 3-24 characters: letters, numbers, dot, underscore, dash.' });
       }
       if (!EMAIL_RE.test(email)) return json(400, { error: 'Enter a valid email address.' });
-      if (password.length < MIN_PASSWORD) {
-        return json(400, { error: `Password must be at least ${MIN_PASSWORD} characters.` });
+      if (password.length < MIN_PASSWORD || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+        return json(400, { error: `Password must be at least ${MIN_PASSWORD} characters and include a letter and a number.` });
       }
 
       const users = read(USERS, []);
@@ -272,7 +272,15 @@ export async function handleApi(req, res, url, cookies) {
     }
 
     if (route === 'GET /api/auth/me') {
-      return actor ? json(200, { user: publicUser(actor) }) : json(401, { user: null });
+      if (!actor) return json(401, { user: null });
+      const profile = read(MEMBERS, []).find((m) => m.userId === actor.id);
+      return json(200, {
+        user: {
+          ...publicUser(actor),
+          avatar: profile?.avatar || 'media/placeholder.png',
+          memberId: profile?.id || null,
+        },
+      });
     }
 
     // ================= admin: members and roles ===========================
@@ -480,6 +488,7 @@ export async function handleApi(req, res, url, cookies) {
         const valid = new Set(read(GAMES, []).map((g) => g.id));
         mine.gamesPlayed = [...new Set(wanted.filter((id) => valid.has(id)))];
       }
+      if (body.photo) mine.avatar = saveUpload(body.photo);
       update(MEMBERS, [], () => members);
       return json(200, { member: mine });
     }
