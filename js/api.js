@@ -143,7 +143,12 @@ const SRN = (() => {
       const user = await me();
       document.querySelectorAll('[data-account-slot]').forEach((slot) => {
         if (!user) {
-          slot.innerHTML = `<a href="account.html" class="btn btn-outline-green">SIGN IN</a>`;
+          // The mobile drawer slot is a column, so lead with the primary action there.
+          const stacked = /flex-direction:\s*column/.test(slot.getAttribute('style') || '');
+          const center = stacked ? ' style="text-align: center;"' : '';
+          const signIn = `<a href="account.html?mode=signin" class="btn btn-outline-light"${center}>SIGN IN</a>`;
+          const signUp = `<a href="account.html" class="btn btn-primary"${center}>SIGN UP</a>`;
+          slot.innerHTML = stacked ? `${signUp}${signIn}` : `${signIn}${signUp}`;
           return;
         }
         const href = user.role === 'admin' ? 'admin.html' : 'account.html';

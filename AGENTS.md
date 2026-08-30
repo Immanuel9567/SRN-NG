@@ -110,11 +110,11 @@ Invariants that are covered by tests, so do not break them:
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
 | API tests only | `npm run test:api` (133 checks) |
-| DOM render tests only | `npm run test:render` (67 checks, uses jsdom) |
+| DOM render tests only | `npm run test:render` (72 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (86 checks) |
+| Page consistency only | `npm run check:pages` (149 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -122,9 +122,9 @@ There is no linter and no typechecker configured.
 
 ## 6. Verification protocol (mandatory before claiming done)
 
-1. `npm run check` — exits 0. It runs, in order: `check:skills` (60 skills), `check:pages`
-   (85 checks), `check:inline` (16 script blocks), `test:api` (102 checks) and `test:render`
-   (45 checks).
+1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
+   `check:skills` (60), `check:pages` (149), `check:inline` (16 blocks), `test:api` (133),
+   `test:render` (72), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
 4. `git diff --stat` shows only intended files, and `data/` is unchanged unless you meant to change it.
@@ -158,8 +158,13 @@ use it, because it has caught a navbar bug that the API tests could not see.
 - **`npm audit` reports 2 vulnerabilities** (1 moderate, 1 high) in the Vite tooling tree. Known.
 - **`media/` holds 15,670,455 bytes** of committed binaries. Prefer the Unsplash URL pattern in
   `IMGS` over adding new large assets.
-- **`node_modules` is gitignored and gets wiped between sessions.** `npm run test:render` fails with
-  `Cannot find package 'jsdom'` until you run `npm ci`. Do this first.
+- **`node_modules` is gitignored and gets wiped between sessions.** `npm run check` has a `precheck`
+  hook (`scripts/ensure-deps.mjs`) that detects missing `jsdom`/`vite` and runs `npm ci` for you.
+  Running the individual `test:*` scripts directly still fails until deps are installed.
+- **The sandbox can also reset the local branch ref** back to an old commit while leaving the
+  working tree intact. Check `git rev-parse HEAD` against `git ls-remote origin <branch>` before
+  committing; recover with `git reset --mixed origin/<branch>`, which moves the pointer without
+  touching your files.
 - **Both test scripts boot a real server on a random port and wait for its stdout banner.** They used
   to poll `fetch()` until anything answered, which silently connected to an orphaned server from a
   previous run and produced false failures. If a check fails mysteriously, look for a stray
@@ -240,6 +245,10 @@ All in `css/style.css`, so a change lands on every page at once.
 - **Clearance.** `body { padding-bottom: 6.5rem }` keeps content out from under the pill. Toasts
   sit at `bottom: 6.5rem` and the shop cart bar at `bottom: 5.5rem` so nothing collides. If you add
   any new fixed bottom element, give it clearance too.
+- **Auth entry points.** There is no "Join Now" anywhere. Signed-out visitors get **SIGN UP**
+  (primary) and **SIGN IN** (outline) in the navbar and the drawer. `account.html` is one card with
+  a `.srn-segmented` toggle that alternates which fields are visible; both `#signup-form` and
+  `#login-form` stay in the DOM, and `?mode=signin` deep-links to sign-in.
 - **Toasts.** `SRN.toast(message, 'success' | 'error' | 'info')` appends to `#srn-toasts`, which is
   created on demand with `role="status"` and `aria-live="polite"`.
 - **Skeletons.** `SRN.skeleton(count, height)` emits `.srn-skeleton` shimmer blocks for loading states.
@@ -255,11 +264,16 @@ Dark theme only. There is no light mode and no theme toggle.
 
 - Backgrounds: `#08080C` / `#0A0A10` / cards `#0E0E14`
 - Primary accent: electric green `#00E676` · Secondary: orange `#FF6B1A`
-- Display font: **Orbitron** (700/800/900) · Body: **Inter** (300-700), both via Google Fonts
+- **Roboto** (300/400/500/700/900) is the site font for both `--font-sans` and `--font-display`.
+  Orbitron is still loaded but is used only by the inline logo SVG mark.
 - Money is always Naira, via `formatNaira()`.
 - Inline SVG icons, never emoji.
 - Do not introduce pure `#000000` backgrounds, AI purple gradients, or 3-equal-column card grids.
-- Keep Inter as the body font: it is paired with Orbitron by design, so it is not a defect here.
+- Large headlines use `.glass-text` rather than flat `color: var(--accent-green)`. It clips a
+  white-to-green gradient to the glyphs with `-webkit-text-fill-color: transparent`, and has an
+  `@supports not (background-clip: text)` fallback to solid green.
+- Frosted panels use `.glass-panel`; the navbar and drawer share the same
+  `rgba(255,255,255,0.1) -> rgba(255,255,255,0.04)` gradient at `blur(24px) saturate(200%)`.
 
 ## 12. Instruction precedence
 

@@ -35,9 +35,9 @@
 
       <div class="navbar-actions">
         <span data-account-slot style="display: inline-flex; align-items: center; gap: 0.75rem;">
-          <a href="account.html" class="btn btn-outline-green">SIGN IN</a>
+          <a href="account.html?mode=signin" class="btn btn-outline-light">SIGN IN</a>
+          <a href="account.html" class="btn btn-primary">SIGN UP</a>
         </span>
-        <a href="members.html" class="btn btn-outline-green">JOIN NOW</a>
       </div>
 
       <button class="mobile-toggle" aria-label="Toggle Navigation">
@@ -60,9 +60,9 @@
       <a href="shop.html" class="mobile-nav-link">Shop</a>
       <a href="about.html" class="mobile-nav-link">About</a>
       <div data-account-slot style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN IN</a>
+        <a href="account.html" class="btn btn-primary" style="text-align: center;">SIGN UP</a>
+        <a href="account.html?mode=signin" class="btn btn-outline-light" style="text-align: center;">SIGN IN</a>
       </div>
-      <a href="members.html" class="btn btn-outline-green" style="margin-top: 0.5rem; text-align: center;">JOIN NOW</a>
     </div>
   </nav>
 
@@ -122,43 +122,41 @@
 
         </div>
 
-        <div id="auth-panel" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.5rem;">
+        <div id="auth-panel" class="card" style="padding: 2rem; max-width: 30rem; margin: 0 auto;">
 
-          <!-- Create account -->
-          <div class="card" style="padding: 2rem;">
-            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">CREATE ACCOUNT</h2>
-            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Takes about ten seconds.</p>
-
-            <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
-              <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
-              <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
-              <input required type="password" name="password" placeholder="Password (min 8 characters)" minlength="8" class="input-field" autocomplete="new-password" />
-
-              <label for="vendor-toggle" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 0.875rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
-                <input type="checkbox" id="vendor-toggle" name="vendor" style="margin-top: 0.2rem; width: 1rem; height: 1rem; accent-color: var(--accent-green); cursor: pointer;" />
-                <span>
-                  <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">I am a vendor</span>
-                  <span style="display: block; font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.25rem;">Assigns the Salesperson tag for selling rigs and gear.</span>
-                </span>
-              </label>
-
-              <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
-              <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
-            </form>
+          <!-- Alternates the fields shown; both forms stay in the DOM. -->
+          <div class="srn-segmented" id="auth-mode" style="margin-bottom: 1.5rem;">
+            <button type="button" data-mode="signup" class="active">SIGN UP</button>
+            <button type="button" data-mode="signin">SIGN IN</button>
           </div>
 
-          <!-- Sign in -->
-          <div class="card" style="padding: 2rem;">
-            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">SIGN IN</h2>
-            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Welcome back.</p>
+          <h2 id="auth-heading" style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">CREATE ACCOUNT</h2>
+          <p id="auth-sub" style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Takes about ten seconds.</p>
 
-            <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem;">
-              <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
-              <input required type="password" name="password" placeholder="Password" class="input-field" autocomplete="current-password" />
-              <button type="submit" class="btn btn-outline-green">SIGN IN</button>
-              <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
-            </form>
-          </div>
+          <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
+            <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
+            <input required type="password" name="password" placeholder="Password (min 8 characters)" minlength="8" class="input-field" autocomplete="new-password" />
+
+            <label for="vendor-toggle" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 0.875rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
+              <input type="checkbox" id="vendor-toggle" name="vendor" style="margin-top: 0.2rem; width: 1rem; height: 1rem; accent-color: var(--accent-green); cursor: pointer;" />
+              <span>
+                <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">I am a vendor</span>
+                <span style="display: block; font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.25rem;">Assigns the Salesperson tag for selling rigs and gear.</span>
+              </span>
+            </label>
+
+            <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+          </form>
+
+          <form id="login-form" style="display: none; flex-direction: column; gap: 1rem;">
+            <input type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
+            <input type="password" name="password" placeholder="Password" class="input-field" autocomplete="current-password" />
+            <button type="submit" class="btn btn-primary">SIGN IN</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+          </form>
+        </div>
         </div>
 
         <!-- Role explainer -->
@@ -201,6 +199,26 @@
       const esc = SRN.esc;
       const authPanel = document.getElementById('auth-panel');
       const signedIn = document.getElementById('signed-in-panel');
+      const signupForm = document.getElementById('signup-form');
+      const loginForm = document.getElementById('login-form');
+
+      // Alternates which fields are on screen. ?mode=signin deep-links straight to it.
+      function setAuthMode(mode) {
+        const isSignup = mode !== 'signin';
+        signupForm.style.display = isSignup ? 'flex' : 'none';
+        loginForm.style.display = isSignup ? 'none' : 'flex';
+        document.getElementById('auth-heading').textContent = isSignup ? 'CREATE ACCOUNT' : 'WELCOME BACK';
+        document.getElementById('auth-sub').textContent = isSignup
+          ? 'Takes about ten seconds.'
+          : 'Sign in to manage your events, rigs and orders.';
+        document.querySelectorAll('#auth-mode button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.mode === (isSignup ? 'signup' : 'signin'));
+        });
+      }
+      document.querySelectorAll('#auth-mode button').forEach((b) => {
+        b.addEventListener('click', () => setAuthMode(b.dataset.mode));
+      });
+      setAuthMode(new URLSearchParams(window.location.search).get('mode') === 'signin' ? 'signin' : 'signup');
 
       function showMessage(form, text, isError) {
         const el = form.querySelector('[data-form-message]');
@@ -283,7 +301,7 @@
         const user = await SRN.me(true);
         if (user) showSignedIn(user);
         else {
-          authPanel.style.display = 'grid';
+          authPanel.style.display = 'block';
           signedIn.style.display = 'none';
           document.getElementById('member-zone').style.display = 'none';
         }

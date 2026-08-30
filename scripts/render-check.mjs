@@ -420,6 +420,29 @@ try {
     !!emptyNews.document.querySelector('.navbar .mobile-toggle'));
   emptyNews.window.close();
 
+  // ---- account page mode toggle ---------------------------------------------
+  const modes = await loadPage('/account.html?mode=signin');
+  const sForm = modes.document.getElementById('signup-form');
+  const lForm = modes.document.getElementById('login-form');
+  check('?mode=signin opens on the sign-in fields',
+    lForm.style.display === 'flex' && sForm.style.display === 'none',
+    `signup=${sForm.style.display} login=${lForm.style.display}`);
+  modes.document.querySelector('#auth-mode button[data-mode="signup"]').click();
+  check('clicking SIGN UP swaps to the signup fields',
+    sForm.style.display === 'flex' && lForm.style.display === 'none');
+  check('swapping updates the heading',
+    modes.document.getElementById('auth-heading').textContent === 'CREATE ACCOUNT');
+  modes.document.querySelector('#auth-mode button[data-mode="signin"]').click();
+  check('clicking SIGN IN swaps back',
+    lForm.style.display === 'flex' && sForm.style.display === 'none');
+  modes.window.close();
+
+  const defaults = await loadPage('/account.html');
+  check('account page defaults to sign up',
+    defaults.document.getElementById('signup-form').style.display === 'flex'
+    && defaults.document.getElementById('login-form').style.display === 'none');
+  defaults.window.close();
+
   console.log('');
   if (failures.length) {
     console.error(`${failures.length} of ${pass + failures.length} render checks FAILED:`);

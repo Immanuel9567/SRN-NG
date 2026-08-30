@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.8.0",
-    "previous_version": "1.7.0",
+    "version": "1.9.0",
+    "previous_version": "1.8.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -149,9 +149,9 @@
         "dev_static": "npm run dev:static  (vite only; no API, pages fall back to mock data)",
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
-        "check": "npm run check  (check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build; exits non-zero on any failure)",
-        "tests": "npm run test:api (133), npm run test:render (67), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (95 checks), npm run check:inline (16 blocks), npm run check:skills",
+        "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
+        "tests": "npm run test:api (133), npm run test:render (72), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
+        "static_checks": "npm run check:pages (149 checks), npm run check:inline (16 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -230,8 +230,9 @@
           "--border-light": "rgba(255, 255, 255, 0.1)"
         },
         "typography": {
-          "--font-display": "'Orbitron', sans-serif (weights 700/800/900)",
-          "--font-sans": "'Inter', system-ui, -apple-system, sans-serif (weights 300-700)",
+          "--font-display": "'Roboto', system-ui (weights 300-900)",
+          "--font-sans": "'Roboto', system-ui (weights 300-900)",
+          "logo_mark": "Orbitron is still loaded but is used only by the inline logo SVG.",
           "loaded_from": "Google Fonts @import at the top of css/style.css"
         },
         "brand": "Electric green #00E676 primary, orange #FF6B1A secondary, on near-black #08080C. Dark theme only."
@@ -259,7 +260,8 @@
         "Node's fetch ignores a Host header override, so the host allowlist must be tested with node:http (npm run test:hostguard).",
         "account.html and other pages must declare const esc = SRN.esc before using esc() in a template; check:pages enforces this and a missing declaration hides behind try/catch as a silent fallback.",
         "The nav is at the bottom, so nothing may assume a top bar. .page-header uses padding-top 5.5rem; do not restore the old 8rem.",
-        "Pages must survive an empty datastore: a crash on an empty collection kills the rest of that DOMContentLoaded handler. npm run test:empty loads all 15 pages against empty data."
+        "Pages must survive an empty datastore: a crash on an empty collection kills the rest of that DOMContentLoaded handler. npm run test:empty loads all 15 pages against empty data.",
+        "The sandbox can reset the local branch ref to an old commit while leaving the working tree intact. Compare git rev-parse HEAD with git ls-remote origin <branch> before committing, and recover with git reset --mixed origin/<branch>, which moves the pointer without touching files."
       ],
       "verification_protocol": {
         "before_claiming_done": [
@@ -269,7 +271,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60 skills), check:pages (95), check:inline (16 blocks), test:api (133), test:render (67), test:hostguard (9), test:empty (29), test:build (22). dist/ contains js/ and media/."
+        "last_verified": "npm run check exit 0: check:skills (60), check:pages (149), check:inline (16 blocks), test:api (133), test:render (72), test:hostguard (9), test:empty (29), test:build (22). Live server confirmed serving Roboto, glass-text, the segmented toggle and no JOIN NOW."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -300,7 +302,10 @@
         "escaping": "Every page that interpolates into innerHTML declares const esc = SRN.esc. check:pages enforces it.",
         "navbar": "Floating pill fixed to the bottom centre: bottom 1rem, left 50%, translateX(-50%), width calc(100% - 2rem) so it never touches a screen edge, max-width 68rem, border-radius 9999px, backdrop-filter blur(20px) saturate(180%). A green-to-orange .navbar::after hairline fades in on scroll. @supports-not falls back to a solid pill.",
         "mobile_drawer": ".mobile-menu is position absolute at bottom calc(100% + 0.75rem), z-index 3, border-radius 1.75rem, the same frosted-glass recipe and border as the pill navbar, a matching .mobile-menu::before hairline, an srn-drawer-pop entrance animation, and links styled as rounded pill rows. .mobile-toggle is position relative z-index 2 with pointer-events auto so nothing in the pill can swallow the click.",
-        "clearance": "body padding-bottom 6.5rem, toasts at bottom 6.5rem, shop cart bar at bottom 5.5rem. Any new fixed bottom element needs clearance."
+        "clearance": "body padding-bottom 6.5rem, toasts at bottom 6.5rem, shop cart bar at bottom 5.5rem. Any new fixed bottom element needs clearance.",
+        "glass_text": ".glass-text clips a white-to-green gradient to the glyphs via background-clip: text and -webkit-text-fill-color: transparent, with an @supports fallback to solid green. Used on the hero headline, the three stat numbers and the 404 heading.",
+        "glass_panel": ".glass-panel is the shared frosted panel. The navbar pill and the mobile drawer both use rgba(255,255,255,0.1) -> rgba(255,255,255,0.04) at blur(24px) saturate(200%).",
+        "auth_entry": "No \"Join Now\" anywhere. Signed-out visitors get SIGN UP (primary) and SIGN IN (outline) in the navbar and drawer. account.html is one card with a .srn-segmented toggle that alternates the visible fields; both forms stay in the DOM and ?mode=signin deep-links to sign-in."
       },
       "security": {
         "passwords": "scrypt, per-user 16-byte salt, timingSafeEqual comparison, no plaintext.",

@@ -18,7 +18,9 @@
     "test:hostguard": "node scripts/check-host-guard.mjs",
     "reset-admin": "node scripts/reset-admin.mjs",
     "test:empty": "node scripts/check-empty-state.mjs",
-    "test:build": "node scripts/check-build.mjs"
+    "test:build": "node scripts/check-build.mjs",
+    "ensure-deps": "node scripts/ensure-deps.mjs",
+    "precheck": "node scripts/ensure-deps.mjs"
   },
   "devDependencies": {
     "jsdom": "^30.0.1",

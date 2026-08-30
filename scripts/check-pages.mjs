@@ -69,6 +69,42 @@ for (const page of CONTENT_PAGES) {
   check('page content clears the floating nav', /body \{[^}]*padding-bottom: 6\.5rem/.test(css));
 }
 
+// ---- the auth entry points and the type/glass system -----------------------
+{
+  const css = readFileSync(join(ROOT, 'css', 'style.css'), 'utf8');
+
+  for (const page of CONTENT_PAGES) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    check(`${page}: no leftover JOIN NOW`, !/JOIN NOW/.test(html));
+    check(`${page}: offers SIGN UP`, />SIGN UP</.test(html));
+    check(`${page}: offers SIGN IN`, />SIGN IN</.test(html));
+  }
+
+  check('Roboto is loaded', /family=Roboto/.test(css));
+  check('Inter is no longer the site font', !/family=Inter/.test(css));
+  check('body font is Roboto', /--font-sans: 'Roboto'/.test(css));
+  check('display font is Roboto', /--font-display: 'Roboto'/.test(css));
+
+  check('.glass-text exists', /\.glass-text \{/.test(css));
+  check('.glass-text falls back where background-clip:text is unsupported',
+    /@supports not \(\(-webkit-background-clip: text\)/.test(css));
+
+  const navBlock = css.match(/\.navbar \{([^}]*)\}/)?.[1] || '';
+  check('navbar panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1\) 0%/.test(navBlock));
+  const drawer = css.match(/\.mobile-menu \{([^}]*)\}/)?.[1] || '';
+  check('drawer panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1\) 0%/.test(drawer));
+
+  const account = readFileSync(join(ROOT, 'account.html'), 'utf8');
+  check('account page has a mode toggle', /id="auth-mode"/.test(account) && /srn-segmented/.test(account));
+  check('account page keeps both forms for alternating fields',
+    /id="signup-form"/.test(account) && /id="login-form"/.test(account));
+
+  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  check('hero headline is glassy', /class="glass-text"[^>]*>YOUR SPEED\./.test(index));
+  check('no large headline is left flat green',
+    !/clamp\((1\.8|2\.4|3\.5)rem[^)]*\)[^>]*color: var\(--accent-green\)/.test(index));
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

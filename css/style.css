@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap');
 
 :root {
   --bg-dark: #08080C;
@@ -17,8 +17,9 @@
   --text-dark: #3A3A4A;
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-light: rgba(255, 255, 255, 0.1);
-  --font-display: 'Orbitron', sans-serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Roboto for all site text. Orbitron is kept only for the inline logo mark. */
+  --font-display: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Roboto', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -266,9 +267,9 @@ button, input, textarea, select {
   max-width: 68rem;
   z-index: 50;
   border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(24, 24, 32, 0.74) 0%, rgba(12, 12, 18, 0.64) 100%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 40px rgba(0, 0, 0, 0.55);
   transition: background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
@@ -301,7 +302,7 @@ button, input, textarea, select {
 /* No backdrop-filter support: fall back to a solid pill rather than unreadable text. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .navbar,
-  .navbar.scrolled { background: rgba(12, 12, 18, 0.97); }
+  .navbar.scrolled { background: rgba(12, 12, 18, 0.96); }
 }
 
 .navbar-container {
@@ -395,9 +396,9 @@ button, input, textarea, select {
   padding: 0.875rem;
   /* Same frosted-glass recipe as the pill navbar, so the sheet reads as one family. */
   border-radius: 1.75rem;
-  background: linear-gradient(180deg, rgba(24, 24, 32, 0.74) 0%, rgba(12, 12, 18, 0.64) 100%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  backdrop-filter: blur(24px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 60px rgba(0, 0, 0, 0.6);
   transform-origin: bottom center;
@@ -428,7 +429,7 @@ button, input, textarea, select {
 
 /* No backdrop-filter support: solid sheet instead of unreadable text. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .mobile-menu { background: rgba(12, 12, 18, 0.97); }
+  .mobile-menu { background: rgba(12, 12, 18, 0.96); }
 }
 
 .mobile-nav-link {
@@ -746,4 +747,69 @@ button, input, textarea, select {
    ========================================================================== */
 body {
   padding-bottom: 6.5rem;
+}
+
+/* ==========================================================================
+   Glass text
+   Replaces flat solid accent-green headlines with a frosted translucent fill.
+   ========================================================================== */
+.glass-text {
+  color: transparent;
+  background-image: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(190, 255, 220, 0.86) 38%,
+    rgba(0, 230, 118, 0.72) 72%,
+    rgba(0, 230, 118, 0.42) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 10px 36px rgba(0, 230, 118, 0.2);
+}
+
+/* A frosted panel to sit behind large headline text. */
+.glass-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .glass-text {
+    color: var(--accent-green);
+    -webkit-text-fill-color: currentColor;
+    background-image: none;
+  }
+}
+
+/* ==========================================================================
+   Segmented control for the account page mode toggle
+   ========================================================================== */
+.srn-segmented {
+  display: inline-flex;
+  padding: 0.25rem;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.srn-segmented button {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.srn-segmented button.active {
+  background: rgba(0, 230, 118, 0.16);
+  color: var(--accent-green);
 }
