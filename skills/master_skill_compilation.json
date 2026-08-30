@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.14.0",
-    "previous_version": "1.13.0",
+    "version": "1.15.0",
+    "previous_version": "1.14.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -15,10 +15,12 @@
       "3. The single skill whose description matches the task. Load one skill at a time.",
       "4. There is no README.md. It was deleted as inaccurate. AGENTS.md is the only prose doc; never recreate it."
     ],
-    "total_skills": 60,
-    "verified_skill_count": 60,
-    "verification_note": "Counted programmatically: 60 name entries, 60 unique, 0 duplicates, split 18/9/9/18/4/2 across the six categories.",
+    "total_skills": 62,
+    "verified_skill_count": 62,
+    "verification_note": "Counted programmatically: 62 name entries, 62 unique, 0 duplicates, split 18/9/9/20/4/2 across the six categories.",
     "global_instructions": [
+      "Before any new modification: inventory the entire working tree (every directory and file that is not .git or node_modules). Do not edit until that inventory is done.",
+      "Anti-AI-slop is always on. Ban: em dashes, delve/foster/leverage/utilize/robust/cutting-edge, \"it's not X, it's Y\", throat-clearing (\"here's the thing\"), faux-insight setups, colon-reveal drama, importance puffery, emoji in product copy, title-case heading spam. Write short, concrete, specific sentences. Show mechanisms, not vibes.",
       "Always be concise and use technical jargon.",
       "Use the brainstorming skill before any coding task that creates something new. Skip it for bugfix, memory-leak-debug, docs-update-from-diff, and docs-audit-and-refresh, which have their own entry workflow.",
       "If a user asks for a website, prioritize design-taste-frontend over tailwind-design-system.",
@@ -153,8 +155,8 @@
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
         "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
-        "tests": "npm run test:api (160), npm run test:render (84), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (307 checks), npm run check:inline (33 blocks), npm run check:skills",
+        "tests": "npm run test:api (161), npm run test:render (84), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
+        "static_checks": "npm run check:pages (307 checks), npm run check:inline (33 blocks), npm run check:skills (62)",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -790,7 +792,9 @@
           "writing-skills",
           "grill-me",
           "desktop-pet",
-          "arena-ai-agents"
+          "arena-ai-agents",
+          "no-ai-slop",
+          "read-entire-tree"
         ],
         "skills": [
           {
@@ -957,6 +961,27 @@
               "Core Metrics: Task Success, Steerability (mid-stream corrections), Error Recovery, and Tool Reliability.",
               "Workflow: Define baseline -> Track behavioral signals -> Perform causal analysis.",
               "Output: Generate an Agent Evaluation Report with Leaderboard Scores and Optimization Recommendations."
+            ]
+          },
+          {
+            "name": "no-ai-slop",
+            "description": "Use when writing or editing any prose, UI copy, comments, commit messages, or docs. Strips detectable AI writing patterns.",
+            "key_rules_summary": [
+              "Always on for this repo. Applies to AGENTS.md, HTML copy, toasts, comments, and commit messages.",
+              "Banned words: delve, foster, leverage, utilize, facilitate, empower, streamline, robust, cutting-edge, paradigm shift, game changer, tapestry, realm, beacon, multifaceted, meticulous, intricate, paramount, transformative, elevate, embark, supercharge, harness, ever-evolving.",
+              "Banned patterns: binary contrast (not X, it's Y); throat-clearing openers; faux-insight setups; colon-reveal drama; trailing -ing analysis (highlighting, underscoring); importance puffery; weasel attribution (experts agree, studies show); synonym cycling; fake-profound endings.",
+              "Punctuation: no em dashes. No emoji in product copy. No numbered-list inflation. Lead with the claim. Concrete numbers over abstractions.",
+              "Source: petergyang/no-ai-slop, conorbronsdon/avoid-ai-writing, Wikipedia Signs of AI writing."
+            ]
+          },
+          {
+            "name": "read-entire-tree",
+            "description": "Use before any new modification. Compulsory full working-tree read so edits are not made against a guessed layout.",
+            "key_rules_summary": [
+              "Iron law: no new file writes or edits until the agent has listed every project file (exclude .git, node_modules, dist).",
+              "Workflow: list the tree -> open AGENTS.md -> open the files that the change will touch -> then edit.",
+              "A grep is not a substitute for the tree listing. Partial reads of one folder do not satisfy this skill.",
+              "If the session already listed the tree in this turn, do not re-list; if a new modification starts later, list again."
             ]
           }
         ]

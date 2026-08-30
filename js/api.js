@@ -113,7 +113,10 @@ const SRN = (() => {
     addGame: (payload) => request('POST', '/api/games', payload),
     removeGame: (id) => request('DELETE', `/api/games/${id}`),
     members: () => withFallback('/api/members', { members: mock('MEMBERS') }),
-    member: (id) => withFallback(`/api/members/${id}`, { member: mock('MEMBERS').find((m) => m.id === id) || null }),
+    member: (id) => {
+      if (!id) return Promise.resolve({ member: null });
+      return withFallback(`/api/members/${id}`, { member: mock('MEMBERS').find((m) => m.id === id) || null });
+    },
     merch: (scope) => withFallback(scope ? `/api/merch?scope=${scope}` : '/api/merch', { merch: mock('MERCH') }),
     listMerch: (payload) => request('POST', '/api/merch', payload),
     setMerchStatus: (id, status) => request('PATCH', `/api/merch/${id}/status`, { status }),

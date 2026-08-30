@@ -123,7 +123,7 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (307), `check:inline` (33 blocks), `test:api` (160),
+   `check:skills` (62), `check:pages` (307), `check:inline` (33 blocks), `test:api` (161),
    `test:render` (84), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
@@ -370,17 +370,19 @@ if any page reintroduces a hardcoded white fill.
 
 ## 15. Skill library
 
-60 skills in six categories, all in `skills/master_skill_compilation.json`:
+62 skills in six categories, all in `skills/master_skill_compilation.json`:
 
 | Category | Count |
 | --- | --- |
 | `engineering_and_debugging` | 18 |
 | `design_and_frontend` | 9 |
 | `product_and_marketing` | 9 |
-| `workflow_process_and_meta` | 18 |
+| `workflow_process_and_meta` | 20 |
 | `documents_and_data` | 4 |
 | `career` | 2 |
-| **Total** | **60** |
+| **Total** | **62** |
+
+Compulsory before any new modification: skill `read-entire-tree` (list the whole working tree). Prose and UI copy: skill `no-ai-slop` is always on.
 
 Skills that do **not** apply here, and why:
 

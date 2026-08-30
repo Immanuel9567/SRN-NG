@@ -120,6 +120,8 @@ try {
   check('GET /server/api.js blocked', serverSrc.status === 403, `got ${serverSrc.status}`);
   const missing = await fetch(`${BASE}/nope.html`);
   check('unknown page falls back to 404.html', missing.status === 404);
+  const pretty = await fetch(`${BASE}/gallery`);
+  check('extensionless /gallery serves gallery.html', pretty.status === 200 && (await pretty.text()).includes('SIM RACING'));
 
   // auth: unauthenticated
   check('GET /api/auth/me when signed out is 401', (await call(anon, 'GET', '/api/auth/me')).status === 401);
