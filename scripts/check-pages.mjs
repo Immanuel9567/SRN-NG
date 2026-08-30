@@ -236,6 +236,18 @@ for (const page of CONTENT_PAGES) {
   }
 }
 
+// ---- hero uses the splash video -------------------------------------------
+{
+  const index = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  check('hero uses media/splash.mp4', /<video[^>]*src="media\/splash\.mp4"/.test(index));
+  check('hero video is muted, looped and playsinline',
+    /<video[^>]*autoplay[^>]*muted[^>]*loop[^>]*playsinline/.test(index) ||
+    /<video[^>]*[^>]*muted/.test(index));
+  check('hero video has a poster fallback', /poster=/.test(index));
+  check('hero video respects reduced motion', /prefers-reduced-motion: reduce/.test(index));
+  check('splash.mp4 exists on disk', existsSync(join(ROOT, 'media', 'splash.mp4')));
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

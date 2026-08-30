@@ -93,8 +93,34 @@
   <main>
     <!-- Hero Section -->
     <section style="position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: #08080C;">
-      <img src="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format" alt="Sim racing setup" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35;" />
+      <video id="hero-video" class="hero-video" src="media/splash.mp4"
+             autoplay muted loop playsinline preload="metadata"
+             poster="https://images.unsplash.com/photo-1771440571270-e27b63085a48?w=1920&h=1080&fit=crop&auto=format"
+             aria-hidden="true" tabindex="-1"></video>
       <div class="hero-scrim"></div>
+      <script>
+        // A hero video should not move for people who prefer reduced motion.
+        (function () {
+          var v = document.getElementById('hero-video');
+          if (!v) return;
+          var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+          // play()/pause() can be unavailable or non-promise in some environments
+          // (jsdom, very old browsers), so never let the hero script throw.
+          var safe = function (fn) {
+            try {
+              var r = fn();
+              if (r && typeof r.catch === 'function') r.catch(function () {});
+            } catch (e) {}
+          };
+          var sync = function () {
+            if (mq && mq.matches) { safe(function () { v.pause(); v.currentTime = 0; }); }
+            else { safe(function () { return v.play(); }); }
+          };
+          if (mq && mq.addEventListener) mq.addEventListener('change', sync);
+          else if (mq && mq.addListener) mq.addListener(sync);
+          sync();
+        })();
+      </script>
       <div class="hero-scrim-fade"></div>
 
       <div class="container on-media" style="position: relative; z-index: 10; padding-top: 7rem; padding-bottom: 4rem;">

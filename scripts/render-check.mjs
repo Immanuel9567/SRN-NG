@@ -149,6 +149,11 @@ async function loadPage(path, { cookie } = {}) {
     pretendToBeVisual: true,
     virtualConsole,
     beforeParse(window) {
+      // jsdom has no media playback; stub play/pause so the hero video is testable.
+      if (window.HTMLMediaElement && window.HTMLMediaElement.prototype) {
+        window.HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+        window.HTMLMediaElement.prototype.pause = function () {};
+      }
       // jsdom has no matchMedia; the theme code guards for it, but the switcher
       // needs a working one to be testable at all.
       window.matchMedia = window.matchMedia || ((query) => ({

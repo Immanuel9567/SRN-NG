@@ -67,6 +67,11 @@ try {
       pretendToBeVisual: true,
       virtualConsole: vc,
       beforeParse(w) {
+      // jsdom has no media playback; stub play/pause so the hero video is testable.
+      if (w.HTMLMediaElement && w.HTMLMediaElement.prototype) {
+        w.HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+        w.HTMLMediaElement.prototype.pause = function () {};
+      }
       // jsdom has no matchMedia; the theme code guards for it, but the switcher
       // needs a working one to be testable at all.
       w.matchMedia = w.matchMedia || ((query) => ({

@@ -114,7 +114,7 @@ Invariants that are covered by tests, so do not break them:
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (302 checks) |
+| Page consistency only | `npm run check:pages` (307 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -123,7 +123,7 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (302), `check:inline` (32 blocks), `test:api` (160),
+   `check:skills` (60), `check:pages` (307), `check:inline` (33 blocks), `test:api` (160),
    `test:render` (84), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
@@ -260,6 +260,12 @@ All in `css/style.css`, so a change lands on every page at once.
 - **Clearance.** `body { padding-bottom: 6.5rem }` keeps content out from under the pill. Toasts
   sit at `bottom: 6.5rem` and the shop cart bar at `bottom: 5.5rem` so nothing collides. If you add
   any new fixed bottom element, give it clearance too.
+- **Hero video.** The index hero background is `media/splash.mp4` in a muted, looped,
+  `playsinline` `<video>` behind the two scrims, with an Unsplash image as `poster`. An inline
+  script pauses it (seeking to 0) when `prefers-reduced-motion: reduce` matches. `play()` is
+  wrapped in a safe helper so the hero never throws where media playback is unavailable.
+  `.hero-video` in `css/style.css` sizes it `object-fit: cover` at `opacity: 0.45`.
+
 - **Nav Home.** Every content page's `.navbar-links` and `.mobile-menu` open with a `Home` link to
   `index.html`, ahead of Gallery. The brand logo also links home.
 
