@@ -53,6 +53,32 @@ a {
   text-decoration: none;
 }
 
+/* Iconify web component (icones.js.org). Size the host so missing API data does not shift layout. */
+iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+}
+
+iconify-icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
+iconify-icon svg path,
+iconify-icon svg circle,
+iconify-icon svg rect {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  animation: srn-icon-draw 0.7s ease forwards;
+}
+
+@keyframes srn-icon-draw {
+  to { stroke-dashoffset: 0; }
+}
+
 img {
   max-width: 100%;
   height: auto;
