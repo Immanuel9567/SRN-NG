@@ -118,6 +118,8 @@ for (const page of CONTENT_PAGES) {
     check(`${page}: loads js/theme.js`, /<script src="js\/theme\.js"><\/script>/.test(html));
     check(`${page}: sets the theme before first paint`,
       /localStorage\.getItem\('srn-theme'\)/.test(html));
+    check(`${page}: header has an admin entry`, /data-admin-entry/.test(html));
+    check(`${page}: header has a notification bell`, /data-notify-open/.test(html));
   }
 
   const backPages = { 'news-article.html': 'news.html', 'member-profile.html': 'members.html', 'sim-rigs.html': 'sim-rigs.html' };
@@ -203,6 +205,9 @@ for (const page of CONTENT_PAGES) {
   check('signup has a topic picker step', /id="interests-panel"/.test(account) && /id="interests-chips"/.test(account));
   check('signup routes through the topic picker', /await showInterestsStep\(res\.user\)/.test(account));
   check('topics stay editable after signup', /id="member-interests"/.test(account));
+  check('account can edit socials', /id="socials-form"/.test(account));
+  check('account can edit games played', /id="games-played"/.test(account));
+  check('account shows a friend list', /id="friend-list"/.test(account));
 
   const admin = readFileSync(join(ROOT, 'admin.html'), 'utf8');
   check('admin can manage supported games', /id="game-form"/.test(admin) && /id="games-list"/.test(admin));
@@ -260,7 +265,7 @@ check('vite.config.js derives pages from the filesystem', /readdirSync/.test(vit
   'hardcoded input lists silently drop new pages');
 
 // The datastore must exist and be well formed, since the repo is the database.
-for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter']) {
+for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter', 'friends', 'notifications']) {
   const file = join(ROOT, 'data', `${name}.json`);
   if (!existsSync(file)) { check(`data/${name}.json exists`, false, 'run npm run seed'); continue; }
   try { JSON.parse(readFileSync(file, 'utf8')); }

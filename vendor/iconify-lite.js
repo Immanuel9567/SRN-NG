@@ -21,6 +21,18 @@ const SRN_ICONIFY = {
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.2"/></svg>',
   'line-md:close':
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  'line-md:bell':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>',
+  'mdi:twitter':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l7.5 9L4 20h2.5L13 14.5 18.5 20H20l-8-9.5L20 4h-2.5L13 9.5 7.5 4H4z"/></svg>',
+  'mdi:instagram':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r="0.8"/></svg>',
+  'mdi:youtube':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10 9.5v5l5-2.5z"/></svg>',
+  'mdi:discord':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7c2-1 4-1.5 5-1.5S15 6 17 7c1.5 2 2 6 2 8-1.2 1-2.5 1.8-4 2.2l-.8-1.4c.6-.2 1.2-.5 1.8-.9-1 .5-2.2.8-4 .8s-3-.3-4-.8c.6.4 1.2.7 1.8.9L7.8 17.2C6.3 16.8 5 16 3.8 15c0-2 .5-6 2-8z"/><circle cx="9.5" cy="12" r="1"/><circle cx="14.5" cy="12" r="1"/></svg>',
+  'mdi:twitch':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h13v9l-4 4H10l-2 3H6v-3H5V4z"/><path d="M11 8v4M15 8v4"/></svg>',
 };
 
 class IconifyIconEl extends HTMLElement {

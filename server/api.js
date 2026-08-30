@@ -28,6 +28,8 @@ const MERCH = 'merch';
 const ORDERS = 'orders';
 const MEMBERS = 'members';
 const GAMES = 'games';
+const FRIENDS = 'friends';
+const NOTIFICATIONS = 'notifications';
 
 const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,24}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -113,6 +115,51 @@ const adminError = (actor) =>
 const clean = (v, max = MAX_TEXT) => String(v ?? '').trim().slice(0, max);
 const requireFields = (body, fields) => fields.filter((f) => !String(body[f] ?? '').trim());
 
+const SOCIAL_KEYS = ['x', 'instagram', 'youtube', 'discord', 'twitch'];
+
+function parseSocials(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const key of SOCIAL_KEYS) {
+    if (raw[key] === undefined) continue;
+    const s = clean(raw[key], 200);
+    if (!s) { out[key] = ''; continue; }
+    if (/^javascript:/i.test(s) || /\s/.test(s)) continue;
+    if (/^https?:\/\//i.test(s) || /^@?[\w.]{2,40}$/.test(s)) out[key] = s;
+  }
+  return out;
+}
+
+function pushNote(userId, type, text, href) {
+  update(NOTIFICATIONS, [], (list) => [...list, {
+    id: newId('ntf'),
+    userId,
+    type,
+    text: clean(text, 240),
+    href: clean(href, 200),
+    read: false,
+    createdAt: new Date().toISOString(),
+  }]);
+}
+
+function emptyProfile(actor) {
+  return {
+    id: newId('mem'),
+    userId: actor.id,
+    name: actor.username,
+    city: '',
+    rank: actor.role === 'admin' ? 'Series Admin' : 'Unranked',
+    sim: '',
+    avatar: 'media/placeholder.png',
+    joined: String(new Date().getFullYear()),
+    bio: '',
+    stats: { races: 0, wins: 0, podiums: 0 },
+    activity: [],
+    socials: {},
+    gamesPlayed: [],
+  };
+}
+
 // ---------------------------------------------------------------- routes
 
 export async function handleApi(req, res, url, cookies) {
@@ -176,6 +223,8 @@ export async function handleApi(req, res, url, cookies) {
         bio: '',
         stats: { races: 0, wins: 0, podiums: 0 },
         activity: [],
+        socials: {},
+        gamesPlayed: [],
       };
       update(MEMBERS, [], (list) => [...list, profile]);
 
@@ -416,23 +465,20 @@ export async function handleApi(req, res, url, cookies) {
       // gets one on first edit rather than failing.
       let mine = members.find((m) => m.userId === actor.id);
       if (!mine) {
-        mine = {
-          id: newId('mem'),
-          userId: actor.id,
-          name: actor.username,
-          city: '',
-          rank: actor.role === 'admin' ? 'Series Admin' : 'Unranked',
-          sim: '',
-          avatar: 'media/placeholder.png',
-          joined: String(new Date().getFullYear()),
-          bio: '',
-          stats: { races: 0, wins: 0, podiums: 0 },
-          activity: [],
-        };
+        mine = emptyProfile(actor);
         members.push(mine);
       }
       for (const field of ['city', 'sim', 'bio', 'avatar']) {
         if (body[field] !== undefined) mine[field] = clean(body[field], field === 'bio' ? 1000 : 200);
+      }
+      if (body.socials !== undefined) {
+        mine.socials = { ...(mine.socials || {}), ...parseSocials(body.socials) };
+      }
+      if (body.gamesPlayed !== undefined) {
+        const wanted = Array.isArray(body.gamesPlayed) ? body.gamesPlayed : [];
+        if (wanted.length > 20) return json(400, { error: 'Pick at most 20 games.' });
+        const valid = new Set(read(GAMES, []).map((g) => g.id));
+        mine.gamesPlayed = [...new Set(wanted.filter((id) => valid.has(id)))];
       }
       update(MEMBERS, [], () => members);
       return json(200, { member: mine });
@@ -699,6 +745,104 @@ export async function handleApi(req, res, url, cookies) {
       target.read = true;
       update(MESSAGES, [], () => messages);
       return json(200, { message: target });
+    }
+
+    // ================= friends ===========================================
+    if (route === 'GET /api/friends') {
+      if (!actor) return json(401, { error: 'Sign in to view friends.' });
+      const rows = read(FRIENDS, []);
+      const members = read(MEMBERS, []);
+      const label = (userId) => members.find((m) => m.userId === userId)?.name
+        || read(USERS, []).find((u) => u.id === userId)?.username || userId;
+      const mine = rows.filter((f) => f.fromId === actor.id || f.toId === actor.id);
+      const pack = (f) => ({
+        id: f.id,
+        status: f.status,
+        fromId: f.fromId,
+        toId: f.toId,
+        otherId: f.fromId === actor.id ? f.toId : f.fromId,
+        otherName: label(f.fromId === actor.id ? f.toId : f.fromId),
+        otherMemberId: members.find((m) => m.userId === (f.fromId === actor.id ? f.toId : f.fromId))?.id || null,
+      });
+      return json(200, {
+        friends: mine.filter((f) => f.status === 'accepted').map(pack),
+        incoming: mine.filter((f) => f.status === 'pending' && f.toId === actor.id).map(pack),
+        outgoing: mine.filter((f) => f.status === 'pending' && f.fromId === actor.id).map(pack),
+      });
+    }
+
+    if (route === 'POST /api/friends') {
+      if (!actor) return json(401, { error: 'Sign in to add a friend.' });
+      const body = await readBody(req);
+      const members = read(MEMBERS, []);
+      const targetMember = members.find((m) => m.id === clean(body.memberId, 40));
+      if (!targetMember?.userId) return json(404, { error: 'No such member.' });
+      if (targetMember.userId === actor.id) return json(400, { error: 'You cannot friend yourself.' });
+      const rows = read(FRIENDS, []);
+      const existing = rows.find((f) =>
+        (f.fromId === actor.id && f.toId === targetMember.userId)
+        || (f.fromId === targetMember.userId && f.toId === actor.id));
+      if (existing?.status === 'accepted') return json(409, { error: 'Already friends.' });
+      if (existing?.status === 'pending') return json(409, { error: 'A request is already pending.' });
+      const row = {
+        id: newId('frn'),
+        fromId: actor.id,
+        toId: targetMember.userId,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      };
+      update(FRIENDS, [], (list) => [...list, row]);
+      const meName = members.find((m) => m.userId === actor.id)?.name || actor.username;
+      pushNote(targetMember.userId, 'friend', `${meName} sent you a friend request.`, `member-profile.html?id=${targetMember.id}`);
+      return json(201, { friend: row });
+    }
+
+    const friendAccept = path.match(/^\/api\/friends\/([\w-]+)\/accept$/);
+    if (friendAccept && method === 'POST') {
+      if (!actor) return json(401, { error: 'Sign in to accept a friend request.' });
+      const rows = read(FRIENDS, []);
+      const row = rows.find((f) => f.id === friendAccept[1]);
+      if (!row) return json(404, { error: 'No such request.' });
+      if (row.toId !== actor.id) return json(403, { error: 'That request is not yours to accept.' });
+      if (row.status !== 'pending') return json(409, { error: 'Already resolved.' });
+      row.status = 'accepted';
+      update(FRIENDS, [], () => rows);
+      const members = read(MEMBERS, []);
+      const meName = members.find((m) => m.userId === actor.id)?.name || actor.username;
+      const theirMem = members.find((m) => m.userId === row.fromId);
+      pushNote(row.fromId, 'friend', `${meName} accepted your friend request.`,
+        theirMem ? `member-profile.html?id=${theirMem.id}` : 'members.html');
+      return json(200, { friend: row });
+    }
+
+    const friendId = path.match(/^\/api\/friends\/([\w-]+)$/);
+    if (friendId && method === 'DELETE') {
+      if (!actor) return json(401, { error: 'Sign in to manage friends.' });
+      const before = read(FRIENDS, []);
+      const row = before.find((f) => f.id === friendId[1]);
+      if (!row) return json(404, { error: 'No such request.' });
+      if (row.fromId !== actor.id && row.toId !== actor.id) return json(403, { error: 'Not your friendship.' });
+      update(FRIENDS, [], () => before.filter((f) => f.id !== row.id));
+      return json(200, { ok: true });
+    }
+
+    // ================= notifications =====================================
+    if (route === 'GET /api/notifications') {
+      if (!actor) return json(401, { error: 'Sign in to view notifications.' });
+      const mine = read(NOTIFICATIONS, []).filter((n) => n.userId === actor.id).reverse();
+      return json(200, { notifications: mine, unread: mine.filter((n) => !n.read).length });
+    }
+
+    const noteRead = path.match(/^\/api\/notifications\/([\w-]+)\/read$/);
+    if (noteRead && method === 'PATCH') {
+      if (!actor) return json(401, { error: 'Sign in to update notifications.' });
+      const list = read(NOTIFICATIONS, []);
+      const target = list.find((n) => n.id === noteRead[1]);
+      if (!target) return json(404, { error: 'No such notification.' });
+      if (target.userId !== actor.id) return json(403, { error: 'Not your notification.' });
+      target.read = true;
+      update(NOTIFICATIONS, [], () => list);
+      return json(200, { notification: target });
     }
 
     return json(404, { error: `No API route for ${route}` });

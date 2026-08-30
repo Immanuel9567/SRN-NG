@@ -24,6 +24,13 @@
   <!-- Sticky sub-header: back link and theme switcher -->
   <div class="sticky-subhead">
     <span class="subhead-spacer"></span>
+    <div class="subhead-tools">
+      <a href="admin.html" class="subhead-admin" data-admin-entry hidden>Admin</a>
+      <button type="button" class="subhead-bell" data-notify-open aria-label="Notifications" hidden>
+        <iconify-icon icon="line-md:bell" width="18" height="18"></iconify-icon>
+        <span class="notify-dot" data-notify-count hidden></span>
+      </button>
+    </div>
     <div class="theme-switch" role="group" aria-label="Colour theme">
       <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><iconify-icon icon="line-md:sunny" width="15" height="15"></iconify-icon></button>
       <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><iconify-icon icon="line-md:moon" width="15" height="15"></iconify-icon></button>
@@ -151,6 +158,34 @@
               <button type="submit" class="btn btn-primary" style="grid-column: 1 / -1;">SAVE PROFILE</button>
             </form>
             <p id="profile-link" style="font-size: 0.75rem; margin-top: 1rem;"></p>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">SOCIALS</h2>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.25rem;">Handles or full URLs. These show on your public profile.</p>
+            <form id="socials-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem;">
+              <input id="social-x" class="input-field" placeholder="X / Twitter" />
+              <input id="social-instagram" class="input-field" placeholder="Instagram" />
+              <input id="social-youtube" class="input-field" placeholder="YouTube" />
+              <input id="social-discord" class="input-field" placeholder="Discord" />
+              <input id="social-twitch" class="input-field" placeholder="Twitch" />
+              <p id="socials-status" style="grid-column: 1 / -1; font-size: 0.75rem; min-height: 1rem;"></p>
+              <button type="submit" class="btn btn-outline-green" style="grid-column: 1 / -1;">SAVE SOCIALS</button>
+            </form>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">GAMES PLAYED</h2>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.25rem;">Sims you actually race, shown on your profile.</p>
+            <div id="games-played" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;"></div>
+            <button id="games-played-save" class="btn btn-outline-green">SAVE GAMES</button>
+            <p id="games-played-status" style="font-size: 0.75rem; min-height: 1rem; margin-top: 0.75rem;"></p>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">FRIENDS</h2>
+            <div id="incoming-friends" style="margin-bottom: 1rem;"></div>
+            <div id="friend-list"></div>
           </div>
 
           <div class="card" style="padding: 2rem;">
@@ -331,13 +366,53 @@
           document.getElementById('profile-bio').value = mine.bio || '';
           document.getElementById('profile-link').innerHTML =
             `<a href="member-profile.html?id=${encodeURIComponent(mine.id)}" style="color: var(--accent-green);">View your public profile</a>`;
+          const s = mine.socials || {};
+          document.getElementById('social-x').value = s.x || '';
+          document.getElementById('social-instagram').value = s.instagram || '';
+          document.getElementById('social-youtube').value = s.youtube || '';
+          document.getElementById('social-discord').value = s.discord || '';
+          document.getElementById('social-twitch').value = s.twitch || '';
+          played.clear();
+          (mine.gamesPlayed || []).forEach((id) => played.add(id));
         }
+
+        try {
+          const fr = await SRN.friends();
+          const incoming = document.getElementById('incoming-friends');
+          incoming.innerHTML = (fr.incoming || []).map((f) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+              <span style="font-size:0.8125rem;color:#FFF;">${esc(f.otherName)} wants to be friends</span>
+              <button type="button" class="btn btn-primary" data-accept-friend="${esc(f.id)}" style="padding:0.4rem 0.8rem;font-size:0.65rem;">Accept</button>
+            </div>`).join('') || '';
+          incoming.querySelectorAll('[data-accept-friend]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              await SRN.acceptFriend(btn.dataset.acceptFriend);
+              SRN.toast('Friend added.', 'success');
+              loadMemberZone(user);
+            });
+          });
+          const list = document.getElementById('friend-list');
+          list.innerHTML = (fr.friends || []).length
+            ? fr.friends.map((f) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--border-subtle);">
+                  <a href="member-profile.html?id=${encodeURIComponent(f.otherMemberId || '')}" style="font-size:0.8125rem;color:var(--accent-green);">${esc(f.otherName)}</a>
+                  <button type="button" class="btn btn-outline-light" data-drop-friend="${esc(f.id)}" style="padding:0.35rem 0.7rem;font-size:0.65rem;">Remove</button>
+                </div>`).join('')
+            : '<p style="font-size:0.8125rem;color:var(--text-dim);">No friends yet. Send a request from a driver profile.</p>';
+          list.querySelectorAll('[data-drop-friend]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              await SRN.dropFriend(btn.dataset.dropFriend);
+              loadMemberZone(user);
+            });
+          });
+        } catch { /* static build */ }
 
         // Topics, editable after the fact.
         selected.clear();
         (user.interests || []).forEach((id) => selected.add(id));
         await loadGames();
         renderChips(document.getElementById('member-interests'));
+        renderChips(document.getElementById('games-played'), played);
         document.getElementById('member-interests-save').onclick = async () => {
           const note = document.getElementById('member-interests-status');
           try {
@@ -399,21 +474,22 @@
       // ---- interest chips -------------------------------------------------
       let allGames = [];
       const selected = new Set();
+      const played = new Set();
 
-      function renderChips(container) {
+      function renderChips(container, set = selected) {
         if (!allGames.length) {
           container.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No supported games yet. An admin adds them.</p>';
           return;
         }
         container.innerHTML = allGames.map((g) => `
-          <button type="button" class="btn-pill ${selected.has(g.id) ? 'active' : ''}" data-game="${esc(g.id)}">
+          <button type="button" class="btn-pill ${set.has(g.id) ? 'active' : ''}" data-game="${esc(g.id)}">
             ${esc(g.shortName || g.name)}
           </button>`).join('');
         container.querySelectorAll('[data-game]').forEach((btn) => {
           btn.addEventListener('click', () => {
             const id = btn.dataset.game;
-            if (selected.has(id)) selected.delete(id); else selected.add(id);
-            btn.classList.toggle('active', selected.has(id));
+            if (set.has(id)) set.delete(id); else set.add(id);
+            btn.classList.toggle('active', set.has(id));
           });
         });
       }

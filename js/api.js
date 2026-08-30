@@ -128,6 +128,12 @@ const SRN = (() => {
     // driver profile and interests
     updateProfile: (payload) => request('PATCH', '/api/members/me', payload),
     setInterests: (interests) => request('PATCH', '/api/auth/interests', { interests }),
+    friends: () => request('GET', '/api/friends'),
+    requestFriend: (memberId) => request('POST', '/api/friends', { memberId }),
+    acceptFriend: (id) => request('POST', `/api/friends/${id}/accept`),
+    dropFriend: (id) => request('DELETE', `/api/friends/${id}`),
+    notifications: () => request('GET', '/api/notifications'),
+    markNotification: (id) => request('PATCH', `/api/notifications/${id}/read`),
 
     // orders
     placeOrder: (items) => request('POST', '/api/orders', { items }),

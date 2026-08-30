@@ -51,6 +51,8 @@ write('rigs', [{ id: 'rig_seed', name: 'Seeded Rig', owner: 'Seed Owner', ownerI
   createdAt: new Date().toISOString() }]);
 write('messages', []);
 write('newsletter', []);
+write('friends', []);
+write('notifications', []);
 
 // ---- boot the server -------------------------------------------------------
 const server = spawn(process.execPath, [join(ROOT, 'server', 'index.js')], {
@@ -316,6 +318,19 @@ try {
   check('signed-in user can edit their own profile',
     edited.data?.member?.city === 'Lagos' && edited.data?.member?.sim === 'ACC', JSON.stringify(edited.data));
   check('profile edit targets the caller only', edited.data?.member?.userId === vendorProfile.userId);
+  const socials = await call(vendor, 'PATCH', '/api/members/me', {
+    socials: { x: '@wheels', instagram: 'https://instagram.com/wheels' },
+    gamesPlayed: ['iracing'],
+  });
+  check('profile stores socials and games played',
+    socials.data?.member?.socials?.x === '@wheels' && socials.data?.member?.gamesPlayed?.[0] === 'iracing',
+    JSON.stringify(socials.data?.member));
+  check('javascript social URLs are dropped',
+    (await call(vendor, 'PATCH', '/api/members/me', { socials: { x: 'javascript:alert(1)' } })).data?.member?.socials?.x !== 'javascript:alert(1)');
+  check('friend request to a profile without an account is 404',
+    (await call(vendor, 'POST', '/api/friends', { memberId: 'mem_1' })).status === 404);
+  check('anonymous cannot list friends', (await call(anon, 'GET', '/api/friends')).status === 401);
+  check('anonymous cannot list notifications', (await call(anon, 'GET', '/api/notifications')).status === 401);
 
   // ---- merch listings (salesperson power) ----------------------------------
   check('anonymous cannot list merch', (await call(anon, 'POST', '/api/merch', { name: 'x', category: 'y', price: 1 })).status === 401);
@@ -323,6 +338,15 @@ try {
   const plainJar = jar();
   const plain = await call(plainJar, 'POST', '/api/auth/signup', { username: 'plain_racer', email: 'plain@srn.ng', password: 'Password!1', vendor: false });
   check('control account is a plain user', plain.data?.user?.role === 'user', `got ${plain.data?.user?.role}`);
+  const plainMember = (await call(anon, 'GET', '/api/members')).data.members.find((m) => m.userId === plain.data.user.id);
+  const asked = await call(vendor, 'POST', '/api/friends', { memberId: plainMember.id });
+  check('friend request is created', asked.status === 201, JSON.stringify(asked.data));
+  const notes = await call(plainJar, 'GET', '/api/notifications');
+  check('friend request creates a notification', notes.data?.unread >= 1, JSON.stringify(notes.data));
+  const accepted = await call(plainJar, 'POST', `/api/friends/${asked.data.friend.id}/accept`);
+  check('friend request can be accepted', accepted.status === 200 && accepted.data?.friend?.status === 'accepted');
+  check('both sides see the friendship',
+    (await call(vendor, 'GET', '/api/friends')).data.friends.length === 1);
   check('a plain user cannot list merch', (await call(plainJar, 'POST', '/api/merch', { name: 'x', category: 'y', price: 1 })).status === 403);
   const listing = await call(vendor, 'POST', '/api/merch', { name: 'DD1 Wheelbase', category: 'Wheels', price: 850000, description: 'Used once.' });
   check('salesperson can list merch', listing.status === 201, JSON.stringify(listing.data));

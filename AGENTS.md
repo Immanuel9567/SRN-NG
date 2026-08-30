@@ -201,7 +201,13 @@ use it, because it has caught a navbar bug that the API tests could not see.
 | POST | `/api/news` | admin | slug generated and de-duplicated |
 | DELETE | `/api/news/:slug` | admin | |
 | GET | `/api/games`, `/api/members`, `/api/merch`, `/api/rigs` | anyone | rigs and merch hide `pending` |
-| PATCH | `/api/members/me` | signed in | edits your own linked profile; creates it if missing |
+| PATCH | `/api/members/me` | signed in | city, sim, bio, avatar, socials, gamesPlayed; creates the profile if missing |
+| GET | `/api/friends` | signed in | friends, incoming, outgoing |
+| POST | `/api/friends` | signed in | `{ memberId }` sends a request |
+| POST | `/api/friends/:id/accept` | signed in | accept an incoming request |
+| DELETE | `/api/friends/:id` | signed in | unfriend or decline |
+| GET | `/api/notifications` | signed in | the caller's notification centre |
+| PATCH | `/api/notifications/:id/read` | signed in | marks one notification read |
 | PATCH | `/api/auth/interests` | signed in | sets your topic list; unknown game ids are 400 |
 | POST | `/api/games` | admin | adds a supported game |
 | DELETE | `/api/games/:id` | admin | removes a supported game |

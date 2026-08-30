@@ -24,6 +24,13 @@
   <!-- Sticky sub-header: back link and theme switcher -->
   <div class="sticky-subhead">
     <a class="subhead-back" href="members.html">&larr; Back to Members</a>
+    <div class="subhead-tools">
+      <a href="admin.html" class="subhead-admin" data-admin-entry hidden>Admin</a>
+      <button type="button" class="subhead-bell" data-notify-open aria-label="Notifications" hidden>
+        <iconify-icon icon="line-md:bell" width="18" height="18"></iconify-icon>
+        <span class="notify-dot" data-notify-count hidden></span>
+      </button>
+    </div>
     <div class="theme-switch" role="group" aria-label="Colour theme">
       <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><iconify-icon icon="line-md:sunny" width="15" height="15"></iconify-icon></button>
       <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><iconify-icon icon="line-md:moon" width="15" height="15"></iconify-icon></button>
@@ -180,6 +187,18 @@
       document.title = `${member.name} — SIM Racing NG`;
 
       const rig = RIGS.find(r => r.ownerId === member.id);
+      const SOCIAL_ICONS = { x: 'mdi:twitter', instagram: 'mdi:instagram', youtube: 'mdi:youtube', discord: 'mdi:discord', twitch: 'mdi:twitch' };
+      const socials = member.socials || {};
+      const socialHtml = Object.entries(SOCIAL_ICONS).filter(([k]) => socials[k]).map(([k, icon]) => {
+        const val = socials[k];
+        const href = /^https?:\/\//i.test(val) ? val : '#';
+        return `<a class="social-chip" href="${esc(href)}" ${href === '#' ? '' : 'target="_blank" rel="noopener"'}>
+          <iconify-icon icon="${icon}" width="14" height="14"></iconify-icon>${esc(val)}</a>`;
+      }).join('');
+      const games = ((await SRN.games()).games || []);
+      const playedNames = (member.gamesPlayed || []).map((id) => games.find((g) => g.id === id)?.shortName || games.find((g) => g.id === id)?.name).filter(Boolean);
+      const me = await SRN.me();
+      const isSelf = me && member.userId === me.id;
 
       container.innerHTML = `
         <header class="page-header">
@@ -193,6 +212,9 @@
                 <span class="badge badge-solid-green">${esc(member.rank)}</span>
                 <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; margin-top: 0.5rem; margin-bottom: 0.25rem;">${esc(member.name)}</h1>
                 <p style="font-size: 0.875rem; color: var(--text-muted);">${esc(member.city)} · Primarily races ${esc(member.sim)} · Joined ${esc(member.joined)}</p>
+                ${socialHtml ? `<div class="social-row" style="margin-top:0.75rem;">${socialHtml}</div>` : ''}
+                ${playedNames.length ? `<p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem;">Plays ${esc(playedNames.join(', '))}</p>` : ''}
+                ${!isSelf && me ? `<button type="button" id="add-friend" class="btn btn-outline-green" style="margin-top:0.75rem;">ADD FRIEND</button>` : ''}
               </div>
             </div>
           </div>
@@ -256,6 +278,20 @@
           </div>
         </section>
       `;
+
+      const addBtn = document.getElementById('add-friend');
+      if (addBtn) {
+        addBtn.addEventListener('click', async () => {
+          try {
+            await SRN.requestFriend(member.id);
+            addBtn.textContent = 'REQUEST SENT';
+            addBtn.disabled = true;
+            SRN.toast('Friend request sent.', 'success');
+          } catch (err) {
+            SRN.toast(err.message, 'error');
+          }
+        });
+      }
     });
   </script>
 </body>
