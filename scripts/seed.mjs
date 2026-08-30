@@ -112,6 +112,33 @@ if (users.some((u) => u.role === 'admin')) {
   }
 }
 
+// ---- backfill fields added after the initial seed ---------------------------
+{
+  const users = read('users', []);
+  let touched = 0;
+  for (const u of users) {
+    if (!Array.isArray(u.interests)) { u.interests = []; touched++; }
+  }
+  if (touched) { write('users', users); console.log(`users.json: added interests to ${touched} account(s)`); }
+
+  const events = read('events', []);
+  let eventTouched = 0;
+  for (const e of events) {
+    if (!e.game) { e.game = 'general'; eventTouched++; }
+    if (!Array.isArray(e.rsvps)) { e.rsvps = []; eventTouched++; }
+  }
+  if (eventTouched) { write('events', events); console.log(`events.json: backfilled ${eventTouched} field(s)`); }
+
+  // Drop driver profiles whose account no longer exists (a deleted user leaves one behind).
+  const ids = new Set(users.map((u) => u.id));
+  const members = read('members', []);
+  const kept = members.filter((m) => !m.userId || ids.has(m.userId));
+  if (kept.length !== members.length) {
+    write('members', kept);
+    console.log(`members.json: removed ${members.length - kept.length} orphan profile(s)`);
+  }
+}
+
 // ---- guarantee every account has a linked driver profile -------------------
 // Accounts created before profiles were auto-created on signup need backfilling.
 {
