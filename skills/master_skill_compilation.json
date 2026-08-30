@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.12.0",
-    "previous_version": "1.11.0",
+    "version": "1.13.0",
+    "previous_version": "1.12.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -154,7 +154,7 @@
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
         "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
         "tests": "npm run test:api (160), npm run test:render (84), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (262 checks), npm run check:inline (32 blocks), npm run check:skills",
+        "static_checks": "npm run check:pages (302 checks), npm run check:inline (32 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -279,7 +279,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60), check:pages (262), check:inline (32 blocks), test:api (160), test:render (84), test:hostguard (9), test:empty (29), test:build (22). Live flow verified: signup with empty interests, admin adds a game, plain user gets 403, interests saved and persisted, event posted to that topic, unknown topic falls back to general."
+        "last_verified": "npm run check exit 0: check:skills (60), check:pages (302), check:inline (32 blocks), test:api (160), test:render (84), test:hostguard (9), test:empty (29), test:build (22). Live: about references all six images and they return 200; every page has Home in nav and drawer."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -356,7 +356,20 @@
         "event_topic": "POST /api/events takes game: a supported game id or \"general\". Unrecognised ids fall back to general.",
         "filters": "activities.html renders #game-filters (All games / General / each game) and #act-game on the submission form."
       },
-      "api_conventions": "Admin guards must use adminError(actor): 401 when unauthenticated, 403 when signed in but not an admin. Returning 403 to an anonymous caller leaks that the route exists and is admin-gated."
+      "api_conventions": "Admin guards must use adminError(actor): 401 when unauthenticated, 403 when signed in but not an admin. Returning 403 to an anonymous caller leaks that the route exists and is admin-gated.",
+      "about_imagery": {
+        "cards": [
+          "media/who-we-are.png",
+          "media/what-we-believe.png",
+          "media/what-we-do.png",
+          "media/our-vision.png"
+        ],
+        "header": "media/logo.png",
+        "join_cta": "media/join-banner.png",
+        "unused": "media/terms-banner.png (no terms page yet)",
+        "guard": "check:pages asserts each referenced about image exists on disk.",
+        "nav_home": "Every content page nav and drawer opens with a Home link to index.html."
+      }
     },
     "categories": {
       "engineering_and_debugging": {

@@ -213,6 +213,29 @@ for (const page of CONTENT_PAGES) {
   }
 }
 
+// ---- nav home button and about imagery -------------------------------------
+{
+  for (const page of CONTENT_PAGES) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    check(`${page}: navbar has a Home link`,
+      /<a href="index\.html" class="nav-link">Home<\/a>/.test(html));
+    check(`${page}: drawer has a Home link`,
+      /<a href="index\.html" class="mobile-nav-link">Home<\/a>/.test(html));
+  }
+
+  const about = readFileSync(join(ROOT, 'about.html'), 'utf8');
+  for (const img of ['who-we-are', 'what-we-believe', 'what-we-do', 'our-vision']) {
+    check(`about.html uses media/${img}.png`, about.includes(`media/${img}.png`));
+  }
+  check('about.html uses the brand logo', about.includes('media/logo.png'));
+  check('about.html has a join CTA', about.includes('media/join-banner.png'));
+
+  // Every local image referenced by the about page must exist on disk.
+  for (const m of about.matchAll(/src="(media\/[^"]+)"/g)) {
+    check(`about image exists: ${m[1]}`, existsSync(join(ROOT, m[1])));
+  }
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

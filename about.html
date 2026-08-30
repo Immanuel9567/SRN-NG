@@ -45,6 +45,7 @@
       </a>
 
       <div class="navbar-links">
+        <a href="index.html" class="nav-link">Home</a>
         <a href="gallery.html" class="nav-link">Gallery</a>
         <a href="activities.html" class="nav-link">Activities</a>
         <a href="news.html" class="nav-link">News</a>
@@ -73,6 +74,7 @@
 
     <!-- Mobile Drawer -->
     <div class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link">Home</a>
       <a href="gallery.html" class="mobile-nav-link">Gallery</a>
       <a href="activities.html" class="mobile-nav-link">Activities</a>
       <a href="news.html" class="mobile-nav-link">News</a>
@@ -90,10 +92,13 @@
 
   <main>
     <header class="page-header">
-      <div class="container">
+      <div class="container" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <img src="media/logo.png" alt="Sim Racing Nigeria logo" style="height: 4.5rem; width: auto; border-radius: 0.75rem;" />
+        <div>
         <p class="page-header-eyebrow">About Us</p>
         <h1 class="page-header-title">BUILT BY THE COMMUNITY</h1>
-        <p class="page-header-subtitle">SIM Racing NG exists to give Nigerian sim racers a home — to race, to learn, and to be seen.</p>
+          <p class="page-header-subtitle">SIM Racing NG exists to give Nigerian sim racers a home — to race, to learn, and to be seen.</p>
+        </div>
       </div>
     </header>
 
@@ -104,6 +109,44 @@
         <p style="font-size: clamp(1.25rem, 2.5vw, 1.75rem); line-height: 1.6; color: #FFF; font-weight: 500;">
           To make competitive sim racing accessible, welcoming, and genuinely fun for every driver in Nigeria — regardless of budget, experience, or where in the country they're racing from.
         </p>
+      </div>
+    </section>
+
+    <!-- Who we are / believe / do / our vision -->
+    <section class="section-py" style="background-color: var(--bg-dark);">
+      <div class="container">
+        <p class="page-header-eyebrow" style="text-align: center;">The Community</p>
+        <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: #FFF; text-align: center; margin-bottom: 3.5rem;">WHAT SRN IS MADE OF</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem;">
+          <div class="card" style="overflow: hidden;">
+            <img src="media/who-we-are.png" alt="Who we are" style="width: 100%; height: 11rem; object-fit: cover;" />
+            <div style="padding: 1.25rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHO WE ARE</h3>
+              <p style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.6;">A nationwide community of drivers, engineers and fans — from first-timer to podium regular.</p>
+            </div>
+          </div>
+          <div class="card" style="overflow: hidden;">
+            <img src="media/what-we-believe.png" alt="What we believe" style="width: 100%; height: 11rem; object-fit: cover;" />
+            <div style="padding: 1.25rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHAT WE BELIEVE</h3>
+              <p style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.6;">Racing should be open to everyone. Budget and background should never decide who gets to be fast.</p>
+            </div>
+          </div>
+          <div class="card" style="overflow: hidden;">
+            <img src="media/what-we-do.png" alt="What we do" style="width: 100%; height: 11rem; object-fit: cover;" />
+            <div style="padding: 1.25rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHAT WE DO</h3>
+              <p style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.6;">Leagues, meetups, endurance events and coaching that take drivers from grid to podium.</p>
+            </div>
+          </div>
+          <div class="card" style="overflow: hidden;">
+            <img src="media/our-vision.png" alt="Our vision" style="width: 100%; height: 11rem; object-fit: cover;" />
+            <div style="padding: 1.25rem;">
+              <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">OUR VISION</h3>
+              <p style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.6;">A Nigeria represented at the top of world sim racing — and a home for everyone on the way up.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -186,6 +229,19 @@
             </div>
             <div style="font-weight: 700; color: #FFF; font-size: 0.875rem;">Bola Afolabi</div>
             <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Technical & Setups Lead</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Join CTA -->
+    <section class="section-py" style="background-color: var(--bg-alt);">
+      <div class="container container-narrow">
+        <div class="card" style="overflow: hidden; text-align: center;">
+          <img src="media/join-banner.png" alt="Join the grid" style="width: 100%; height: 14rem; object-fit: cover;" />
+          <div style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 900; color: #FFF; margin-bottom: 0.75rem;">READY TO JOIN THE GRID?</h2>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">Create an account, pick your games and see you on track.</p>
+            <a href="account.html" class="btn btn-primary">CREATE YOUR ACCOUNT</a>
           </div>
         </div>
       </div>
