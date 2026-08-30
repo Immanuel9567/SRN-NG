@@ -68,6 +68,7 @@ export function publicUser(user) {
     email: user.email,
     role: user.role,
     vendor: user.vendor,
+    interests: user.interests || [],
     createdAt: user.createdAt,
   };
 }

@@ -109,12 +109,12 @@ Invariants that are covered by tests, so do not break them:
 | Seed the datastore | `npm run seed` (idempotent; `-- --force` reseeds content) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
-| API tests only | `npm run test:api` (138 checks) |
-| DOM render tests only | `npm run test:render` (80 checks, uses jsdom) |
+| API tests only | `npm run test:api` (160 checks) |
+| DOM render tests only | `npm run test:render` (84 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (238 checks) |
+| Page consistency only | `npm run check:pages` (262 checks) |
 | Inline JS syntax only | `npm run check:inline` (16 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -123,8 +123,8 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (60), `check:pages` (238), `check:inline` (32 blocks), `test:api` (138),
-   `test:render` (80), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
+   `check:skills` (60), `check:pages` (262), `check:inline` (32 blocks), `test:api` (160),
+   `test:render` (84), `test:hostguard` (9), `test:empty` (29) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
 4. `git diff --stat` shows only intended files, and `data/` is unchanged unless you meant to change it.
@@ -202,6 +202,9 @@ use it, because it has caught a navbar bug that the API tests could not see.
 | DELETE | `/api/news/:slug` | admin | |
 | GET | `/api/games`, `/api/members`, `/api/merch`, `/api/rigs` | anyone | rigs and merch hide `pending` |
 | PATCH | `/api/members/me` | signed in | edits your own linked profile; creates it if missing |
+| PATCH | `/api/auth/interests` | signed in | sets your topic list; unknown game ids are 400 |
+| POST | `/api/games` | admin | adds a supported game |
+| DELETE | `/api/games/:id` | admin | removes a supported game |
 | POST | `/api/merch` | salesperson, admin | others get 403; price validated |
 | PATCH | `/api/merch/:id/status` | admin | `approved`, `pending`, `rejected` |
 | POST | `/api/orders` | signed in | **totals priced server-side from the catalogue** |
@@ -320,7 +323,30 @@ how the tests avoid writing into the working tree.
 **Inputs.** `.input-field` uses `var(--bg-dark)`, `var(--border-light)` and `var(--text-primary)`.
 It used to hardcode `background: #08080C`, which is why the search bars stayed black in light mode.
 
-## 13. Instruction precedence
+## 13. Topics and supported games
+
+`data/games.json` is the list of supported games, and **only admins can change it** (`POST` and
+`DELETE /api/games`). Everything else derives from it:
+
+- **Registration is two steps.** After `POST /api/auth/signup` the account page shows the topic
+  picker (`#interests-panel`) instead of the signed-in panel. Saving calls
+  `PATCH /api/auth/interests`, which validates every id against the games list and de-duplicates.
+  Topics stay editable later from the "Your topics" card.
+- **Events carry a topic.** `POST /api/events` takes `game`: a supported game id, or `general`.
+  An unrecognised id falls back to `general` rather than failing the submission.
+- **Activities filter by game.** `#game-filters` renders All games / General / each supported game,
+  and `#act-game` is the topic dropdown on the submission form.
+
+**Admin route status codes.** Use `adminError(actor)`: 401 when unauthenticated, 403 when signed in
+but not an admin. Returning 403 to an anonymous caller leaks that the route exists and is
+admin-gated. Do not hand-roll `json(403, ...)` for admin guards.
+
+**Brand mark.** The logo SVG uses `fill="currentColor"` for "SIM RACING" and
+`fill="var(--accent-green)"` for "NIGERIA", with the anchor setting `color: var(--text-white)`.
+It used to hardcode `fill="#FFFFFF"`, which vanished on the light glass pill. `check:pages` fails
+if any page reintroduces a hardcoded white fill.
+
+## 14. Instruction precedence
 
 1. Explicit user instruction in the current message.
 2. The repo facts in this file.
@@ -328,7 +354,7 @@ It used to hardcode `background: #08080C`, which is why the search bars stayed b
 4. The active skill's `key_rules_summary`.
 5. Default assistant behaviour.
 
-## 14. Skill library
+## 15. Skill library
 
 60 skills in six categories, all in `skills/master_skill_compilation.json`:
 

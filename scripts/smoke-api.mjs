@@ -377,6 +377,67 @@ try {
   const big = await call(vendor, 'POST', '/api/rigs', { name: 'x', owner: 'y', photo: `data:image/png;base64,${tooBig}` });
   check('an oversized photo is rejected', big.status === 400 || big.status === 413, `got ${big.status}`);
 
+  // ---- supported games: admin-managed -------------------------------------
+  check('a plain user cannot add a supported game',
+    (await call(plainJar, 'POST', '/api/games', { name: 'Rogue Title' })).status === 403);
+  check('anonymous cannot add a supported game',
+    (await call(anon, 'POST', '/api/games', { name: 'Rogue Title' })).status === 401);
+  check('game without a name is rejected 400',
+    (await call(admin, 'POST', '/api/games', { genre: 'GT' })).status === 400);
+  const newGame = await call(admin, 'POST', '/api/games', { name: 'Le Mans Ultimate', shortName: 'LMU', genre: 'Endurance' });
+  check('admin can add a supported game', newGame.status === 201, JSON.stringify(newGame.data));
+  check('new game gets an id and defaults', newGame.data?.game?.id?.startsWith('game_')
+    && newGame.data?.game?.genre === 'Endurance');
+  check('shortName falls back to the full name',
+    (await call(admin, 'POST', '/api/games', { name: 'BeamNG' })).data?.game?.shortName === 'BeamNG');
+  check('duplicate game name is rejected 409',
+    (await call(admin, 'POST', '/api/games', { name: 'le mans ultimate' })).status === 409);
+  check('new game is publicly listed',
+    (await call(anon, 'GET', '/api/games')).data.games.some((g) => g.id === newGame.data.game.id));
+
+  // ---- interests -----------------------------------------------------------
+  check('signup starts with no interests', plain.data?.user?.interests?.length === 0,
+    JSON.stringify(plain.data?.user?.interests));
+  check('anonymous cannot set interests',
+    (await call(anon, 'PATCH', '/api/auth/interests', { interests: [newGame.data.game.id] })).status === 401);
+  check('unknown game id is rejected 400',
+    (await call(plainJar, 'PATCH', '/api/auth/interests', { interests: ['game_nope'] })).status === 400);
+  check('too many interests is rejected 400',
+    (await call(plainJar, 'PATCH', '/api/auth/interests', { interests: Array.from({ length: 21 }, (_, i) => `game_${i}`) })).status === 400);
+  const saved = await call(plainJar, 'PATCH', '/api/auth/interests', { interests: [newGame.data.game.id, newGame.data.game.id] });
+  check('interests are saved', saved.data?.interests?.length === 1, JSON.stringify(saved.data));
+  check('duplicate interests are de-duplicated', saved.data?.interests?.length === 1);
+  check('interests come back on /api/auth/me',
+    (await call(plainJar, 'GET', '/api/auth/me')).data.user.interests.length === 1);
+
+  // ---- event topics ---------------------------------------------------------
+  const generalEvent = await call(plainJar, 'POST', '/api/events', {
+    title: 'General Meet', date: '2026-11-01', time: '18:00', location: 'Lagos',
+    type: 'Meetup', description: 'No specific game.',
+  });
+  check('event with no topic defaults to general', generalEvent.data?.event?.game === 'general',
+    `got ${generalEvent.data?.event?.game}`);
+  const topicEvent = await call(plainJar, 'POST', '/api/events', {
+    title: 'LMU Endurance', date: '2026-11-02', time: '19:00', location: 'Online',
+    type: 'Race Night', description: 'LMU only.', game: newGame.data.game.id,
+  });
+  check('event can be posted to a specific topic', topicEvent.data?.event?.game === newGame.data.game.id);
+  const badTopic = await call(plainJar, 'POST', '/api/events', {
+    title: 'Bad Topic', date: '2026-11-03', time: '20:00', location: 'Online',
+    type: 'Meetup', description: 'Unknown game.', game: 'game_does_not_exist',
+  });
+  check('an unknown topic falls back to general rather than failing',
+    badTopic.data?.event?.game === 'general', `got ${badTopic.data?.event?.game}`);
+
+  // ---- removing a supported game ---------------------------------------------
+  check('a plain user cannot remove a supported game',
+    (await call(plainJar, 'DELETE', `/api/games/${newGame.data.game.id}`)).status === 403);
+  check('removing an unknown game is 404', (await call(admin, 'DELETE', '/api/games/game_nope')).status === 404);
+  check('admin can remove a supported game',
+    (await call(admin, 'DELETE', `/api/games/${newGame.data.game.id}`)).status === 200);
+  check('removed game is no longer listed',
+    !(await call(anon, 'GET', '/api/games')).data.games.some((g) => g.id === newGame.data.game.id));
+
   // ---- rate limiting (last: it exhausts a bucket shared with the tests above) --
   let loginBlockedAt = null;
   for (let i = 0; i < 25; i++) {

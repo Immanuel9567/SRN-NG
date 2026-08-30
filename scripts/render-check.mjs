@@ -202,8 +202,23 @@ try {
   signup.querySelector('[name="password"]').value = 'Password!1';
   acct.document.getElementById('vendor-toggle').checked = true;
   fireSubmit(acct.window, signup);
-  await waitFor(() => acct.document.getElementById('signed-in-title').textContent.includes('render_driver'), 'signup panel');
-  check('signup form signs the user in', acct.document.getElementById('signed-in-title').textContent.includes('render_driver'),
+
+  // Registration now stops at the topic picker before the account is complete.
+  await waitFor(() => acct.document.getElementById('interests-panel').style.display === 'block', 'topic picker');
+  check('signup routes to the topic picker',
+    acct.document.getElementById('interests-panel').style.display === 'block');
+  check('the signed-in panel is held back until topics are saved',
+    acct.document.getElementById('signed-in-panel').style.display !== 'block');
+  const chips = acct.document.querySelectorAll('#interests-chips [data-game]');
+  check('topic chips list the supported games', chips.length > 0, `${chips.length} chips`);
+
+  chips[0].click();
+  check('clicking a chip selects it', chips[0].classList.contains('active'));
+  acct.document.getElementById('interests-save').click();
+
+  await waitFor(() => acct.document.getElementById('signed-in-title').textContent.includes('render_driver'), 'signed-in panel');
+  check('saving topics completes registration',
+    acct.document.getElementById('signed-in-title').textContent.includes('render_driver'),
     JSON.stringify(acct.document.getElementById('signed-in-title').textContent));
   check('signup form shows the salesperson role', acct.document.getElementById('signed-in-role').textContent === 'SALESPERSON',
     acct.document.getElementById('signed-in-role').textContent);

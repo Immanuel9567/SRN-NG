@@ -1,7 +1,7 @@
 {
   "master_skill_compilation": {
-    "version": "1.11.0",
-    "previous_version": "1.10.0",
+    "version": "1.12.0",
+    "previous_version": "1.11.0",
     "generated_for": "Yination",
     "installed_in": {
       "repo": "Immanuel9567/SRN-NG",
@@ -140,7 +140,10 @@
           "PATCH /api/merch/:id/status (admin)",
           "POST /api/orders (signed in; server-priced)",
           "GET /api/orders (?scope=all for admin)",
-          "PATCH /api/orders/:id/status (admin)"
+          "PATCH /api/orders/:id/status (admin)",
+          "PATCH /api/auth/interests (signed in)",
+          "POST /api/games (admin)",
+          "DELETE /api/games/:id (admin)"
         ]
       },
       "commands": {
@@ -150,8 +153,8 @@
         "build": "npm run build  (emits all 15 pages to dist/)",
         "seed": "npm run seed  (idempotent; -- --force reseeds events and news from js/data.js)",
         "check": "npm run check  (precheck runs ensure-deps, then check:skills, check:pages, check:inline, test:api, test:render, test:hostguard, test:empty, test:build)",
-        "tests": "npm run test:api (138), npm run test:render (80), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
-        "static_checks": "npm run check:pages (238 checks), npm run check:inline (32 blocks), npm run check:skills",
+        "tests": "npm run test:api (160), npm run test:render (84), npm run test:hostguard (9), npm run test:empty (29), npm run test:build (22)",
+        "static_checks": "npm run check:pages (262 checks), npm run check:inline (32 blocks), npm run check:skills",
         "lint": "NONE. No eslint/prettier config.",
         "typecheck": "NONE. No TypeScript.",
         "rotate_admin": "npm run reset-admin -- <admin-email>  (SRN_ADMIN_PASSWORD to set your own)"
@@ -276,7 +279,7 @@
           "git diff --stat, and confirm data/ is unchanged unless intended"
         ],
         "note": "A clean build exit proves pages compile, not that they render. test:render executes the real page scripts in jsdom against a live server and asserts on the DOM; it caught a navbar null-dereference that the API tests could not see.",
-        "last_verified": "npm run check exit 0: check:skills (60), check:pages (238), check:inline (32 blocks), test:api (138), test:render (80), test:hostguard (9), test:empty (29), test:build (22). Live CSS confirmed: navbar 0.625rem, subhead 3.25rem, input-field themed, on-media and cart-bar classes present, light shadows present."
+        "last_verified": "npm run check exit 0: check:skills (60), check:pages (262), check:inline (32 blocks), test:api (160), test:render (84), test:hostguard (9), test:empty (29), test:build (22). Live flow verified: signup with empty interests, admin adds a game, plain user gets 403, interests saved and persisted, event posted to that topic, unknown topic falls back to general."
       },
       "doc_drift": [
         "Resolved: the stale README.md was deleted. Any external description mentioning React, TypeScript, Tailwind, src/ or routes like /gallery is wrong.",
@@ -311,7 +314,8 @@
         "glass_text": ".glass-text clips a white-to-green gradient to the glyphs via background-clip: text and -webkit-text-fill-color: transparent, with an @supports fallback to solid green. Used on the hero headline, the three stat numbers and the 404 heading.",
         "glass_panel": ".glass-panel is the shared frosted panel. The navbar pill and the mobile drawer both use rgba(255,255,255,0.1) -> rgba(255,255,255,0.04) at blur(24px) saturate(200%).",
         "auth_entry": "No \"Join Now\" anywhere. Signed-out visitors get SIGN UP (primary) and SIGN IN (outline) in the navbar and drawer. account.html is one card with a .srn-segmented toggle that alternates the visible fields; both forms stay in the DOM and ?mode=signin deep-links to sign-in.",
-        "sticky_subhead": "Every content page opens with .sticky-subhead (position sticky, top 0) holding .subhead-back and the theme switcher. sim-rigs.html hides the back link unless ?id= is set."
+        "sticky_subhead": "Every content page opens with .sticky-subhead (position sticky, top 0) holding .subhead-back and the theme switcher. sim-rigs.html hides the back link unless ?id= is set.",
+        "brand_mark": "The logo SVG uses fill=\"currentColor\" for SIM RACING and fill=\"var(--accent-green)\" for NIGERIA, with the anchor setting color: var(--text-white). It used to hardcode fill=\"#FFFFFF\" and vanished on the light glass pill. check:pages fails on any hardcoded white fill."
       },
       "security": {
         "passwords": "scrypt, per-user 16-byte salt, timingSafeEqual comparison, no plaintext.",
@@ -344,7 +348,15 @@
         "limits": "Request body limit is 4 MB because base64 inflates by about a third.",
         "gitignored": "media/uploads/",
         "tests": "SRN_UPLOAD_DIR redirects the directory so tests never write into the working tree."
-      }
+      },
+      "topics": {
+        "source": "data/games.json is the supported-games list. Only admins can POST/DELETE /api/games.",
+        "registration": "Two steps. After signup the account page shows #interests-panel instead of the signed-in panel; saving calls PATCH /api/auth/interests. Topics stay editable from the \"Your topics\" card.",
+        "interests": "Stored on the user record, validated against the games list, de-duplicated, max 20.",
+        "event_topic": "POST /api/events takes game: a supported game id or \"general\". Unrecognised ids fall back to general.",
+        "filters": "activities.html renders #game-filters (All games / General / each game) and #act-game on the submission form."
+      },
+      "api_conventions": "Admin guards must use adminError(actor): 401 when unauthenticated, 403 when signed in but not an admin. Returning 403 to an anonymous caller leaks that the route exists and is admin-gated."
     },
     "categories": {
       "engineering_and_debugging": {

@@ -34,13 +34,13 @@
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container navbar-container">
-      <a href="index.html" class="navbar-brand">
+      <a href="index.html" class="navbar-brand" style="color: var(--text-white);">
         <svg width="140" height="32" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="45" height="45" rx="10" fill="#00E676"/>
           <path d="M12 33L22 12L32 33" stroke="#08080C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 26H28" stroke="#08080C" stroke-width="4.5" stroke-linecap="round"/>
-          <text x="58" y="24" fill="#FFFFFF" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
-          <text x="58" y="38" fill="#00E676" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
+          <text x="58" y="24" fill="currentColor" font-family="Orbitron, sans-serif" font-weight="900" font-size="16" letter-spacing="1">SIM RACING</text>
+          <text x="58" y="38" fill="var(--accent-green)" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" letter-spacing="3">NIGERIA</text>
         </svg>
       </a>
 
@@ -113,6 +113,17 @@
           </div>
         </div>
 
+        <!-- Step two of signup: pick the games you follow -->
+        <div id="interests-panel" class="card" style="display: none; padding: 2rem; margin-bottom: 1.5rem;">
+          <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHAT DO YOU RACE?</h2>
+          <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Pick the games you follow. Activities will be filtered to these, and you can change this any time.
+          </p>
+          <div id="interests-chips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;"></div>
+          <p id="interests-status" style="font-size: 0.75rem; min-height: 1rem; margin-bottom: 1rem;"></p>
+          <button id="interests-save" class="btn btn-primary">SAVE AND CONTINUE</button>
+        </div>
+
         <!-- Driver profile and orders, shown when signed in -->
         <div id="member-zone" style="display: none; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem;">
 
@@ -135,6 +146,14 @@
               <button type="submit" class="btn btn-primary" style="grid-column: 1 / -1;">SAVE PROFILE</button>
             </form>
             <p id="profile-link" style="font-size: 0.75rem; margin-top: 1rem;"></p>
+          </div>
+
+          <div class="card" style="padding: 2rem;">
+            <h2 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">YOUR TOPICS</h2>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.25rem;">The games you follow.</p>
+            <div id="member-interests" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;"></div>
+            <button id="member-interests-save" class="btn btn-outline-green">SAVE TOPICS</button>
+            <p id="member-interests-status" style="font-size: 0.75rem; min-height: 1rem; margin-top: 0.75rem;"></p>
           </div>
 
           <div class="card" style="padding: 2rem;">
@@ -263,6 +282,24 @@
             `<a href="member-profile.html?id=${encodeURIComponent(mine.id)}" style="color: var(--accent-green);">View your public profile</a>`;
         }
 
+        // Topics, editable after the fact.
+        selected.clear();
+        (user.interests || []).forEach((id) => selected.add(id));
+        await loadGames();
+        renderChips(document.getElementById('member-interests'));
+        document.getElementById('member-interests-save').onclick = async () => {
+          const note = document.getElementById('member-interests-status');
+          try {
+            await SRN.setInterests([...selected]);
+            note.textContent = 'Topics saved.';
+            note.style.color = 'var(--accent-green)';
+            SRN.toast('Topics saved.', 'success');
+          } catch (err) {
+            note.textContent = err.message;
+            note.style.color = '#FF6B6B';
+          }
+        };
+
         // Order history.
         const list = document.getElementById('orders-list');
         try {
@@ -308,6 +345,58 @@
         }
       });
 
+      // ---- interest chips -------------------------------------------------
+      let allGames = [];
+      const selected = new Set();
+
+      function renderChips(container) {
+        if (!allGames.length) {
+          container.innerHTML = '<p style="font-size: 0.8125rem; color: var(--text-dim);">No supported games yet. An admin adds them.</p>';
+          return;
+        }
+        container.innerHTML = allGames.map((g) => `
+          <button type="button" class="btn-pill ${selected.has(g.id) ? 'active' : ''}" data-game="${esc(g.id)}">
+            ${esc(g.shortName || g.name)}
+          </button>`).join('');
+        container.querySelectorAll('[data-game]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.game;
+            if (selected.has(id)) selected.delete(id); else selected.add(id);
+            btn.classList.toggle('active', selected.has(id));
+          });
+        });
+      }
+
+      async function loadGames() {
+        allGames = (await SRN.games()).games;
+      }
+
+      async function showInterestsStep(user) {
+        authPanel.style.display = 'none';
+        signedIn.style.display = 'none';
+        document.getElementById('member-zone').style.display = 'none';
+        selected.clear();
+        (user.interests || []).forEach((id) => selected.add(id));
+        await loadGames();
+        renderChips(document.getElementById('interests-chips'));
+        document.getElementById('interests-panel').style.display = 'block';
+      }
+
+      document.getElementById('interests-save').addEventListener('click', async () => {
+        const status = document.getElementById('interests-status');
+        try {
+          await SRN.setInterests([...selected]);
+          status.textContent = 'Saved.';
+          status.style.color = 'var(--accent-green)';
+          document.getElementById('interests-panel').style.display = 'none';
+          showSignedIn(await SRN.me(true));
+          SRN.toast('Topics saved. Welcome aboard.', 'success');
+        } catch (err) {
+          status.textContent = err.message;
+          status.style.color = '#FF6B6B';
+        }
+      });
+
       function showSignedIn(user) {
         authPanel.style.display = 'none';
         signedIn.style.display = 'block';
@@ -327,6 +416,7 @@
           authPanel.style.display = 'block';
           signedIn.style.display = 'none';
           document.getElementById('member-zone').style.display = 'none';
+          document.getElementById('interests-panel').style.display = 'none';
         }
       }
 
@@ -344,7 +434,8 @@
           showMessage(form, 'Account created.', false);
           form.reset();
           await SRN.renderAccountState();
-          showSignedIn(res.user);
+          // Registration is not finished until topics are chosen.
+          await showInterestsStep(res.user);
         } catch (err) {
           showMessage(form, err.message, true);
         }

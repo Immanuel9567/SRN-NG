@@ -188,6 +188,31 @@ for (const page of CONTENT_PAGES) {
   check('audited at least one hardcoded surface', surfaces.size > 0, `found ${surfaces.size}`);
 }
 
+// ---- topics, games and the brand mark --------------------------------------
+{
+  const activities = readFileSync(join(ROOT, 'activities.html'), 'utf8');
+  check('activities has a game filter row', /id="game-filters"/.test(activities));
+  check('activities filters by the selected game', /currentGame === 'all'/.test(activities));
+  check('activity form has a topic selector', /id="act-game"/.test(activities));
+  check('topic selector offers General', />Topic: General</.test(activities));
+  check('submission sends the topic', /game: document\.getElementById\('act-game'\)\.value/.test(activities));
+
+  const account = readFileSync(join(ROOT, 'account.html'), 'utf8');
+  check('signup has a topic picker step', /id="interests-panel"/.test(account) && /id="interests-chips"/.test(account));
+  check('signup routes through the topic picker', /await showInterestsStep\(res\.user\)/.test(account));
+  check('topics stay editable after signup', /id="member-interests"/.test(account));
+
+  const admin = readFileSync(join(ROOT, 'admin.html'), 'utf8');
+  check('admin can manage supported games', /id="game-form"/.test(admin) && /id="games-list"/.test(admin));
+  check('admin games section can remove a game', /data-game-delete/.test(admin));
+
+  // The logo hardcodes a white fill, which disappears on the light glass pill.
+  for (const page of CONTENT_PAGES) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    check(`${page}: brand mark has no hardcoded white fill`, !/fill="#FFFFFF"/i.test(html));
+  }
+}
+
 // 404.html is deliberately bare.
 const notFound = readFileSync(join(ROOT, '404.html'), 'utf8');
 check('404.html stays script-free', !/<script/.test(notFound));

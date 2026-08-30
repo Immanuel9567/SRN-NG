@@ -195,5 +195,22 @@
       "podiums": 0
     },
     "activity": []
+  },
+  {
+    "id": "mem_d959d77e14e8aca2",
+    "userId": "usr_db3ca7c6913f073f",
+    "name": "topic_tester",
+    "city": "",
+    "rank": "Unranked",
+    "sim": "",
+    "avatar": "media/placeholder.png",
+    "joined": "2026",
+    "bio": "",
+    "stats": {
+      "races": 0,
+      "wins": 0,
+      "podiums": 0
+    },
+    "activity": []
   }
 ]

@@ -27,6 +27,7 @@ const NEWSLETTER = 'newsletter';
 const MERCH = 'merch';
 const ORDERS = 'orders';
 const MEMBERS = 'members';
+const GAMES = 'games';
 
 const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,24}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,6 +105,11 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// 401 says "who are you", 403 says "you may not". Returning 403 to an anonymous
+// caller leaks that the route exists and is admin-gated, so distinguish them.
+const adminError = (actor) =>
+  json(actor ? 403 : 401, { error: actor ? 'Admin only.' : 'Sign in as an admin.' });
+
 const clean = (v, max = MAX_TEXT) => String(v ?? '').trim().slice(0, max);
 const requireFields = (body, fields) => fields.filter((f) => !String(body[f] ?? '').trim());
 
@@ -150,6 +156,7 @@ export async function handleApi(req, res, url, cookies) {
       const role = vendor ? VENDOR_ROLE : DEFAULT_ROLE;
       const user = {
         id: newId('usr'), username, email, role, vendor,
+        interests: [],
         ...hashPassword(password),
         createdAt: new Date().toISOString(),
       };
@@ -197,19 +204,37 @@ export async function handleApi(req, res, url, cookies) {
       return json(200, { ok: true }, { 'Set-Cookie': clearedCookie() });
     }
 
+    if (route === 'PATCH /api/auth/interests') {
+      if (!actor) return json(401, { error: 'Sign in to choose your interests.' });
+      const body = await readBody(req);
+      const wanted = Array.isArray(body.interests) ? body.interests : [];
+      if (wanted.length > 20) return json(400, { error: 'Pick at most 20 interests.' });
+
+      // Only accept ids that correspond to a real supported game.
+      const valid = new Set(read(GAMES, []).map((g) => g.id));
+      const unknown = wanted.filter((id) => !valid.has(id));
+      if (unknown.length) return json(400, { error: `Unknown game(s): ${unknown.join(', ')}.` });
+
+      const users = read(USERS, []);
+      const target = users.find((u) => u.id === actor.id);
+      target.interests = [...new Set(wanted)];
+      update(USERS, [], () => users);
+      return json(200, { interests: target.interests });
+    }
+
     if (route === 'GET /api/auth/me') {
       return actor ? json(200, { user: publicUser(actor) }) : json(401, { user: null });
     }
 
     // ================= admin: members and roles ===========================
     if (route === 'GET /api/users') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       return json(200, { users: read(USERS, []).map(publicUser) });
     }
 
     const roleMatch = path.match(/^\/api\/users\/([\w-]+)\/role$/);
     if (roleMatch && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const role = clean(body.role, 20);
       if (!ROLES.includes(role)) return json(400, { error: `Role must be one of: ${ROLES.join(', ')}.` });
@@ -228,7 +253,42 @@ export async function handleApi(req, res, url, cookies) {
     }
 
     // ================= public read-only collections =======================
-    if (route === 'GET /api/games') return json(200, { games: read('games', []) });
+    if (route === 'GET /api/games') return json(200, { games: read(GAMES, []) });
+
+    if (route === 'POST /api/games') {
+      if (!isAdmin) return adminError(actor);
+      const body = await readBody(req);
+      const missing = requireFields(body, ['name']);
+      if (missing.length) return json(400, { error: `Missing required field(s): ${missing.join(', ')}.` });
+
+      const games = read(GAMES, []);
+      const name = clean(body.name, 80);
+      if (games.some((g) => g.name.toLowerCase() === name.toLowerCase())) {
+        return json(409, { error: 'That game is already supported.' });
+      }
+      const game = {
+        id: newId('game'),
+        name,
+        shortName: clean(body.shortName, 24) || name,
+        genre: clean(body.genre, 40) || 'Other',
+        description: clean(body.description, 400),
+        img: clean(body.img, 500) || 'media/placeholder.png',
+        addedBy: actor.username,
+        createdAt: new Date().toISOString(),
+      };
+      update(GAMES, [], (list) => [...list, game]);
+      return json(201, { game });
+    }
+
+    const gameDelete = path.match(/^\/api\/games\/([\w-]+)$/);
+    if (gameDelete && method === 'DELETE') {
+      if (!isAdmin) return adminError(actor);
+      const before = read(GAMES, []);
+      const after = before.filter((g) => g.id !== gameDelete[1]);
+      if (after.length === before.length) return json(404, { error: 'No such game.' });
+      update(GAMES, [], () => after);
+      return json(200, { ok: true });
+    }
     // Merch: salespeople and admins can list items; submissions wait for approval.
     if (route === 'GET /api/merch') {
       const all = url.searchParams.get('scope') === 'all' && isAdmin;
@@ -271,7 +331,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const merchStatus = path.match(/^\/api\/merch\/([\w-]+)\/status$/);
     if (merchStatus && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const status = clean(body.status, 20);
       if (!['approved', 'pending', 'rejected'].includes(status)) {
@@ -331,7 +391,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const orderStatus = path.match(/^\/api\/orders\/([\w-]+)\/status$/);
     if (orderStatus && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const status = clean(body.status, 20);
       if (!['new', 'fulfilled', 'cancelled'].includes(status)) {
@@ -403,6 +463,13 @@ export async function handleApi(req, res, url, cookies) {
         time: clean(body.time, 40),
         location: clean(body.location, 120),
         type: clean(body.type, 40),
+        // Topic is either a supported game id or the literal 'general'.
+        // Anything unrecognised falls back to general rather than failing the submission.
+        game: (() => {
+          const wanted = clean(body.game, 40) || 'general';
+          if (wanted === 'general') return 'general';
+          return read(GAMES, []).some((g) => g.id === wanted) ? wanted : 'general';
+        })(),
         description: clean(body.description, 1000),
         img: clean(body.img, 500) || 'media/placeholder.png',
         // Admins publish straight away; everyone else waits for approval.
@@ -422,7 +489,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const eventStatus = path.match(/^\/api\/events\/([\w-]+)\/status$/);
     if (eventStatus && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const status = clean(body.status, 20);
       if (!['upcoming', 'past', 'pending', 'rejected'].includes(status)) {
@@ -456,7 +523,7 @@ export async function handleApi(req, res, url, cookies) {
     if (route === 'GET /api/news') return json(200, { articles: read(NEWS, []) });
 
     if (route === 'POST /api/news') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const missing = requireFields(body, ['title', 'tag', 'excerpt', 'body']);
       if (missing.length) return json(400, { error: `Missing required field(s): ${missing.join(', ')}.` });
@@ -487,7 +554,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const newsDelete = path.match(/^\/api\/news\/([\w-]+)$/);
     if (newsDelete && method === 'DELETE') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const before = read(NEWS, []);
       const after = before.filter((a) => a.slug !== newsDelete[1]);
       if (after.length === before.length) return json(404, { error: 'No such article.' });
@@ -547,7 +614,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const rigStatus = path.match(/^\/api\/rigs\/([\w-]+)\/status$/);
     if (rigStatus && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
       const status = clean(body.status, 20);
       if (!['approved', 'pending', 'rejected'].includes(status)) {
@@ -599,7 +666,7 @@ export async function handleApi(req, res, url, cookies) {
 
     // ================= admin inbox ========================================
     if (route === 'GET /api/inbox') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const messages = read(MESSAGES, []);
       const subscribers = read(NEWSLETTER, []);
       const pendingEvents = read(EVENTS, []).filter((e) => e.status === 'pending');
@@ -625,7 +692,7 @@ export async function handleApi(req, res, url, cookies) {
 
     const markRead = path.match(/^\/api\/messages\/([\w-]+)\/read$/);
     if (markRead && method === 'PATCH') {
-      if (!isAdmin) return json(403, { error: 'Admin only.' });
+      if (!isAdmin) return adminError(actor);
       const messages = read(MESSAGES, []);
       const target = messages.find((m) => m.id === markRead[1]);
       if (!target) return json(404, { error: 'No such message.' });

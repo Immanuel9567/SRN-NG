@@ -110,6 +110,8 @@ const SRN = (() => {
     deleteNews: (slug) => request('DELETE', `/api/news/${slug}`),
 
     games: () => withFallback('/api/games', { games: mock('GAMES') }),
+    addGame: (payload) => request('POST', '/api/games', payload),
+    removeGame: (id) => request('DELETE', `/api/games/${id}`),
     members: () => withFallback('/api/members', { members: mock('MEMBERS') }),
     member: (id) => withFallback(`/api/members/${id}`, { member: mock('MEMBERS').find((m) => m.id === id) || null }),
     merch: (scope) => withFallback(scope ? `/api/merch?scope=${scope}` : '/api/merch', { merch: mock('MERCH') }),
@@ -120,8 +122,9 @@ const SRN = (() => {
     submitRig: (payload) => request('POST', '/api/rigs', payload),
     setRigStatus: (id, status) => request('PATCH', `/api/rigs/${id}/status`, { status }),
 
-    // driver profile
+    // driver profile and interests
     updateProfile: (payload) => request('PATCH', '/api/members/me', payload),
+    setInterests: (interests) => request('PATCH', '/api/auth/interests', { interests }),
 
     // orders
     placeOrder: (items) => request('POST', '/api/orders', { items }),
