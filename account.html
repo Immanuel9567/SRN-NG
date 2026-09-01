@@ -219,6 +219,11 @@
           <h2 id="auth-heading" style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">CREATE ACCOUNT</h2>
           <p id="auth-sub" style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Takes about ten seconds.</p>
 
+          <!-- Shown only when the page is served without the SRN API (static hosting). -->
+          <p id="offline-note" style="display: none; font-size: 0.6875rem; color: var(--text-muted); background: var(--bg-card-alt); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem;">
+            The SRN server is not connected yet, so your account is created and kept in this browser. It moves online once the server goes live.
+          </p>
+
           <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
             <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
             <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
@@ -249,22 +254,6 @@
             <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
           </form>
         </div>
-        </div>
-
-        <!-- Role explainer -->
-        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem;">
-          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
-            <div class="badge badge-green">USER</div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Default for every new account. Can submit events for admin review.</p>
-          </div>
-          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
-            <div class="badge badge-orange">SALESPERSON</div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Set by the vendor toggle at signup. For vendors listing rigs and gear.</p>
-          </div>
-          <div class="card-alt" style="padding: 1.25rem; border-radius: 8px;">
-            <div class="badge badge-solid-green">ADMIN</div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">Cannot be self-assigned. Granted only by an existing admin. Publishes news and approves events.</p>
-          </div>
         </div>
 
       </div>
@@ -358,6 +347,11 @@
         b.addEventListener('click', () => setAuthMode(b.dataset.mode));
       });
       setAuthMode(new URLSearchParams(window.location.search).get('mode') === 'signin' ? 'signin' : 'signup');
+
+      // Say so plainly when accounts are living in localStorage rather than on a server.
+      SRN.offline().then((off) => {
+        if (off) document.getElementById('offline-note').style.display = 'block';
+      });
 
       function showMessage(form, text, isError) {
         const el = form.querySelector('[data-form-message]');

@@ -14,10 +14,11 @@
     "test:render": "node scripts/render-check.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:inline": "node scripts/check-inline-js.mjs",
-    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:hostguard && npm run test:empty && npm run test:build",
+    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:hostguard && npm run test:empty && npm run test:offline && npm run test:build",
     "test:hostguard": "node scripts/check-host-guard.mjs",
     "reset-admin": "node scripts/reset-admin.mjs",
     "test:empty": "node scripts/check-empty-state.mjs",
+    "test:offline": "node scripts/check-offline-accounts.mjs",
     "test:build": "node scripts/check-build.mjs",
     "ensure-deps": "node scripts/ensure-deps.mjs",
     "precheck": "node scripts/ensure-deps.mjs"
