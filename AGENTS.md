@@ -17,7 +17,8 @@ committed JSON in `data/`.
 
 **There is no `README.md`.** It was deleted because it described a React + TypeScript + Tailwind v4
 stack with a `src/` tree and React Router, none of which has ever existed in this checkout. Do not
-recreate it: **`AGENTS.md` is the canonical documentation for this repository.**
+recreate it: **`AGENTS.md` is the canonical documentation for this repository. Infrastructure, DNS and the
+deployment runbook live in [`DEPLOYMENT.md`](DEPLOYMENT.md).**
 
 If you were handed an outside description of this project claiming React, TypeScript, Tailwind,
 `src/`, or client-side routes like `/gallery`, it is wrong. The real routes are plain `.html` hrefs:
@@ -166,6 +167,7 @@ out of shell history by piping it.
 | Offline accounts (no API) | `npm run test:offline` (17 checks against a plain static host) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
+| Proxy trust only | `npm run test:proxytrust` (14 checks) |
 | Page consistency only | `npm run check:pages` (399 checks) |
 | Inline JS syntax only | `npm run check:inline` (34 blocks) |
 | Skills file validation | `npm run check:skills` |
@@ -176,8 +178,8 @@ There is no linter and no typechecker configured.
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
    `check:skills` (62), `check:pages` (399), `check:inline` (34 blocks), `test:api` (170),
-   `test:render` (86), `test:hostguard` (9), `test:empty` (29), `test:offline` (17) and
-   `test:build` (22).
+   `test:render` (86), `test:hostguard` (9), `test:proxytrust` (14), `test:empty` (29),
+   `test:offline` (17) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
 4. `git diff --stat` shows only intended files, and `data/` is unchanged unless you meant to change it.
@@ -284,9 +286,13 @@ use it, because it has caught a navbar bug that the API tests could not see.
 - **Sessions.** 32 random bytes, `HttpOnly`, `SameSite=Lax`, 7-day TTL, expired ones swept on write.
   `Secure` is added only when `SRN_SECURE_COOKIES=1`, which every TLS deployment must set (3.2).
 - **Rate limiting.** `server/ratelimit.js` caps login and signup at 10 attempts per 15 minutes per
-  socket address, returning 429 with `Retry-After`. It runs **before** body parsing, so a
-  malformed body to a throttled endpoint answers 429, not 400. `X-Forwarded-For` is deliberately
-  ignored: a client could rotate it to walk past the limit. Put the real IP in at a trusted proxy.
+  client address, returning 429 with `Retry-After`. It runs **before** body parsing, so a
+  malformed body to a throttled endpoint answers 429, not 400. `X-Forwarded-For` is ignored unless
+  `SRN_TRUST_PROXY` is set to the exact number of proxies you operate (1 for a single Caddy or
+  nginx, 2 for Cloudflare plus Caddy). With it set, only the entry to the left of your own hops is
+  trusted, so a forged prefix cannot mint a fresh bucket. `npm run test:proxytrust` covers both.
+  Unset behind a proxy means every request looks like `127.0.0.1`, all users share one bucket, and
+  one attacker can lock out login sitewide.
 - **Host allowlist.** Set `SRN_ALLOWED_HOSTS` (comma separated, `.example.com` matches subdomains)
   to reject any other `Host` with 421. Unset means allow everything, which is what the sandbox
   preview needs. Set it in production.
