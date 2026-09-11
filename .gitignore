@@ -18,4 +18,9 @@ data/newsletter.json
 data/notifications.json
 data/friends.json
 
+# The SQLite database and its write-ahead log. The DB is the datastore.
+data/srn.db
+data/srn.db-wal
+data/srn.db-shm
+
 media/uploads/

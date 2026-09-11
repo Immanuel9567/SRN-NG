@@ -272,21 +272,26 @@ const viteConfig = readFileSync(join(ROOT, 'vite.config.js'), 'utf8');
 check('vite.config.js derives pages from the filesystem', /readdirSync/.test(viteConfig),
   'hardcoded input lists silently drop new pages');
 
-// The datastore must exist and be well formed, since the repo is the database.
-for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter', 'friends', 'notifications']) {
-  const file = join(ROOT, 'data', `${name}.json`);
-  if (!existsSync(file)) { check(`data/${name}.json exists`, false, 'run npm run seed'); continue; }
-  try { JSON.parse(readFileSync(file, 'utf8')); }
-  catch (e) { check(`data/${name}.json is valid JSON`, false, e.message); }
+// The datastore is SQLite and lives outside version control. The repo is no
+// longer the database, so these guard that property rather than the old JSON
+// files. They are the regression guard for the credential commit that was
+// removed in 3e8e542: if personal data becomes tracked again, this fails.
+const gitignore = readFileSync(join(ROOT, '.gitignore'), 'utf8');
+for (const name of ['users', 'orders', 'messages', 'newsletter', 'notifications', 'friends', 'sessions']) {
+  check(`.gitignore covers data/${name}.json`, new RegExp(`data/${name}\\.json`).test(gitignore));
 }
+check('.gitignore covers the SQLite database', /data\/srn\.db/.test(gitignore));
+check('.gitignore covers the SQLite write-ahead log', /data\/srn\.db-wal/.test(gitignore));
 
-// No plaintext passwords or session tokens may be committed.
-const users = JSON.parse(readFileSync(join(ROOT, 'data', 'users.json'), 'utf8'));
-for (const u of users) {
-  check(`user ${u.username}: has a salted hash, not plaintext`, !!u.salt && !!u.hash && !u.password);
-}
-check('data/sessions.json is gitignored',
-  /data\/sessions\.json/.test(readFileSync(join(ROOT, '.gitignore'), 'utf8')));
+// No collection file may sit in data/ at all. js/data.js is the single seed
+// source, and anything else there is either personal data or a stale copy.
+const dataDir = join(ROOT, 'data');
+const strayJson = existsSync(dataDir)
+  ? readdirSync(dataDir).filter((f) => f.endsWith('.json'))
+  : [];
+check('no JSON collections are left in data/', strayJson.length === 0, strayJson.join(', '));
+const strayDb = existsSync(dataDir) ? readdirSync(dataDir).filter((f) => f.startsWith('srn.db')) : [];
+check('no SQLite database is left in data/', strayDb.length === 0, strayDb.join(', '));
 
 console.log(bad ? `\n${bad} of ${good + bad} page check(s) failed across ${pages.length} pages.`
                 : `All ${good} page checks passed across ${pages.length} pages.`);

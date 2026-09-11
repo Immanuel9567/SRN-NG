@@ -128,11 +128,12 @@ SRN_ADMIN_EMAIL=admin@simracing.ng SRN_ADMIN_PASSWORD='...' npm run seed
 The application imposes three constraints that decide this. All three are already true of the code;
 they are not preferences.
 
-1. **A writable persistent directory.** `server/store.js` writes JSON collections, and uploaded rig
-   photos go to `SRN_UPLOAD_DIR`. Both must survive a redeploy.
-2. **A single long-running process.** The login rate limiter is an in-memory `Map` in
-   `server/ratelimit.js`, and sessions are a JSON file. Multiple instances, or a platform that
-   suspends idle containers, silently resets throttling state.
+1. **A writable persistent directory.** The datastore is a SQLite file at `<SRN_DATA_DIR>/srn.db`,
+   and uploaded rig photos go to `SRN_UPLOAD_DIR`. Both must survive a redeploy.
+2. **A single long-running process with a local disk.** The login rate limiter is an in-memory
+   `Map` in `server/ratelimit.js`, so multiple instances or a platform that suspends idle
+   containers silently resets throttling state. SQLite also cannot sit on NFS, which rules out a
+   PaaS volume in favour of a local disk.
 3. **A host that will run an arbitrary Node process.** Not a static host, not serverless, and not a
    PHP-only shared plan.
 
@@ -212,12 +213,19 @@ stored in plain text and cannot be recovered, only rotated with `npm run reset-a
 Confirm it worked, since an empty datastore renders an empty site:
 
 ```
-ls /var/lib/srn/data          # expect 12 json files
+ls -la /var/lib/srn/data      # expect a single srn.db, roughly 60 KB
 ```
 
-If you see only `users.json` and `members.json`, you are on a build older than commit `3e8e542`,
-where `seed.mjs` checked the repo's fixtures instead of the target directory and silently skipped
-all content.
+If that file is only a few kilobytes, content did not seed. You are on a build older than commit
+`3e8e542`, where `seed.mjs` checked the repo's fixtures instead of the target directory and
+silently skipped everything.
+
+`SRN_DATA_DIR` is resolved when the module loads, so it must be exported in the same environment
+that starts the server, not set afterwards.
+
+If you are migrating an existing deployment that stored JSON, do nothing special: the first open
+imports `<SRN_DATA_DIR>/*.json` into `srn.db` and leaves the originals in place so you can verify
+before deleting them.
 
 ### 6.4 systemd unit
 
@@ -247,6 +255,8 @@ Environment=SRN_SECURE_COOKIES=1
 Environment=SRN_ALLOWED_HOSTS=simracing.ng,www.simracing.ng
 # Exactly one reverse proxy sits in front of this service.
 Environment=SRN_TRUST_PROXY=1
+# node:sqlite prints an ExperimentalWarning and its API may change between minors.
+# Pin the Node version you tested on rather than tracking latest.
 
 NoNewPrivileges=true
 PrivateTmp=true
@@ -291,8 +301,16 @@ everybody for fifteen minutes.
 
 ### 6.6 Backups
 
-Everything worth keeping is in `/var/lib/srn`. `data/sessions.json` is regenerable and can be
-excluded, which also keeps live session tokens out of your backups.
+Everything worth keeping is under `/var/lib/srn`: the database and the uploaded rig photos.
+Two files matter.
+
+```bash
+/var/lib/srn/data/srn.db        # accounts, sessions, events, news, orders, messages
+/var/lib/srn/uploads/           # rig photos
+```
+
+Take the database copy with SQLite's own backup, which is safe against a running server and
+produces a consistent single file. A plain `cp` of a live WAL database can capture a torn state.
 
 `/usr/local/bin/srn-backup`:
 
@@ -300,16 +318,27 @@ excluded, which also keeps live session tokens out of your backups.
 #!/bin/sh
 set -eu
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-OUT=/var/backups/srn-$STAMP.tar.gz
-tar czf "$OUT" -C /var/lib/srn --exclude=sessions.json .
-age -r "$SRN_BACKUP_PUBKEY" -o "$OUT.age" "$OUT"
-rm -f "$OUT"
+TMP=/var/backups/srn-$STAMP
+mkdir -p "$TMP"
+
+# .backup is the safe way to copy a live database. Drops expired sessions first.
+sudo -u srn sqlite3 /var/lib/srn/data/srn.db \
+  "DELETE FROM sessions WHERE expires_at <= $(date +%s)000; VACUUM INTO '$TMP/srn.db'"
+
+cp -a /var/lib/srn/uploads "$TMP/uploads"
+tar czf "$TMP.tar.gz" -C /var/backups "srn-$STAMP"
+age -r "$SRN_BACKUP_PUBKEY" -o "$TMP.tar.gz.age" "$TMP.tar.gz"
+rm -rf "$TMP" "$TMP.tar.gz"
 find /var/backups -name 'srn-*.age' -mtime +30 -delete
 ```
 
-Encrypt before it leaves the machine. These files contain email addresses and order history.
-Schedule it with a systemd timer or cron, ship it offsite, and **restore one backup as a test**.
-An untested backup is not a backup.
+If `sqlite3` is not installed, `apt install sqlite3`. You can get the same result from Node with the
+`backup()` export in `node:sqlite` if you would rather not add the CLI.
+
+Excluding sessions keeps live tokens out of your backups. Everything else here is personal data:
+email addresses, order history, contact messages. Encrypt before it leaves the machine, schedule it
+with a systemd timer or cron, ship it offsite, and **restore one backup as a test**. An untested
+backup is not a backup.
 
 ### 6.7 Cutover
 
@@ -333,13 +362,16 @@ Run these against the live domain, not against localhost.
 | `curl -sI https://www.simracing.ng/` | `200`, and a `server: Caddy` header rather than LiteSpeed |
 | `curl -sI http://simracing.ng/` | redirect to `https` |
 | Login, inspect the cookie | `Secure`, `HttpOnly`, `SameSite=Lax`, `Max-Age=604800` |
-| `curl -s -o /dev/null -w '%{http_code}' https://www.simracing.ng/data/users.json` | `403` |
+| `curl -s -o /dev/null -w '%{http_code}' https://www.simracing.ng/data/srn.db` | `403` |
 | `curl -s -o /dev/null -w '%{http_code}' https://www.simracing.ng/server/api.js` | `403` |
+| `curl -s -o /dev/null -w '%{http_code}' https://www.simracing.ng/server/db.js` | `403` |
 | `curl -s -o /dev/null -w '%{http_code}' https://www.simracing.ng/api/auth/me` | `401` (JSON, not a 404 HTML page) |
 | `curl -s -H 'Host: evil.example.com' https://127.0.0.1/` from the server | `421` |
 | 11 bad logins from one IP | `429` with a `Retry-After` header |
 | The same 11 with a forged `X-Forwarded-For` prefix | still `429` |
 | Register an account, reload, confirm still signed in | session persists |
+| `ls -la /var/lib/srn/data` | one `srn.db`, roughly 60 KB after seeding |
+| Restart the service, sign in again | the account survives (it is in SQLite, not memory) |
 | Restore a backup into a scratch directory | seeded content is intact |
 
 The API returning `401` with JSON at `/api/auth/me` is the single clearest signal that the Node
@@ -359,7 +391,10 @@ Tracked here so the gap is not mistaken for done.
 - **scrypt parameters are below the OWASP table.** `N=16384, r=8, p=1` in `server/auth.js` sits
   under all of OWASP's listed configurations. Raising `p` is the cheaper lever; raising `N` costs
   memory per concurrent login. `scryptSync` also blocks the event loop and should become async.
-- **No retention policy.** Sessions expire; nothing else does.
+- **No retention policy.** Sessions expire and are swept; nothing else does. The database makes
+  this tractable now, since it is one `DELETE` per rule rather than rewriting whole JSON files.
+- **`data/` in the repo is empty and stays that way.** If a future change needs a tracked fixture,
+  it belongs in `js/data.js`, not as a JSON collection file.
 - **No CSRF tokens.** Mitigated by `SameSite=Lax` and the absence of cross-origin requests, and it
   holds only while no state-changing `GET` route is added.
 - **`npm audit` reports 2 vulnerabilities** (1 moderate, 1 high) in the Vite tooling tree. Not

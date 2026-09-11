@@ -1,56 +1,89 @@
-// JSON file persistence for the SRN-NG repo-backed datastore.
-// Data lives in <repo>/data/*.json and is committed to the repo, per project decision.
+// Collection-level persistence for the SRN-NG datastore.
+//
+// Storage is SQLite (see db.js). This module keeps the read/write/update shape
+// the API and the scripts were written against, so callers did not have to
+// change when the JSON files were replaced.
+//
+//   read(name, [])                    the collection as an array
+//   write(name, items)                replace it
+//   update(name, [], (list) => ...)   read, mutate, write
+//   has(name)                         does it hold any rows
+//
+// Sessions are not a collection. They are keyed rows in their own table, reached
+// through the session helpers below.
 
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+// Re-exported so existing importers of store.js keep working.
+export { ROOT, DATA_DIR, UPLOAD_DIR, MAX_UPLOAD_BYTES } from './paths.js';
+
+import { join } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+// A re-export does not bring the name into local scope, so these are imported as
+// well as re-exported.
+import { MAX_UPLOAD_BYTES, UPLOAD_DIR } from './paths.js';
+import {
+  countCollection,
+  removeSession,
+  replaceCollection,
+  selectCollection,
+  selectSession,
+  sweepSessions,
+  upsertSession,
+} from './db.js';
 
-export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-// Overridable so the smoke tests can run against a throwaway directory.
-export const DATA_DIR = process.env.SRN_DATA_DIR
-  ? resolve(process.env.SRN_DATA_DIR)
-  : join(ROOT, 'data');
-
-function pathFor(name) {
-  if (!/^[a-z0-9-]+$/.test(name)) throw new Error(`Refusing to open collection "${name}"`);
-  return join(DATA_DIR, `${name}.json`);
-}
-
-export function read(name, fallback) {
-  const file = pathFor(name);
-  if (!existsSync(file)) return fallback;
-  try {
-    return JSON.parse(readFileSync(file, 'utf8'));
-  } catch (err) {
-    throw new Error(`${file} is corrupt and could not be parsed: ${err.message}`);
+function requireArray(name, fallback) {
+  if (!Array.isArray(fallback)) {
+    throw new Error(
+      `read("${name}") needs an array fallback. Sessions are not a collection; use getSession().`,
+    );
   }
 }
 
-// Write via a temp file + rename so a crash mid-write cannot truncate the collection.
+export function read(name, fallback) {
+  requireArray(name, fallback);
+  return selectCollection(name);
+}
+
 export function write(name, value) {
-  mkdirSync(DATA_DIR, { recursive: true });
-  const file = pathFor(name);
-  const tmp = `${file}.${process.pid}.tmp`;
-  writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`);
-  renameSync(tmp, file);
+  if (!Array.isArray(value)) {
+    throw new Error(`write("${name}") needs an array. Use putSession() for sessions.`);
+  }
+  replaceCollection(name, value);
   return value;
 }
 
 export function update(name, fallback, mutate) {
   const next = mutate(read(name, fallback));
-  write(name, next);
-  return next;
+  return write(name, next);
 }
 
-// Uploaded images live under media/uploads/ so the static server can serve them
-// without opening up the rest of data/.
-// Overridable so the tests never write into the working tree. The public path
-// stays media/uploads/... regardless; only the physical location moves.
-export const UPLOAD_DIR = process.env.SRN_UPLOAD_DIR
-  ? resolve(process.env.SRN_UPLOAD_DIR)
-  : join(ROOT, 'media', 'uploads');
-export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+// True when the collection holds at least one row. Replaces the existsSync()
+// checks the seed script used against the old JSON files.
+export function has(name) {
+  return countCollection(name) > 0;
+}
+
+export function count(name) {
+  return countCollection(name);
+}
+
+// ---- sessions -------------------------------------------------------------
+
+export function getSession(token) {
+  return selectSession(token);
+}
+
+export function putSession(token, userId, expiresAt) {
+  upsertSession(token, userId, expiresAt);
+}
+
+export function deleteSession(token) {
+  return removeSession(token);
+}
+
+export { sweepSessions };
+
+// ---- uploads --------------------------------------------------------------
 
 const EXT_BY_MIME = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 

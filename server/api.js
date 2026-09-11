@@ -15,10 +15,17 @@ import {
   verifyPassword,
 } from './auth.js';
 import { clientKey, rateLimit } from './ratelimit.js';
-import { read, saveUpload, update } from './store.js';
+import {
+  deleteSession,
+  getSession,
+  putSession,
+  read,
+  saveUpload,
+  sweepSessions,
+  update,
+} from './store.js';
 
 const USERS = 'users';
-const SESSIONS = 'sessions';
 const EVENTS = 'events';
 const NEWS = 'news';
 const RIGS = 'rigs';
@@ -70,21 +77,17 @@ function readBody(req) {
 function currentUser(cookies) {
   const token = cookies.srn_session;
   if (!token) return null;
-  const session = read(SESSIONS, {})[token];
+  const session = getSession(token);
   if (!session || Date.now() > session.expiresAt) return null;
   return read(USERS, []).find((u) => u.id === session.userId) || null;
 }
 
 function startSession(userId) {
   const token = newToken();
-  update(SESSIONS, {}, (sessions) => {
-    const now = Date.now();
-    for (const [key, value] of Object.entries(sessions)) {
-      if (value.expiresAt <= now) delete sessions[key];
-    }
-    sessions[token] = { userId, expiresAt: now + SESSION_TTL_MS };
-    return sessions;
-  });
+  const now = Date.now();
+  // One indexed DELETE replaces iterating every stored session.
+  sweepSessions(now);
+  putSession(token, userId, now + SESSION_TTL_MS);
   return token;
 }
 
@@ -249,7 +252,7 @@ export async function handleApi(req, res, url, cookies) {
 
     if (route === 'POST /api/auth/logout') {
       const token = cookies.srn_session;
-      if (token) update(SESSIONS, {}, (s) => (delete s[token], s));
+      if (token) deleteSession(token);
       return json(200, { ok: true }, { 'Set-Cookie': clearedCookie() });
     }
 

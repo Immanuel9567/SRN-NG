@@ -48,14 +48,31 @@ If you were handed an outside description of this project claiming React, TypeSc
 - `server/auth.js` — `scrypt` password hashing, session tokens, cookie handling.
 - `server/store.js` — atomic JSON read/write. `SRN_DATA_DIR` overrides the location (used by tests).
 
-**Datastore** — `data/`, committed to the repo.
+**Datastore** — SQLite, one file at `<SRN_DATA_DIR>/srn.db`. See 3.2.
 
-Ten committed collections: `users`, `events`, `news`, `games`, `members`, `merch`, `rigs`,
-`messages`, `newsletter`, `orders`. `sessions.json` is gitignored because it holds live tokens, and
-since 3.2 the same applies to `users.json` and the other runtime PII collections.
-`npm run seed` populates them from `js/data.js` and creates the empty inbox files.
-- **There are zero runtime dependencies.** `vite ^8.0.0` and `jsdom ^30` are both devDependencies:
-  a build tool and the test DOM respectively. The server runs on Node's standard library alone.
+`server/db.js` owns the schema and the SQL. `server/store.js` presents it to the rest of the
+codebase as collections (`read`, `write`, `update`, `has`) plus session helpers, so `api.js` and
+every script call the same functions they always did.
+
+- `docs` holds one row per collection entry, `body` is that entry as JSON, keyed by
+  `(collection, ordinal)`. Twelve collections live here: `users`, `events`, `news`, `games`,
+  `members`, `merch`, `rigs`, `messages`, `newsletter`, `orders`, `friends`, `notifications`.
+- `sessions` is a real table keyed by token with an index on `expires_at`, so sweeping expired
+  sessions is one indexed `DELETE` instead of a full scan of a JSON object.
+- **Uniqueness is enforced by the database.** Expression indexes on
+  `json_extract(body, '$.email')` and `$.username`, scoped to the `users` collection, reject a
+  duplicate even if a route forgets to check. Scoped by collection so a member profile may reuse
+  an address.
+- **Writes diff before writing.** `replaceCollection()` compares every row and touches only the
+  ones that changed, so adding one account no longer rewrites the whole users collection the way
+  the old JSON store did.
+- **`js/data.js` is the one seed source.** `npm run seed` populates the database from it. There are
+  no collection files in `data/` any more, tracked or otherwise.
+- **Migration is automatic.** On first open, if `<SRN_DATA_DIR>/*.json` exist they are imported and
+  the JSON files are left on disk untouched. Live sessions are carried over, expired ones are not.
+- **There are zero runtime dependencies.** `node:sqlite` ships with Node. `vite ^8.0.0` and
+  `jsdom ^30` are both devDependencies: a build tool and the test DOM. The server runs on Node's
+  standard library alone.
 
 ## 3. Accounts and roles
 
@@ -104,21 +121,24 @@ a plain file host and every account call runs against a **browser-local datastor
 
 ### 3.2 Production datastore and cookie flags
 
-**The repo's `data/` is the seed fixture set, not the production database.** In production,
-`SRN_DATA_DIR` points outside the checkout:
+**The database must not live inside the checkout.** In production, `SRN_DATA_DIR` points elsewhere:
 
 ```
 SRN_DATA_DIR=/var/lib/srn/data
 ```
 
-Then a redeploy cannot delete accounts, `git pull` cannot overwrite live data, and a `git clean`
-cannot wipe sessions. Seed it once (`npm run seed`) and leave it alone.
+That directory ends up holding exactly one file, `srn.db` (plus `srn.db-wal` and `srn.db-shm`
+while the server runs). A redeploy cannot delete accounts, `git pull` cannot overwrite live data,
+and `git clean` cannot wipe sessions. Seed it once (`npm run seed`) and leave it alone.
 
-Collections split by sensitivity. Tracked in git are the six content fixtures: `events`, `games`,
-`members`, `news`, `merch`, `rigs`. Gitignored because they hold personal data are six runtime
-collections: `users` (email, salt, hash), `sessions` (live tokens), `orders`, `messages`,
-`newsletter`, `notifications`, `friends`. They are not in git history either; they were untracked
-deliberately. Do not re-add them, and do not commit a checkout with real signups in `data/`.
+**`data/` is empty in a git checkout.** Every path in it is gitignored: `srn.db`, its write-ahead
+log, and the seven legacy JSON names (`users`, `sessions`, `orders`, `messages`, `newsletter`,
+`notifications`, `friends`) that used to be committed. `npm run check:pages` fails if any JSON
+collection or database file appears there, which is the regression guard for the credential commit
+removed in `3e8e542`. Do not re-add anything.
+
+**Backing up means copying one file**, and `node:sqlite` exports a `backup()` function so you can
+do it against a live database without stopping the server.
 
 **`SRN_SECURE_COOKIES=1` is required in production.** `sessionCookie()` and `clearedCookie()` only
 append `Secure` when that variable is exactly `1`. A `Secure` cookie is silently dropped over plain
@@ -141,7 +161,10 @@ out of shell history by piping it.
 ├── js/api.js              <- SRN client + SRN.esc() escaper
 ├── js/app.js              <- navbar, active links, account state
 ├── server/                <- node:http API and static server (not servable over HTTP)
-├── data/                  <- SEED FIXTURES + the runtime datastore in dev. Content collections are tracked; users/sessions/orders/messages/newsletter/notifications/friends are gitignored. See 3.2.
+│   ├── db.js              <- SQLite schema and SQL; the datastore
+│   ├── store.js           <- collection + session facade over db.js
+│   └── paths.js           <- ROOT / DATA_DIR / UPLOAD_DIR resolution
+├── data/                  <- empty in a checkout; holds srn.db in dev. Everything in it is gitignored. See 3.2.
 ├── scripts/               <- seed + all check and test runners
 ├── skills/                <- agent skills; master_skill_compilation.json
 ├── media/                 <- 9 committed binaries, 15,670,455 bytes (splash.mp4 is 5.9 MB of it)
@@ -159,6 +182,7 @@ out of shell history by piping it.
 | Static-only dev server | `npm run dev:static` (Vite; no API, pages fall back to mock data) |
 | Build | `npm run build` (emits all 15 pages to `dist/`) |
 | Seed the datastore | `npm run seed` (idempotent; `-- --force` reseeds content) |
+| Datastore only | `npm run test:datastore` (33 checks; SQLite, migration, restart) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
 | API tests only | `npm run test:api` (170 checks) |
@@ -168,7 +192,7 @@ out of shell history by piping it.
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
 | Proxy trust only | `npm run test:proxytrust` (14 checks) |
-| Page consistency only | `npm run check:pages` (399 checks) |
+| Page consistency only | `npm run check:pages` (408 checks) |
 | Inline JS syntax only | `npm run check:inline` (34 blocks) |
 | Skills file validation | `npm run check:skills` |
 
@@ -177,9 +201,9 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (62), `check:pages` (399), `check:inline` (34 blocks), `test:api` (170),
-   `test:render` (86), `test:hostguard` (9), `test:proxytrust` (14), `test:empty` (29),
-   `test:offline` (17) and `test:build` (22).
+   `check:skills` (62), `check:pages` (408), `check:inline` (34 blocks), `test:api` (170),
+   `test:render` (86), `test:hostguard` (9), `test:proxytrust` (14), `test:datastore` (33),
+   `test:empty` (29), `test:offline` (17) and `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
 4. `git diff --stat` shows only intended files, and `data/` is unchanged unless you meant to change it.
@@ -208,7 +232,22 @@ use it, because it has caught a navbar bug that the API tests could not see.
   accounts fall back to the browser-local datastore described in section 3.1. `admin.html` still
   needs the Node server: moderation is server-only.
 - **`data/sessions.json` must never be committed.** It holds live session tokens. Neither may
-  `users.json` or any other runtime collection; see 3.2.
+  `users.json`, `srn.db`, or any other runtime file; see 3.2.
+- **`node:sqlite` prints `ExperimentalWarning: SQLite is an experimental feature` on every boot.**
+  It is noise, not a failure. The API could still change in a future Node major, so pin the Node
+  version in the systemd unit rather than tracking `latest`.
+- **`SRN_DATA_DIR` must be set before `db.js` is imported.** `DB_FILE` is computed at module load.
+  The test scripts set the env var and then use dynamic `await import()`. A static import would
+  open the wrong database.
+- **Sessions are not a collection.** `read('sessions', {})` throws a deliberate error. Use
+  `getSession`, `putSession`, `deleteSession` and `sweepSessions` from `store.js`. The error exists
+  because the old keyed-object shape was the one thing `read()` could not express as an array.
+- **`replaceCollection` matches rows by position**, so a collection must be written as a complete
+  array in the order it should read back. Every current caller already does this. Reordering a
+  collection rewrites the rows that moved, which is correct but not free.
+- **The unique indexes are created after the legacy import.** If stored accounts contain duplicate
+  emails or usernames, boot throws with an explanation instead of a raw SQLite error. Resolve the
+  duplicates, then restart.
 - **The first admin password is generated by `npm run seed` and printed once.** It is not stored in
   plaintext. To change it, delete `data/users.json` and re-seed with `SRN_ADMIN_PASSWORD=...`.
 - **`npm audit` reports 2 vulnerabilities** (1 moderate, 1 high) in the Vite tooling tree. Known.

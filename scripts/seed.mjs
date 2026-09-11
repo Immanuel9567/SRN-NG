@@ -6,16 +6,16 @@
 //
 // Idempotent: existing users, events and news are preserved unless --force is passed.
 
-import { existsSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { hashPassword, newId } from '../server/auth.js';
-// DATA_DIR is the directory write() actually targets. Checking ROOT/data instead
-// would inspect the seed fixtures and skip writing to an empty production datastore.
-import { DATA_DIR, read, write } from '../server/store.js';
+// has() reports whether a collection already holds rows, which is what decides
+// whether seeding is skipped. It must not be an existsSync() on a JSON file: the
+// store is SQLite and writes no JSON at all.
+import { has, read, write } from '../server/store.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(here, '..');
@@ -29,8 +29,7 @@ vm.runInContext(readFileSync(join(ROOT, 'js', 'data.js'), 'utf8'), sandbox);
 const get = (name) => vm.runInContext(name, sandbox);
 
 // ---- events ---------------------------------------------------------------
-const eventsFile = join(DATA_DIR, 'events.json');
-if (force || !existsSync(eventsFile)) {
+if (force || !has('events')) {
   const events = get('ACTIVITIES').map((a) => ({
     ...a,
     status: a.status || 'upcoming',
@@ -40,23 +39,22 @@ if (force || !existsSync(eventsFile)) {
     createdAt: new Date().toISOString(),
   }));
   write('events', events);
-  console.log(`events.json: wrote ${events.length} events from js/data.js`);
+  console.log(`events: wrote ${events.length} events from js/data.js`);
 } else {
-  console.log(`events.json: kept existing ${read('events', []).length} events (use --force to reseed)`);
+  console.log(`events: kept existing ${read('events', []).length} events (use --force to reseed)`);
 }
 
 // ---- news -----------------------------------------------------------------
-const newsFile = join(DATA_DIR, 'news.json');
-if (force || !existsSync(newsFile)) {
+if (force || !has('news')) {
   const articles = get('NEWS').map((n) => ({
     ...n,
     createdBy: 'SRN Editorial',
     createdAt: new Date().toISOString(),
   }));
   write('news', articles);
-  console.log(`news.json: wrote ${articles.length} articles from js/data.js`);
+  console.log(`news: wrote ${articles.length} articles from js/data.js`);
 } else {
-  console.log(`news.json: kept existing ${read('news', []).length} articles (use --force to reseed)`);
+  console.log(`news: kept existing ${read('news', []).length} articles (use --force to reseed)`);
 }
 
 // ---- remaining collections ------------------------------------------------
@@ -66,31 +64,28 @@ for (const [file, source, label] of [
   ['merch', 'MERCH', 'merch items'],
   ['rigs', 'RIGS', 'rigs'],
 ]) {
-  const target = join(DATA_DIR, `${file}.json`);
-  if (force || !existsSync(target)) {
+  if (force || !has(file)) {
     // rigs and merch are moderated collections, so seeded rows start approved.
     const rows = get(source).map((r) =>
       (file === 'rigs' || file === 'merch') ? { ...r, status: 'approved' } : r);
     write(file, rows);
-    console.log(`${file}.json: wrote ${rows.length} ${label} from js/data.js`);
+    console.log(`${file}: wrote ${rows.length} ${label} from js/data.js`);
   } else {
-    console.log(`${file}.json: kept existing ${read(file, []).length} ${label} (use --force to reseed)`);
+    console.log(`${file}: kept existing ${read(file, []).length} ${label} (use --force to reseed)`);
   }
 }
 
 // ---- empty inbox collections -----------------------------------------------
 for (const name of ['messages', 'newsletter', 'orders', 'friends', 'notifications']) {
-  const target = join(DATA_DIR, `${name}.json`);
-  if (!existsSync(target)) {
-    write(name, []);
-    console.log(`${name}.json: created empty`);
-  }
+  // Collections are created on first write, so there is nothing to do for an
+  // empty one. Reported for parity with the old output.
+  if (!has(name)) console.log(`${name}: empty`);
 }
 
 // ---- first admin ----------------------------------------------------------
 const users = read('users', []);
 if (users.some((u) => u.role === 'admin')) {
-  console.log('users.json: admin already exists, nothing to do');
+  console.log('users: admin already exists, nothing to do');
 } else {
   const generated = randomBytes(9).toString('base64url');
   const password = process.env.SRN_ADMIN_PASSWORD || generated;
@@ -104,7 +99,7 @@ if (users.some((u) => u.role === 'admin')) {
     createdAt: new Date().toISOString(),
   };
   write('users', [...users, admin]);
-  console.log(`users.json: created admin "${admin.username}" <${admin.email}>`);
+  console.log(`users: created admin "${admin.username}" <${admin.email}>`);
   if (!process.env.SRN_ADMIN_PASSWORD) {
     console.log('');
     console.log('  generated admin password (printed once, not stored in plain text):');
@@ -121,7 +116,7 @@ if (users.some((u) => u.role === 'admin')) {
   for (const u of users) {
     if (!Array.isArray(u.interests)) { u.interests = []; touched++; }
   }
-  if (touched) { write('users', users); console.log(`users.json: added interests to ${touched} account(s)`); }
+  if (touched) { write('users', users); console.log(`users: added interests to ${touched} account(s)`); }
 
   const events = read('events', []);
   let eventTouched = 0;
@@ -129,7 +124,7 @@ if (users.some((u) => u.role === 'admin')) {
     if (!e.game) { e.game = 'general'; eventTouched++; }
     if (!Array.isArray(e.rsvps)) { e.rsvps = []; eventTouched++; }
   }
-  if (eventTouched) { write('events', events); console.log(`events.json: backfilled ${eventTouched} field(s)`); }
+  if (eventTouched) { write('events', events); console.log(`events: backfilled ${eventTouched} field(s)`); }
 
   // Drop driver profiles whose account no longer exists (a deleted user leaves one behind).
   const ids = new Set(users.map((u) => u.id));
@@ -137,7 +132,7 @@ if (users.some((u) => u.role === 'admin')) {
   const kept = members.filter((m) => !m.userId || ids.has(m.userId));
   if (kept.length !== members.length) {
     write('members', kept);
-    console.log(`members.json: removed ${members.length - kept.length} orphan profile(s)`);
+    console.log(`members: removed ${members.length - kept.length} orphan profile(s)`);
   }
 }
 
@@ -166,8 +161,8 @@ if (users.some((u) => u.role === 'admin')) {
   }
   if (added) {
     write('members', allMembers);
-    console.log(`members.json: linked ${added} account(s) to a driver profile`);
+    console.log(`members: linked ${added} account(s) to a driver profile`);
   } else {
-    console.log(`members.json: all ${allUsers.length} account(s) already linked to a profile`);
+    console.log(`members: all ${allUsers.length} account(s) already linked to a profile`);
   }
 }
