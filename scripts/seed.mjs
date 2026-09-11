@@ -13,7 +13,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { hashPassword, newId } from '../server/auth.js';
-import { read, write } from '../server/store.js';
+// DATA_DIR is the directory write() actually targets. Checking ROOT/data instead
+// would inspect the seed fixtures and skip writing to an empty production datastore.
+import { DATA_DIR, read, write } from '../server/store.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(here, '..');
@@ -27,7 +29,7 @@ vm.runInContext(readFileSync(join(ROOT, 'js', 'data.js'), 'utf8'), sandbox);
 const get = (name) => vm.runInContext(name, sandbox);
 
 // ---- events ---------------------------------------------------------------
-const eventsFile = join(ROOT, 'data', 'events.json');
+const eventsFile = join(DATA_DIR, 'events.json');
 if (force || !existsSync(eventsFile)) {
   const events = get('ACTIVITIES').map((a) => ({
     ...a,
@@ -44,7 +46,7 @@ if (force || !existsSync(eventsFile)) {
 }
 
 // ---- news -----------------------------------------------------------------
-const newsFile = join(ROOT, 'data', 'news.json');
+const newsFile = join(DATA_DIR, 'news.json');
 if (force || !existsSync(newsFile)) {
   const articles = get('NEWS').map((n) => ({
     ...n,
@@ -64,7 +66,7 @@ for (const [file, source, label] of [
   ['merch', 'MERCH', 'merch items'],
   ['rigs', 'RIGS', 'rigs'],
 ]) {
-  const target = join(ROOT, 'data', `${file}.json`);
+  const target = join(DATA_DIR, `${file}.json`);
   if (force || !existsSync(target)) {
     // rigs and merch are moderated collections, so seeded rows start approved.
     const rows = get(source).map((r) =>
@@ -78,7 +80,7 @@ for (const [file, source, label] of [
 
 // ---- empty inbox collections -----------------------------------------------
 for (const name of ['messages', 'newsletter', 'orders', 'friends', 'notifications']) {
-  const target = join(ROOT, 'data', `${name}.json`);
+  const target = join(DATA_DIR, `${name}.json`);
   if (!existsSync(target)) {
     write(name, []);
     console.log(`${name}.json: created empty`);

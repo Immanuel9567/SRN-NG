@@ -3,6 +3,19 @@ dist/
 .DS_Store
 *.local
 
-# live session tokens must never be committed
+# ---- Personal data. Never commit these. ----
+# The repo's data/ directory is the SEED fixture set only. In production,
+# SRN_DATA_DIR points outside the checkout and nothing here is written.
+#
+# data/sessions.json holds live session tokens.
 data/sessions.json
+# data/users.json holds email addresses, salts and password hashes.
+data/users.json
+# Runtime collections: written by real users, empty in a fresh checkout.
+data/orders.json
+data/messages.json
+data/newsletter.json
+data/notifications.json
+data/friends.json
+
 media/uploads/

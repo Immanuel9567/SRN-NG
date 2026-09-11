@@ -9,6 +9,12 @@ export const VENDOR_ROLE = 'salesperson';
 export const SESSION_COOKIE = 'srn_session';
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+// Secure cookies are required the moment the site is served over HTTPS, and a
+// Secure cookie is simply dropped by the browser over plain http. So this is
+// opt-in: `npm run dev` on http://localhost keeps working untouched, and every
+// real deployment sets SRN_SECURE_COOKIES=1.
+export const SECURE_COOKIES = process.env.SRN_SECURE_COOKIES === '1';
+
 const KEYLEN = 64;
 const SCRYPT_OPTS = { N: 16384, r: 8, p: 1 };
 
@@ -46,17 +52,21 @@ export function parseCookies(header = '') {
 }
 
 export function sessionCookie(token) {
-  return [
+  const parts = [
     `${SESSION_COOKIE}=${token}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Lax',
     `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
-  ].join('; ');
+  ];
+  if (SECURE_COOKIES) parts.push('Secure');
+  return parts.join('; ');
 }
 
 export function clearedCookie() {
-  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+  const parts = [`${SESSION_COOKIE}=`, 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
+  if (SECURE_COOKIES) parts.push('Secure');
+  return parts.join('; ');
 }
 
 // Strip credential material before a user record is ever sent to the browser.

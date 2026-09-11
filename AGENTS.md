@@ -50,7 +50,8 @@ If you were handed an outside description of this project claiming React, TypeSc
 **Datastore** — `data/`, committed to the repo.
 
 Ten committed collections: `users`, `events`, `news`, `games`, `members`, `merch`, `rigs`,
-`messages`, `newsletter`, `orders`. `sessions.json` is gitignored because it holds live tokens.
+`messages`, `newsletter`, `orders`. `sessions.json` is gitignored because it holds live tokens, and
+since 3.2 the same applies to `users.json` and the other runtime PII collections.
 `npm run seed` populates them from `js/data.js` and creates the empty inbox files.
 - **There are zero runtime dependencies.** `vite ^8.0.0` and `jsdom ^30` are both devDependencies:
   a build tool and the test DOM respectively. The server runs on Node's standard library alone.
@@ -100,6 +101,34 @@ a plain file host and every account call runs against a **browser-local datastor
   promise for that flag.
 - `npm run test:offline` boots a dumb static file server with no API and asserts all of the above.
 
+### 3.2 Production datastore and cookie flags
+
+**The repo's `data/` is the seed fixture set, not the production database.** In production,
+`SRN_DATA_DIR` points outside the checkout:
+
+```
+SRN_DATA_DIR=/var/lib/srn/data
+```
+
+Then a redeploy cannot delete accounts, `git pull` cannot overwrite live data, and a `git clean`
+cannot wipe sessions. Seed it once (`npm run seed`) and leave it alone.
+
+Collections split by sensitivity. Tracked in git are the six content fixtures: `events`, `games`,
+`members`, `news`, `merch`, `rigs`. Gitignored because they hold personal data are six runtime
+collections: `users` (email, salt, hash), `sessions` (live tokens), `orders`, `messages`,
+`newsletter`, `notifications`, `friends`. They are not in git history either; they were untracked
+deliberately. Do not re-add them, and do not commit a checkout with real signups in `data/`.
+
+**`SRN_SECURE_COOKIES=1` is required in production.** `sessionCookie()` and `clearedCookie()` only
+append `Secure` when that variable is exactly `1`. A `Secure` cookie is silently dropped over plain
+http, so it stays opt-in and `npm run dev` on `http://localhost` is unaffected. Set it on any
+deployment behind TLS, or the session cookie can be sent over an unencrypted connection.
+
+**The committed admin hash is spent.** `data/users.json` held a real salt and hash in git history
+before it was untracked. Anyone who has ever cloned this repo can read it forever. Rotate that
+password once on the production host (`npm run reset-admin -- admin@srn.ng`) and keep `SRN_ADMIN_PASSWORD`
+out of shell history by piping it.
+
 ## 4. Folder structure
 
 ```
@@ -111,7 +140,7 @@ a plain file host and every account call runs against a **browser-local datastor
 ├── js/api.js              <- SRN client + SRN.esc() escaper
 ├── js/app.js              <- navbar, active links, account state
 ├── server/                <- node:http API and static server (not servable over HTTP)
-├── data/                  <- THE DATABASE. Committed JSON. sessions.json is gitignored.
+├── data/                  <- SEED FIXTURES + the runtime datastore in dev. Content collections are tracked; users/sessions/orders/messages/newsletter/notifications/friends are gitignored. See 3.2.
 ├── scripts/               <- seed + all check and test runners
 ├── skills/                <- agent skills; master_skill_compilation.json
 ├── media/                 <- 9 committed binaries, 15,670,455 bytes (splash.mp4 is 5.9 MB of it)
@@ -131,14 +160,14 @@ a plain file host and every account call runs against a **browser-local datastor
 | Seed the datastore | `npm run seed` (idempotent; `-- --force` reseeds content) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
-| API tests only | `npm run test:api` (160 checks) |
-| DOM render tests only | `npm run test:render` (84 checks, uses jsdom) |
+| API tests only | `npm run test:api` (170 checks) |
+| DOM render tests only | `npm run test:render` (86 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Offline accounts (no API) | `npm run test:offline` (17 checks against a plain static host) |
 | Build output integrity | `npm run test:build` (22 checks; rebuilds `dist/` first) |
 | Host allowlist only | `npm run test:hostguard` (9 checks) |
-| Page consistency only | `npm run check:pages` (307 checks) |
-| Inline JS syntax only | `npm run check:inline` (16 blocks) |
+| Page consistency only | `npm run check:pages` (399 checks) |
+| Inline JS syntax only | `npm run check:inline` (34 blocks) |
 | Skills file validation | `npm run check:skills` |
 
 There is no linter and no typechecker configured.
@@ -146,8 +175,8 @@ There is no linter and no typechecker configured.
 ## 6. Verification protocol (mandatory before claiming done)
 
 1. `npm run check` — exits 0. A `precheck` hook installs missing dependencies first, then it runs
-   `check:skills` (62), `check:pages` (335), `check:inline` (33 blocks), `test:api` (161),
-   `test:render` (84), `test:hostguard` (9), `test:empty` (29), `test:offline` (17) and
+   `check:skills` (62), `check:pages` (399), `check:inline` (34 blocks), `test:api` (170),
+   `test:render` (86), `test:hostguard` (9), `test:empty` (29), `test:offline` (17) and
    `test:build` (22).
 2. `npm run build` — exits 0 and emits 15 pages.
 3. `npm run dev`, load the changed page, confirm the render and that the console shows no new errors.
@@ -176,7 +205,8 @@ use it, because it has caught a navbar bug that the API tests could not see.
 - **`dist/` is static and has no API.** Pages fall back to `js/data.js`, so they still render, and
   accounts fall back to the browser-local datastore described in section 3.1. `admin.html` still
   needs the Node server: moderation is server-only.
-- **`data/sessions.json` must never be committed.** It holds live session tokens.
+- **`data/sessions.json` must never be committed.** It holds live session tokens. Neither may
+  `users.json` or any other runtime collection; see 3.2.
 - **The first admin password is generated by `npm run seed` and printed once.** It is not stored in
   plaintext. To change it, delete `data/users.json` and re-seed with `SRN_ADMIN_PASSWORD=...`.
 - **`npm audit` reports 2 vulnerabilities** (1 moderate, 1 high) in the Vite tooling tree. Known.
@@ -252,6 +282,7 @@ use it, because it has caught a navbar bug that the API tests could not see.
 
 - **Passwords.** `scrypt` with a per-user 16-byte salt, compared with `timingSafeEqual`. No plaintext.
 - **Sessions.** 32 random bytes, `HttpOnly`, `SameSite=Lax`, 7-day TTL, expired ones swept on write.
+  `Secure` is added only when `SRN_SECURE_COOKIES=1`, which every TLS deployment must set (3.2).
 - **Rate limiting.** `server/ratelimit.js` caps login and signup at 10 attempts per 15 minutes per
   socket address, returning 429 with `Retry-After`. It runs **before** body parsing, so a
   malformed body to a throttled endpoint answers 429, not 400. `X-Forwarded-For` is deliberately
