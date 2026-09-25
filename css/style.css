@@ -2241,3 +2241,55 @@ button.card {
 /* Signed-in panels stay full width; only the auth card is centred narrow. */
 .auth-stage-wrap .container-medium { max-width: 60rem; }
 .auth-stage-wrap { padding-bottom: 6rem; }
+
+/* Live field guidance: appears while typing, gone when the field is right. */
+.field-msg {
+  display: block;
+  min-height: 0;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #DC2626;
+}
+
+.field-msg:empty { display: none; }
+
+/* Show/hide password. */
+.pw-eye {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  z-index: 99;
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: #8B8E98;
+  cursor: pointer;
+}
+
+.pw-eye:hover { color: #212121; }
+
+/* Requirement meter: red -> orange -> green as rules are met. */
+.pw-meter {
+  display: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: #ECECEE;
+  overflow: hidden;
+}
+
+.pw-meter-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.pw-meter-bar.lv1 { background: #DC2626; }
+.pw-meter-bar.lv2 { background: #F59E0B; }
+.pw-meter-bar.lv3 { background: var(--accent-green); }
