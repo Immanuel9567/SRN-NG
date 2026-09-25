@@ -427,6 +427,13 @@ function initNavIcons(scope) {
     icon.setAttribute('width', '15');
     icon.setAttribute('height', '15');
     link.insertBefore(icon, link.firstChild);
+    // Labels live in a span so narrow desktops can drop them (icon-only chips).
+    const label = document.createElement('span');
+    label.className = 'nav-label';
+    while (link.nextSibling) {
+      label.appendChild(link.nextSibling);
+    }
+    link.appendChild(label);
   });
 }
 
