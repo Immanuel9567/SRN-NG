@@ -1,0 +1,17 @@
+# Render.com: "New +" > "Blueprint" > point it at this repo. The free plan
+# sleeps after idle and wakes on request; the SQLite file needs a paid
+# persistent disk to survive redeploy, so set SRN_DATA_DIR to the disk mount
+# when you add one (e.g. /data).
+services:
+  - type: web
+    name: srn-ng
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    healthCheckPath: /api/auth/me
+    envVars:
+      - key: SRN_DATA_DIR
+        value: /data
+      - key: SRN_ADMIN_PASSWORD
+        sync: false

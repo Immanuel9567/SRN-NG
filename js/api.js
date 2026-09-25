@@ -257,8 +257,10 @@ const SRN = (() => {
         // Enumeration is not a concern inside the user's own browser, and the
         // honest answer prevents a misleading one: this store only ever holds
         // accounts created on this device, so an unknown email is usually a
-        // server account stuck in offline mode.
-        fail('You are offline: this browser only knows accounts created here. The server is unreachable right now - wait a few seconds and try again; the page reconnects on its own.', 401);
+        // server account the page cannot reach.
+        fail(probeWasTrue
+          ? 'You are offline: this browser only knows accounts created here. The server is unreachable right now - wait a few seconds and try again; the page reconnects on its own.'
+          : 'No SRN server on this copy of the site: accounts live only in the browser you made them in. Use an account created on this device.', 401);
       }
       const ok = (await localHash(String(payload.password ?? ''), user.salt)) === user.hash;
       if (!ok) fail('Email or password is incorrect.', 401);
@@ -496,9 +498,14 @@ const SRN = (() => {
   // the next account action, so a server that comes back is picked up without
   // a reload.
   let apiProbe = null;
+  let probeWasTrue = false; // the page saw a live server at least once
   function fireProbe() {
     return fetch('/api/auth/me', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
-      .then((res) => (res.headers.get('content-type') || '').includes('json'))
+      .then((res) => {
+        const ok = (res.headers.get('content-type') || '').includes('json');
+        if (ok) probeWasTrue = true;
+        return ok;
+      })
       .catch(() => false);
   }
   function apiAvailable() {

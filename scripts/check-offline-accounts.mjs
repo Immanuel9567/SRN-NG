@@ -169,7 +169,7 @@ try {
   fireSubmit(wrong.window, loginForm);
   await waitFor(() => loginForm.querySelector('[data-form-message]').textContent.trim(), 'login result');
   check('an unknown account is rejected with the offline answer',
-    /offline/i.test(loginForm.querySelector('[data-form-message]').textContent),
+    /browser/i.test(loginForm.querySelector('[data-form-message]').textContent),
     JSON.stringify(loginForm.querySelector('[data-form-message]').textContent));
 
   // Existing local account, wrong password: the classic rejection.

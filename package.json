@@ -22,7 +22,9 @@
     "test:build": "node scripts/check-build.mjs",
     "ensure-deps": "node scripts/ensure-deps.mjs",
     "precheck": "node scripts/ensure-deps.mjs",
-    "test:serverloss": "node scripts/check-server-loss.mjs"
+    "test:serverloss": "node scripts/check-server-loss.mjs",
+    "start": "node server/index.js",
+    "deploy:pages": "node scripts/deploy-pages.mjs"
   },
   "devDependencies": {
     "jsdom": "^29.1.1",
