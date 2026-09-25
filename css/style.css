@@ -47,6 +47,9 @@ body {
 
 main {
   flex: 1;
+  /* The floating nav overlays the viewport bottom; the footer that used to
+     keep content clear of it is gone, so main reserves the space. */
+  padding-bottom: 7rem;
 }
 
 a {
@@ -361,6 +364,10 @@ button, input, textarea, select {
   flex-shrink: 0;
 }
 
+.navbar-brand img {
+  border-radius: 0.55rem;
+}
+
 .navbar-links {
   display: none;
   align-items: center;
@@ -435,6 +442,10 @@ button, input, textarea, select {
   margin: 0 auto;
   max-width: 28rem;
   bottom: 5.5rem;
+  /* Nine links plus the account buttons can outrun a short phone; scroll
+     inside the sheet instead of clipping off-screen. */
+  max-height: calc(100dvh - 7.5rem);
+  overflow-y: auto;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.875rem;
@@ -2062,6 +2073,11 @@ button.card {
 
 [data-theme="dark"] .form_container { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55); }
 
+@media (max-width: 480px) {
+  .form_container { padding: 36px 22px 20px 22px; gap: 13px; }
+  .auth-stage { padding-top: 2.5rem; padding-bottom: 5rem; }
+}
+
 .logo_container {
   box-sizing: border-box;
   width: 80px;
@@ -2074,7 +2090,7 @@ button.card {
   border-radius: 11px;
 }
 
-.logo_container img { width: 62px; height: auto; }
+.logo_container img { width: 62px; height: auto; border-radius: 0.45rem; }
 
 .title_container {
   display: flex;
