@@ -2056,14 +2056,14 @@ button.card {
 
 .form_container {
   width: 100%;
-  max-width: 24.5rem;
+  max-width: 27.5rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 15px;
-  padding: 50px 40px 24px 40px;
+  padding: 56px 44px 30px 44px;
   background-color: #ffffff;
   box-shadow: 0px 106px 42px rgba(0, 0, 0, 0.01),
     0px 59px 36px rgba(0, 0, 0, 0.05), 0px 26px 26px rgba(0, 0, 0, 0.09),
@@ -2090,7 +2090,7 @@ button.card {
   border-radius: 11px;
 }
 
-.logo_container img { width: 62px; height: auto; border-radius: 0.45rem; }
+.logo_container img { width: 70px; height: auto; border-radius: 0.5rem; }
 
 .title_container {
   display: flex;
@@ -2102,16 +2102,16 @@ button.card {
 
 .title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #212121;
 }
 
 .subtitle {
-  font-size: 0.725rem;
-  max-width: 80%;
+  font-size: 0.8125rem;
+  max-width: 90%;
   text-align: center;
-  line-height: 1.1rem;
+  line-height: 1.2rem;
   color: #8B8E98;
 }
 
@@ -2124,24 +2124,27 @@ button.card {
   gap: 5px;
 }
 
+.input_row { position: relative; }
+
 .icon {
   width: 20px;
   height: 20px;
   position: absolute;
   z-index: 99;
   left: 12px;
-  bottom: 9px;
+  bottom: 12px;
 }
 
 .input_label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: #8B8E98;
   font-weight: 600;
 }
 
 #auth-panel .input_field {
   width: auto;
-  height: 40px;
+  height: 44px;
+  font-size: 0.9375rem;
   padding: 0 12px 0 40px;
   border-radius: 7px;
   outline: none;
@@ -2163,7 +2166,8 @@ button.card {
 
 .sign-in_btn {
   width: 100%;
-  height: 40px;
+  height: 46px;
+  font-size: 0.9375rem;
   border: 0;
   background: var(--accent-green);
   border-radius: 7px;
@@ -2185,7 +2189,7 @@ button.card {
   justify-content: center;
   gap: 30px;
   color: #8B8E98;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .separator .line {
@@ -2197,7 +2201,7 @@ button.card {
 }
 
 .note {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: #8B8E98;
   background: none;
   border: 0;
@@ -2231,7 +2235,7 @@ button.card {
 #auth-panel .pw-rules {
   margin: 0;
   padding-left: 1.1rem;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: #8B8E98;
   line-height: 1.5;
 }
@@ -2247,7 +2251,7 @@ button.card {
   display: block;
   min-height: 0;
   margin-top: 2px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #DC2626;
 }
@@ -2258,7 +2262,7 @@ button.card {
 .pw-eye {
   position: absolute;
   right: 8px;
-  bottom: 7px;
+  bottom: 8px;
   z-index: 99;
   width: 28px;
   height: 26px;
