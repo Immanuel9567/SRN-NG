@@ -27,7 +27,7 @@
   margin: 0;
   padding: 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-green) #0e0e14;
+  scrollbar-color: var(--accent-green) var(--bg-dark);
 }
 
 html {
@@ -1481,14 +1481,18 @@ body::after {
   border-radius: 6px;
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--accent-green), var(--accent-cyan));
-  border-radius: 8px;
-  border: 2px solid var(--bg-dark);
+  border-radius: 999px;
+  border: 3px solid var(--bg-dark);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-green); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-green);
+  border-color: var(--bg-card);
+}
+::-webkit-scrollbar-corner { background: var(--bg-dark); }
 
 /* Primary button: speed gradient, glow lift, shine sweep. */
 .btn-primary {
@@ -1938,13 +1942,16 @@ body::after {
    ========================================================================== */
 
 .srn-hero-card {
+  display: grid;
+  grid-template-columns: 19rem 1fr;
   background: linear-gradient(180deg, #12121A 0%, #0A0A10 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .srn-hero-card-img {
   position: relative;
-  height: 11rem;
+  height: 100%;
+  min-height: 12rem;
   overflow: hidden;
 }
 
@@ -1957,6 +1964,8 @@ body::after {
 }
 
 .srn-hero-card-img img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1965,7 +1974,13 @@ body::after {
 
 .srn-hero-card:hover .srn-hero-card-img img { transform: scale(1.06); }
 
-.srn-hero-card-body { position: relative; padding: 1.15rem 1.25rem 1.35rem; }
+.srn-hero-card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem 2.25rem;
+}
 
 /* Speed hairline: the gradient from the primary button, repeated as a tick. */
 .srn-hero-card-body::before {
@@ -1982,11 +1997,11 @@ body::after {
 
 .srn-hero-card-body h3 {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 900;
   letter-spacing: 0.03em;
   color: #FFFFFF;
-  margin: 0.7rem 0 0.55rem;
+  margin: 0.75rem 0 0.6rem;
 }
 
 /* The YOUR SPEED. treatment: last word lands in SRN green. */
@@ -2006,6 +2021,13 @@ body::after {
 
 [data-theme="light"] .srn-hero-card:hover {
   box-shadow: 0 18px 44px rgba(10, 10, 20, 0.3), 0 0 0 1px rgba(0, 145, 74, 0.3);
+}
+
+@media (max-width: 700px) {
+  .srn-hero-card { grid-template-columns: 1fr; }
+  .srn-hero-card-img { height: 11rem; min-height: 0; }
+  .srn-hero-card-body { padding: 1.15rem 1.25rem 1.35rem; }
+  .srn-hero-card-body h3 { font-size: 1.1rem; }
 }
 
 /* ==========================================================================
