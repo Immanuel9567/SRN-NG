@@ -1942,25 +1942,32 @@ body::after {
    ========================================================================== */
 
 .srn-hero-card {
-  display: grid;
-  grid-template-columns: 19rem 1fr;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  min-height: clamp(19rem, 24vw, 22rem);
   background: linear-gradient(180deg, #12121A 0%, #0A0A10 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* The picture IS the background: full bleed, pinned left, fading right. */
 .srn-hero-card-img {
-  position: relative;
-  height: 100%;
-  min-height: 12rem;
-  overflow: hidden;
+  position: absolute;
+  inset: 0;
 }
 
-/* Cinematic dim, like the hero video sitting under its headline. */
+/* Left-to-right fade: image reads on the left, dissolves into the panel
+   by two-thirds across so the text zone stays perfectly legible. */
 .srn-hero-card-img::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(8, 8, 12, 0.88) 0%, rgba(8, 8, 12, 0.22) 55%, rgba(8, 8, 12, 0.05) 100%);
+  background: linear-gradient(90deg,
+    rgba(8, 8, 12, 0.18) 0%,
+    rgba(8, 8, 12, 0.52) 34%,
+    rgba(10, 10, 16, 0.92) 58%,
+    #0A0A10 72%);
 }
 
 .srn-hero-card-img img {
@@ -1969,17 +1976,22 @@ body::after {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: left center;
   transition: transform 0.4s ease;
 }
 
-.srn-hero-card:hover .srn-hero-card-img img { transform: scale(1.06); }
+.srn-hero-card:hover .srn-hero-card-img img { transform: scale(1.05); }
 
+/* Text occupies the faded right side of the card. */
 .srn-hero-card-body {
   position: relative;
+  z-index: 1;
+  margin-left: auto;
+  width: min(56%, 36rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1.5rem 2.25rem;
+  padding: 2rem 2.5rem;
 }
 
 /* Speed hairline: the gradient from the primary button, repeated as a tick. */
@@ -1997,7 +2009,7 @@ body::after {
 
 .srn-hero-card-body h3 {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 900;
   letter-spacing: 0.03em;
   color: #FFFFFF;
@@ -2024,10 +2036,21 @@ body::after {
 }
 
 @media (max-width: 700px) {
-  .srn-hero-card { grid-template-columns: 1fr; }
-  .srn-hero-card-img { height: 11rem; min-height: 0; }
-  .srn-hero-card-body { padding: 1.15rem 1.25rem 1.35rem; }
-  .srn-hero-card-body h3 { font-size: 1.1rem; }
+  .srn-hero-card { min-height: 21rem; }
+  .srn-hero-card-img::after {
+    background: linear-gradient(180deg,
+      rgba(8, 8, 12, 0.25) 0%,
+      rgba(8, 8, 12, 0.6) 42%,
+      #0A0A10 78%);
+  }
+  .srn-hero-card-img img { object-position: center; }
+  .srn-hero-card-body {
+    width: 100%;
+    margin: 0;
+    justify-content: flex-end;
+    padding: 1.5rem 1.25rem 1.6rem;
+  }
+  .srn-hero-card-body h3 { font-size: 1.15rem; }
 }
 
 /* ==========================================================================
