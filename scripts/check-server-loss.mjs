@@ -28,25 +28,27 @@ process.env.SRN_UPLOAD_DIR = mkdtempSync(join(tmpdir(), 'srn-serverloss-uploads-
 
 const { JSDOM, VirtualConsole } = await import('jsdom');
 
-const server = spawn(process.execPath, [join(ROOT, 'server', 'index.js')], {
+let server = spawn(process.execPath, [join(ROOT, 'server', 'index.js')], {
   cwd: ROOT,
   env: { ...process.env, PORT: String(PORT), SRN_DATA_DIR: dataDir },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
+let revived = null;
 let log = '';
 server.stdout.on('data', (d) => { log += d; });
 server.stderr.on('data', (d) => { log += d; });
 
-const waitForServer = () => new Promise((res, rej) => {
+const waitBanner = (getLog, label) => new Promise((res, rej) => {
   const banner = `SRN-NG server on http://0.0.0.0:${PORT}`;
-  const timer = setTimeout(() => rej(new Error(`server did not start.\n${log}`)), 10000);
+  const timer = setTimeout(() => rej(new Error(`${label} did not start.\n${getLog()}`)), 10000);
   const poll = () => {
-    if (log.includes('EADDRINUSE')) { clearTimeout(timer); rej(new Error(`port ${PORT} in use.\n${log}`)); return; }
-    if (log.includes(banner)) { clearTimeout(timer); res(); return; }
+    if (getLog().includes('EADDRINUSE')) { clearTimeout(timer); rej(new Error(`port ${PORT} in use.\n${getLog()}`)); return; }
+    if (getLog().includes(banner)) { clearTimeout(timer); res(); return; }
     setTimeout(poll, 50);
   };
   poll();
 });
+const waitForServer = () => waitBanner(() => log, 'server');
 
 let pass = 0;
 const failures = [];
@@ -154,6 +156,34 @@ try {
   check('the fallback account landed in the local datastore', await waitFor(hasFallbackUser, 'local write'),
     Object.keys(stored).join(','));
 
+  // 6. Recovery: the server comes back, and the same page instance -- still
+  //    latched offline -- goes back online on the next action, no reload.
+  revived = spawn(process.execPath, [join(ROOT, 'server', 'index.js')], {
+    cwd: ROOT,
+    env: { ...process.env, PORT: String(PORT), SRN_DATA_DIR: dataDir },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  let log2 = '';
+  revived.stdout.on('data', (d) => { log2 += d; });
+  revived.stderr.on('data', (d) => { log2 += d; });
+  await waitBanner(() => log2, 'restarted server');
+  window.fetch = (input, init = {}) => {
+    const url = new URL(typeof input === 'string' ? input : input.url, BASE);
+    return fetch(url, init);
+  };
+  msg.textContent = '';
+  submitSignup(window, 'loss_test_d', 'loss_d@srn.ng');
+  check('a recovered server is picked up without a reload',
+    await waitFor(() => msg.textContent.includes('Account created'), 'reconnect signup'),
+    msg.textContent);
+  const revivedLogin = await fetch(`${BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'loss_d@srn.ng', password: 'Passw0rd!' }),
+  });
+  check('the reconnected account landed on the server, not just locally',
+    revivedLogin.status === 200, `server login status ${revivedLogin.status}`);
+
   check('no page errors during the whole loss cycle', pageErrors.length === 0, pageErrors.join(' | '));
 
   window.close();
@@ -162,6 +192,7 @@ try {
   console.log(`FAIL  harness -- ${err.message}\n${log.slice(-800)}`);
 } finally {
   server.kill('SIGKILL');
+  if (revived) revived.kill('SIGKILL');
 }
 
 console.log('');

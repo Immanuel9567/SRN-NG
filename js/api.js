@@ -253,8 +253,14 @@ const SRN = (() => {
       const state = readLocal();
       const email = trim(payload.email, 200).toLowerCase();
       const user = state.users.find((u) => u.email === email);
-      // Same answer for an unknown email and a wrong password.
-      const ok = user && (await localHash(String(payload.password ?? ''), user.salt)) === user.hash;
+      if (!user) {
+        // Enumeration is not a concern inside the user's own browser, and the
+        // honest answer prevents a misleading one: this store only ever holds
+        // accounts created on this device, so an unknown email is usually a
+        // server account stuck in offline mode.
+        fail('You are offline: this browser only knows accounts created here. Once the server is back online, reload the page and sign in again.', 401);
+      }
+      const ok = (await localHash(String(payload.password ?? ''), user.salt)) === user.hash;
       if (!ok) fail('Email or password is incorrect.', 401);
       state.session = user.id;
       writeLocal(state);
@@ -484,15 +490,23 @@ const SRN = (() => {
 
   // ---- transport ----------------------------------------------------------
 
-  // One probe per page load: does this origin actually serve the API? A static
-  // host answers /api/* with its own HTML 404 page, which is how we tell them apart.
+  // Does this origin actually serve the API? A static host answers /api/* with
+  // its own HTML 404 page, which is how we tell them apart. The result latches
+  // per page load, but not forever: a page that latched offline re-probes on
+  // the next account action, so a server that comes back is picked up without
+  // a reload.
   let apiProbe = null;
+  function fireProbe() {
+    return fetch('/api/auth/me', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+      .then((res) => (res.headers.get('content-type') || '').includes('json'))
+      .catch(() => false);
+  }
   function apiAvailable() {
-    if (!apiProbe) {
-      apiProbe = fetch('/api/auth/me', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
-        .then((res) => (res.headers.get('content-type') || '').includes('json'))
-        .catch(() => false);
-    }
+    if (!apiProbe) apiProbe = fireProbe();
+    return apiProbe;
+  }
+  function reprobe() {
+    apiProbe = fireProbe();
     return apiProbe;
   }
 
@@ -502,6 +516,10 @@ const SRN = (() => {
   // there is not. A real API error (400/401/409...) is always surfaced as-is:
   // only a transport failure falls through to the local store.
   async function api(method, path, body, localFn) {
+    // Self-heal: a latched-offline page gives the API one more chance before
+    // doing anything locally. Cheap (one fetch per action while offline), and
+    // it turns "reload the page after a deploy" into "just try again".
+    if (localFn && apiProbe && !(await apiAvailable())) await reprobe();
     if (await apiAvailable()) {
       try {
         return await request(method, path, body);

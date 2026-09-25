@@ -158,17 +158,30 @@ try {
     back.document.getElementById('signed-in-title').textContent.includes('offlinedriver'),
     JSON.stringify(back.document.getElementById('signed-in-title').textContent));
 
-  // ---- a wrong password is still rejected ---------------------------------
+  // ---- bad sign-ins are still rejected ------------------------------------
+  // Fresh browser, unknown email: the local store only knows accounts created
+  // here, so the message says the caller is offline rather than claiming a
+  // wrong password. Either way, nobody gets in.
   const wrong = await loadPage('/account.html');
   const loginForm = wrong.document.getElementById('login-form');
   loginForm.querySelector('[name="email"]').value = 'offline@srn.ng';
   loginForm.querySelector('[name="password"]').value = 'not-the-password';
-  // Fresh browser: no accounts at all, so this must fail rather than let anyone in.
   fireSubmit(wrong.window, loginForm);
   await waitFor(() => loginForm.querySelector('[data-form-message]').textContent.trim(), 'login result');
-  check('a bad sign-in is rejected offline',
-    /incorrect/i.test(loginForm.querySelector('[data-form-message]').textContent),
+  check('an unknown account is rejected with the offline answer',
+    /offline/i.test(loginForm.querySelector('[data-form-message]').textContent),
     JSON.stringify(loginForm.querySelector('[data-form-message]').textContent));
+
+  // Existing local account, wrong password: the classic rejection.
+  const known = await loadPage('/account.html', state);
+  const knownForm = known.document.getElementById('login-form');
+  knownForm.querySelector('[name="email"]').value = 'offline@srn.ng';
+  knownForm.querySelector('[name="password"]').value = 'not-the-password';
+  fireSubmit(known.window, knownForm);
+  await waitFor(() => knownForm.querySelector('[data-form-message]').textContent.trim(), 'known login result');
+  check('a wrong password for a known local account is still incorrect',
+    /incorrect/i.test(knownForm.querySelector('[data-form-message]').textContent),
+    JSON.stringify(knownForm.querySelector('[data-form-message]').textContent));
 
   // ---- taking part in an activity -----------------------------------------
   const acts = await loadPage('/activities.html', state);

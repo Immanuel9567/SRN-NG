@@ -138,7 +138,7 @@ a plain file host and every account call runs against a **browser-local datastor
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
 | API tests only | `npm run test:api` (198 checks) |
-| Server-loss fallback | `npm run test:serverloss` (6 checks; signup survives the server dying mid-session) |
+| Server-loss fallback | `npm run test:serverloss` (8 checks; accounts survive the server dying, and a latched-offline page self-heals when it returns) |
 | DOM render tests only | `npm run test:render` (84 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Offline accounts (no API) | `npm run test:offline` (17 checks against a plain static host) |
