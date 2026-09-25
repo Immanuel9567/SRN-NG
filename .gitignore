@@ -3,6 +3,6 @@ dist/
 .DS_Store
 *.local
 
-# live session tokens must never be committed
-data/sessions.json
+# runtime state: the sqlite datastore and uploaded images
+data/
 media/uploads/

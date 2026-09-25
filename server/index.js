@@ -4,6 +4,7 @@
 //   npm run dev   ->  http://0.0.0.0:5173
 
 import { createReadStream, existsSync, statSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { handleApi } from './api.js';
@@ -111,6 +112,33 @@ const server = createServer(async (req, res) => {
   }
   sendStatic(res, resolved.file);
 });
+
+// A fresh deployment has an empty datastore; the first boot creates the admin
+// so the site is usable without a manual seed step. Tests that seed users
+// before boot never hit this branch.
+{
+  const { read, write } = await import('./store.js');
+  const { hashPassword, newId } = await import('./auth.js');
+  const users = read('users', []);
+  if (!users.length) {
+    const generated = randomBytes(9).toString('base64url');
+    const password = process.env.SRN_ADMIN_PASSWORD || generated;
+    const admin = {
+      id: newId('usr'),
+      username: process.env.SRN_ADMIN_USERNAME || 'admin',
+      email: (process.env.SRN_ADMIN_EMAIL || 'admin@srn.ng').toLowerCase(),
+      role: 'admin',
+      vendor: false,
+      ...hashPassword(password),
+      createdAt: new Date().toISOString(),
+    };
+    write('users', [admin]);
+    console.log(`admin: created "${admin.username}" <${admin.email}> from an empty datastore`);
+    if (!process.env.SRN_ADMIN_PASSWORD) {
+      console.log(`  generated admin password (printed once): ${password}`);
+    }
+  }
+}
 
 server.listen(PORT, HOST, () => {
   console.log(`SRN-NG server on http://${HOST}:${PORT}`);

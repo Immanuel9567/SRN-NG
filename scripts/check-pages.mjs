@@ -3,7 +3,8 @@
 //
 //   npm run check:pages
 
-import { readFileSync, readdirSync, existsSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { execSync } from 'child_process';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -271,21 +272,15 @@ const viteConfig = readFileSync(join(ROOT, 'vite.config.js'), 'utf8');
 check('vite.config.js derives pages from the filesystem', /readdirSync/.test(viteConfig),
   'hardcoded input lists silently drop new pages');
 
-// The datastore must exist and be well formed, since the repo is the database.
-for (const name of ['users', 'events', 'news', 'games', 'members', 'merch', 'rigs', 'messages', 'newsletter', 'friends', 'notifications']) {
-  const file = join(ROOT, 'data', `${name}.json`);
-  if (!existsSync(file)) { check(`data/${name}.json exists`, false, 'run npm run seed'); continue; }
-  try { JSON.parse(readFileSync(file, 'utf8')); }
-  catch (e) { check(`data/${name}.json is valid JSON`, false, e.message); }
+// The datastore is gitignored runtime state: it must NOT be committed, and the
+// ignore rule must cover the whole directory (database, WAL, sessions).
+{
+  const ignore = readFileSync(join(ROOT, '.gitignore'), 'utf8');
+  check('data/ is gitignored', /^data\/?$/m.test(ignore));
+  let committed = 'git-unavailable';
+  try { committed = execSync('git ls-files data/', { cwd: ROOT, encoding: 'utf8' }).trim(); } catch { /* git absent */ }
+  check('no datastore files are committed', committed === '', committed);
 }
-
-// No plaintext passwords or session tokens may be committed.
-const users = JSON.parse(readFileSync(join(ROOT, 'data', 'users.json'), 'utf8'));
-for (const u of users) {
-  check(`user ${u.username}: has a salted hash, not plaintext`, !!u.salt && !!u.hash && !u.password);
-}
-check('data/sessions.json is gitignored',
-  /data\/sessions\.json/.test(readFileSync(join(ROOT, '.gitignore'), 'utf8')));
 
 console.log(bad ? `\n${bad} of ${good + bad} page check(s) failed across ${pages.length} pages.`
                 : `All ${good} page checks passed across ${pages.length} pages.`);

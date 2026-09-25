@@ -1,8 +1,16 @@
-// JSON file persistence for the SRN-NG repo-backed datastore.
-// Data lives in <repo>/data/*.json and is committed to the repo, per project decision.
+// SQLite persistence for the SRN-NG datastore.
+//
+// One file: <DATA_DIR>/srn.db. The database is runtime state and is
+// gitignored; it is never committed. Collections keep their in-memory shape
+// (arrays of objects, sessions as an object) stored as JSON documents in a
+// single table, so every caller keeps the read/write/update API unchanged.
+//
+// Driver: better-sqlite3. node:sqlite needs Node 22+; this project runs on
+// Node 20. better-sqlite3 is synchronous, which matches the store's API.
 
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import Database from 'better-sqlite3';
 import { randomBytes } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,28 +20,39 @@ export const DATA_DIR = process.env.SRN_DATA_DIR
   ? resolve(process.env.SRN_DATA_DIR)
   : join(ROOT, 'data');
 
-function pathFor(name) {
+mkdirSync(DATA_DIR, { recursive: true });
+
+export const DB_PATH = join(DATA_DIR, 'srn.db');
+
+const db = new Database(DB_PATH);
+// WAL keeps a reader (status pages, future replicas) from blocking writes.
+db.pragma('journal_mode = WAL');
+db.exec('CREATE TABLE IF NOT EXISTS collections (name TEXT PRIMARY KEY, json TEXT NOT NULL)');
+
+const getStmt = db.prepare('SELECT json FROM collections WHERE name = ?');
+const setStmt = db.prepare(
+  'INSERT INTO collections (name, json) VALUES (?, ?) ON CONFLICT(name) DO UPDATE SET json = excluded.json'
+);
+
+function keyFor(name) {
   if (!/^[a-z0-9-]+$/.test(name)) throw new Error(`Refusing to open collection "${name}"`);
-  return join(DATA_DIR, `${name}.json`);
+  return name;
 }
 
 export function read(name, fallback) {
-  const file = pathFor(name);
-  if (!existsSync(file)) return fallback;
+  const row = getStmt.get(keyFor(name));
+  if (!row) return fallback;
   try {
-    return JSON.parse(readFileSync(file, 'utf8'));
+    return JSON.parse(row.json);
   } catch (err) {
-    throw new Error(`${file} is corrupt and could not be parsed: ${err.message}`);
+    throw new Error(`Collection "${name}" is corrupt and could not be parsed: ${err.message}`);
   }
 }
 
-// Write via a temp file + rename so a crash mid-write cannot truncate the collection.
+// SQLite gives atomicity per statement; the whole collection goes in one row,
+// so a crash mid-write cannot leave a truncated document behind.
 export function write(name, value) {
-  mkdirSync(DATA_DIR, { recursive: true });
-  const file = pathFor(name);
-  const tmp = `${file}.${process.pid}.tmp`;
-  writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`);
-  renameSync(tmp, file);
+  setStmt.run(keyFor(name), JSON.stringify(value));
   return value;
 }
 
@@ -44,7 +63,7 @@ export function update(name, fallback, mutate) {
 }
 
 // Uploaded images live under media/uploads/ so the static server can serve them
-// without opening up the rest of data/.
+// without opening up the datastore.
 // Overridable so the tests never write into the working tree. The public path
 // stays media/uploads/... regardless; only the physical location moves.
 export const UPLOAD_DIR = process.env.SRN_UPLOAD_DIR
