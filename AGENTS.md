@@ -228,6 +228,9 @@ use it, because it has caught a navbar bug that the API tests could not see.
 | POST | `/api/news/:slug/comments` | signed in | `{ text }` up to 600 chars; rate limited; notifies the author |
 | GET | `/api/news/:slug/reactions` | anyone | counts per kind plus the caller's active kinds |
 | POST | `/api/news/:slug/reactions` | signed in | toggles `{ kind }` of flag/fire/love/trophy; one per kind |
+| GET | `/api/news/trending` | anyone | top four articles ranked by total reactions |
+| GET | `/api/comments` | admin | newest 50 comments across all articles |
+| DELETE | `/api/comments/:id` | admin | removes one comment from the pit wall |
 | GET | `/api/games`, `/api/members`, `/api/merch`, `/api/rigs` | anyone | rigs and merch hide `pending` |
 | PATCH | `/api/members/me` | signed in | city, sim, bio, avatar, socials, gamesPlayed; creates the profile if missing |
 | GET | `/api/friends` | signed in | friends, incoming, outgoing |

@@ -316,6 +316,30 @@ try {
   const rmine = await call(user, 'GET', '/api/news/seeded-article/reactions');
   check('signed-in driver sees their own reactions', rmine.data?.mine?.length === 1 && rmine.data.mine[0] === 'flag');
 
+  // ---- trending --------------------------------------------------------------
+  // Seeded article carries 2 reactions from the block above; give the published
+  // article one and the ranking must follow the totals.
+  await call(vendor, 'POST', '/api/news/srn-announces-season-opener/reactions', { kind: 'fire' });
+  const trend = await call(anon, 'GET', '/api/news/trending');
+  check('trending is public', trend.status === 200 && Array.isArray(trend.data?.articles));
+  check('trending ranks by reaction totals', trend.data?.articles?.[0]?.slug === 'seeded-article' &&
+    trend.data?.articles?.[0]?.reactions === 2 &&
+    trend.data?.articles?.some((a) => a.slug === 'srn-announces-season-opener' && a.reactions === 1),
+    JSON.stringify(trend.data?.articles?.map((a) => [a.slug, a.reactions])));
+  check('trending returns at most four articles', trend.data?.articles?.length <= 4);
+
+  // ---- comment moderation ----------------------------------------------------
+  check('non-admin cannot list every comment', (await call(vendor, 'GET', '/api/comments')).status === 403);
+  const modList = await call(admin, 'GET', '/api/comments');
+  check('admin can list recent comments', modList.status === 200 && modList.data?.comments?.length >= 2, JSON.stringify(modList.data?.comments?.length));
+  const victim = modList.data.comments[0];
+  check('non-admin cannot delete a comment', (await call(vendor, 'DELETE', `/api/comments/${victim.id}`)).status === 403);
+  check('deleting an unknown comment is 404', (await call(admin, 'DELETE', '/api/comments/cmt_nope')).status === 404);
+  check('admin deletes a comment', (await call(admin, 'DELETE', `/api/comments/${victim.id}`)).status === 200);
+  const afterMod = await call(anon, 'GET', `/api/news/${victim.slug}/comments`);
+  check('deleted comment is gone from the public pit wall',
+    !afterMod.data?.comments?.some((c) => c.id === victim.id));
+
   // ---- comment notifications ------------------------------------------------
   // The published article belongs to driver_one, so a comment from the vendor
   // account must notify the admin jar, and the author's own comment must not.

@@ -583,6 +583,19 @@ export async function handleApi(req, res, url, cookies) {
     // ================= news: admin only ===================================
     if (route === 'GET /api/news') return json(200, { articles: read(NEWS, []) });
 
+    // Trending: the four hottest articles by total reaction count. Articles
+    // with no reactions fall back to newest-first, so the strip is never empty.
+    if (route === 'GET /api/news/trending') {
+      const articles = read(NEWS, []);
+      const reactions = read(REACTIONS, []);
+      const total = (slug) => reactions.filter((r) => r.slug === slug).length;
+      const ranked = articles
+        .map((a) => ({ ...a, reactions: total(a.slug) }))
+        .sort((a, b) => b.reactions - a.reactions || String(b.createdAt).localeCompare(String(a.createdAt)))
+        .slice(0, 4);
+      return json(200, { articles: ranked });
+    }
+
     if (route === 'POST /api/news') {
       if (!isAdmin) return adminError(actor);
       const body = await readBody(req);
@@ -706,6 +719,24 @@ export async function handleApi(req, res, url, cookies) {
         active = true;
       }
       return json(200, { active, counts: reactionCounts(slug).counts });
+    }
+
+    // ================= comment moderation: admin only ======================
+    // Newest first, capped so a huge pit wall cannot stall the admin panel.
+    if (route === 'GET /api/comments') {
+      if (!isAdmin) return adminError(actor);
+      const list = read(COMMENTS, []);
+      return json(200, { comments: list.slice().reverse().slice(0, 50) });
+    }
+
+    const commentDelete = path.match(/^\/api\/comments\/([\w-]+)$/);
+    if (commentDelete && method === 'DELETE') {
+      if (!isAdmin) return adminError(actor);
+      const before = read(COMMENTS, []);
+      const after = before.filter((c) => c.id !== commentDelete[1]);
+      if (after.length === before.length) return json(404, { error: 'No such comment.' });
+      update(COMMENTS, [], () => after);
+      return json(200, { ok: true });
     }
 
 

@@ -634,6 +634,12 @@ const SRN = (() => {
     reactions: (slug) => read(`/api/news/${encodeURIComponent(slug)}/reactions`,
       () => ({ counts: {}, mine: [], kinds: ['flag', 'fire', 'love', 'trophy'] })),
     toggleReaction: (slug, kind) => api('POST', `/api/news/${encodeURIComponent(slug)}/reactions`, { kind }),
+    // Trending ranks by live reaction totals, so it needs the server; offline
+    // the homepage simply hides the strip.
+    trending: () => read('/api/news/trending', () => ({ articles: [] })),
+    // Moderation is admin + server only: there is nobody to moderate offline.
+    allComments: () => api('GET', '/api/comments'),
+    deleteComment: (id) => api('DELETE', `/api/comments/${id}`),
 
     // orders
     placeOrder: (items) => api('POST', '/api/orders', { items }, () => local.placeOrder(items)),

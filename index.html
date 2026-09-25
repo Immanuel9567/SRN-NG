@@ -156,6 +156,20 @@
       </div>
     </section>
 
+    <!-- Trending on the track -->
+    <section class="section-py" id="trending-section" style="background-color: var(--bg-alt); display: none;">
+      <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+          <div>
+            <p style="color: var(--accent-cyan); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;">Hottest right now</p>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 900; color: var(--text-white);">TRENDING ON THE TRACK</h2>
+          </div>
+          <a href="news.html" class="btn btn-outline-light">All News →</a>
+        </div>
+        <div id="trending-strip" class="srn-trending"></div>
+      </div>
+    </section>
+
     </div>
   </main>
 
@@ -288,6 +302,23 @@
             `).join('')}
           </div>
         `;
+      }
+
+      // Trending strip: ranked by live reaction totals. Hidden when the API
+      // is absent (static deploy) or nothing has been ranked yet.
+      const trending = await SRN.trending().catch(() => ({ articles: [] }));
+      if (trending.articles.length) {
+        document.getElementById('trending-section').style.display = '';
+        document.getElementById('trending-strip').innerHTML = trending.articles.map((a) => `
+          <a href="news-article.html?slug=${encodeURIComponent(a.slug)}" class="srn-trend-card">
+            <div class="srn-trend-img"><img src="${esc(a.img)}" alt="${esc(a.title)}" loading="lazy" /></div>
+            <div class="srn-trend-body">
+              <span class="badge badge-solid-green">${esc(a.tag || 'News')}</span>
+              <h3>${esc(a.title)}</h3>
+              <span class="srn-trend-heat"><iconify-icon icon="mdi:fire" width="13" height="13"></iconify-icon> ${Number(a.reactions || 0)} reactions</span>
+            </div>
+          </a>
+        `).join('');
       }
     });
   </script>
