@@ -211,7 +211,7 @@
 
           <!-- Shown only when the page is served without the SRN API (static hosting). -->
           <p id="offline-note" style="display: none; font-size: 0.6875rem; color: #8B8E98; background: #F7F7F8; border-radius: 7px; padding: 0.65rem 0.75rem; margin: 0; width: 100%;">
-            The SRN server is not connected yet, so your account is created and kept in this browser. It moves online once the server goes live.
+            This copy has no account server. Only accounts created in this browser can sign in here. Server accounts, including admin, are unavailable. Browser accounts do not automatically transfer online.
           </p>
 
           <form id="signup-form" novalidate style="display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: stretch;">
@@ -554,7 +554,7 @@
         const user = await SRN.me(true);
         if (user) showSignedIn(user);
         else {
-          authPanel.style.display = 'block';
+          authPanel.style.display = 'flex';
           signedIn.style.display = 'none';
           document.getElementById('member-zone').style.display = 'none';
           document.getElementById('interests-panel').style.display = 'none';
