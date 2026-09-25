@@ -113,7 +113,7 @@ try {
 
   // static + path traversal
   const home = await fetch(`${BASE}/`);
-  check('GET / serves the site', home.status === 200 && (await home.text()).includes('SIM RACING'));
+  check('GET / serves the site', home.status === 200 && (await home.text()).includes('media/logo.png'));
   const traversal = await fetch(`${BASE}/data/users.json`);
   check('GET /data/users.json blocked', traversal.status === 403, `got ${traversal.status}`);
   const traversal2 = await fetch(`${BASE}/../data/users.json`);
@@ -123,7 +123,7 @@ try {
   const missing = await fetch(`${BASE}/nope.html`);
   check('unknown page falls back to 404.html', missing.status === 404);
   const pretty = await fetch(`${BASE}/gallery`);
-  check('extensionless /gallery serves gallery.html', pretty.status === 200 && (await pretty.text()).includes('SIM RACING'));
+  check('extensionless /gallery serves gallery.html', pretty.status === 200 && (await pretty.text()).includes('media/logo.png'));
 
   // auth: unauthenticated
   check('GET /api/auth/me when signed out is 401', (await call(anon, 'GET', '/api/auth/me')).status === 401);

@@ -346,9 +346,9 @@ button, input, textarea, select {
   justify-content: space-between;
   flex-wrap: nowrap;
   gap: 0.75rem;
-  /* Trimmed: the pill reads as one tight bar, not a padded tray. */
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
+  /* Original vertical rhythm restored; only the horizontal trim stays. */
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
   padding-left: 0.875rem;
   padding-right: 0.875rem;
 }
@@ -404,7 +404,7 @@ button, input, textarea, select {
   border: none;
   color: var(--accent-green);
   cursor: pointer;
-  padding: 0.4rem;
+  padding: 0.625rem;
   border-radius: 9999px;
   pointer-events: auto;
   -webkit-tap-highlight-color: rgba(0, 230, 118, 0.25);
@@ -1565,26 +1565,6 @@ body::after {
   background-image: linear-gradient(100deg, #14141B 55%, #00914A 130%);
 }
 
-/* Footer: checkered flag strip along the top edge. */
-.footer { position: relative; }
-
-.footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 7px;
-  background:
-    conic-gradient(#FFFFFF 0.25turn, #0B0B10 0.25turn 0.5turn, #FFFFFF 0.5turn 0.75turn, #0B0B10 0.75turn) 0 0 / 14px 14px repeat-x;
-  opacity: 0.85;
-}
-
-[data-theme="light"] .footer::before {
-  background:
-    conic-gradient(#14141B 0.25turn, #F3F5F7 0.25turn 0.5turn, #14141B 0.5turn 0.75turn, #F3F5F7 0.75turn) 0 0 / 14px 14px repeat-x;
-}
-
 /* Scroll-reveal. JS opts elements in by adding .srn-reveal; without JS or
    IntersectionObserver nothing is ever hidden. */
 .srn-reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.55s ease, transform 0.55s ease; }
@@ -1948,9 +1928,6 @@ body::after {
 @media (max-width: 640px) {
   .srn-trending { grid-auto-columns: 72%; }
 }
-
-/* Nav-scoped button: the pill's SIGN IN / account chip sit lower than page CTAs. */
-.navbar .btn { padding: 0.5rem 1.15rem; }
 
 /* ==========================================================================
    LIVE LAYER (v4): hero-grade pillar cards + final nav trim.
