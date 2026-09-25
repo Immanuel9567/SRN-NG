@@ -2009,7 +2009,7 @@ body::after {
 
 .srn-hero-card-body h3 {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 900;
   letter-spacing: 0.03em;
   color: #FFFFFF;
@@ -2020,7 +2020,7 @@ body::after {
 .srn-hero-card-body h3 span { color: var(--accent-green); }
 
 .srn-hero-card-body p {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.65;
   color: #9A9AA8;
 }
