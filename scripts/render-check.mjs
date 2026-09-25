@@ -469,7 +469,7 @@ try {
   check('clicking SIGN UP swaps to the signup fields',
     sForm.style.display === 'flex' && lForm.style.display === 'none');
   check('swapping updates the heading',
-    modes.document.getElementById('auth-heading').textContent === 'CREATE ACCOUNT');
+    modes.document.getElementById('auth-heading').textContent === 'Create your account');
   modes.document.querySelector('#auth-mode button[data-mode="signin"]').click();
   check('clicking SIGN IN swaps back',
     lForm.style.display === 'flex' && sForm.style.display === 'none');

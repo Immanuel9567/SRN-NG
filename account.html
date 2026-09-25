@@ -106,15 +106,7 @@
 
 
   <main>
-    <header class="page-header">
-      <div class="container">
-        <div class="page-header-eyebrow">MEMBER ACCESS</div>
-        <h1 class="page-header-title">Your SRN Account</h1>
-        <p class="page-header-subtitle">Create an account to submit events and manage your membership. Every new account starts as a User; only an admin can promote you.</p>
-      </div>
-    </header>
-
-    <section class="section-py">
+    <section class="section-py auth-stage-wrap">
       <div class="container container-medium">
 
         <!-- Already signed in -->
@@ -133,9 +125,6 @@
         <!-- Step two of signup: pick the games you follow -->
         <div id="interests-panel" class="card" style="display: none; padding: 2rem; margin-bottom: 1.5rem;">
           <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">WHAT DO YOU RACE?</h2>
-          <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-            Pick the games you follow. Activities will be filtered to these, and you can change this any time.
-          </p>
           <div id="interests-chips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;"></div>
           <p id="interests-status" style="font-size: 0.75rem; min-height: 1rem; margin-bottom: 1rem;"></p>
           <button id="interests-save" class="btn btn-primary">SAVE AND CONTINUE</button>
@@ -211,26 +200,46 @@
 
         </div>
 
-        <div id="auth-panel" class="card" style="padding: 2rem; max-width: 30rem; margin: 0 auto;">
-
-          <!-- Alternates the fields shown; both forms stay in the DOM. -->
-          <div class="srn-segmented" id="auth-mode" style="margin-bottom: 1.5rem;">
-            <button type="button" data-mode="signup" class="active">SIGN UP</button>
-            <button type="button" data-mode="signin">SIGN IN</button>
+        <div class="form_container" id="auth-panel">
+          <div class="logo_container">
+            <img src="media/logo.png" alt="SIM Racing Nigeria" />
+          </div>
+          <div class="title_container">
+            <p class="title" id="auth-heading">Create your account</p>
+            <span class="subtitle" id="auth-sub">One account for events, rigs, orders and your profile.</span>
           </div>
 
-          <h2 id="auth-heading" style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">CREATE ACCOUNT</h2>
-          <p id="auth-sub" style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem;">Takes about ten seconds.</p>
-
           <!-- Shown only when the page is served without the SRN API (static hosting). -->
-          <p id="offline-note" style="display: none; font-size: 0.6875rem; color: var(--text-muted); background: var(--bg-card-alt); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem;">
+          <p id="offline-note" style="display: none; font-size: 0.6875rem; color: #8B8E98; background: #F7F7F8; border-radius: 7px; padding: 0.65rem 0.75rem; margin: 0; width: 100%;">
             The SRN server is not connected yet, so your account is created and kept in this browser. It moves online once the server goes live.
           </p>
 
-          <form id="signup-form" style="display: flex; flex-direction: column; gap: 1rem;">
-            <input required type="text" name="username" placeholder="Username" minlength="3" maxlength="24" class="input-field" autocomplete="username" />
-            <input required type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
-            <input required type="password" id="signup-password" name="password" placeholder="Password" minlength="8" class="input-field" autocomplete="new-password" />
+          <form id="signup-form" style="display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: stretch;">
+            <div class="input_container">
+              <label class="input_label" for="su-username">Username</label>
+              <svg fill="none" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg" class="icon">
+                <circle cx="12" cy="8" r="3.6" stroke="#141B34" stroke-width="1.5"></circle>
+                <path stroke="#141B34" stroke-linecap="round" stroke-width="1.5" d="M5 19.5c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"></path>
+              </svg>
+              <input placeholder="driver_name" title="Username" name="username" type="text" class="input_field" id="su-username" minlength="3" maxlength="24" autocomplete="username" required>
+            </div>
+            <div class="input_container">
+              <label class="input_label" for="su-email">Email</label>
+              <svg fill="none" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg" class="icon">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"></path>
+                <path stroke-linejoin="round" stroke-width="1.5" stroke="#141B34" d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"></path>
+              </svg>
+              <input placeholder="name@mail.com" title="Email" name="email" type="email" class="input_field" id="su-email" autocomplete="email" required>
+            </div>
+            <div class="input_container">
+              <label class="input_label" for="signup-password">Password</label>
+              <svg fill="none" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg" class="icon">
+                <path stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M18 11.0041C17.4166 9.91704 16.273 9.15775 14.9519 9.0993C13.477 9.03404 11.9788 9 10.329 9C8.67911 9 7.18091 9.03404 5.70604 9.0993C3.95328 9.17685 2.51295 10.4881 2.27882 12.1618C2.12602 13.2541 2 14.3734 2 15.5134C2 16.6534 2.12602 17.7727 2.27882 18.865C2.51295 20.5387 3.95328 21.8499 5.70604 21.9275C6.42013 21.9591 7.26041 21.9834 8 22"></path>
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M6 9V6.5C6 4.01472 8.01472 2 10.5 2C12.9853 2 15 4.01472 15 6.5V9"></path>
+                <path fill="#141B34" d="M21.2046 15.1045L20.6242 15.6956V15.6956L21.2046 15.1045ZM21.4196 16.4767C21.7461 16.7972 22.2706 16.7924 22.5911 16.466C22.9116 16.1395 22.9068 15.615 22.5804 15.2945L21.4196 16.4767ZM18.0228 15.1045L17.4424 14.5134V14.5134L18.0228 15.1045ZM18.2379 18.0387C18.5643 18.3593 19.0888 18.3545 19.4094 18.028C19.7299 17.7016 19.7251 17.1771 19.3987 16.8565L18.2379 18.0387ZM14.2603 20.7619C13.7039 21.3082 12.7957 21.3082 12.2394 20.7619L11.0786 21.9441C12.2794 23.1232 14.2202 23.1232 15.4211 21.9441L14.2603 20.7619ZM12.2394 20.7619C11.6914 20.2239 11.6914 19.358 12.2394 18.82L11.0786 17.6378C9.86927 18.8252 9.86927 20.7567 11.0786 21.9441L12.2394 20.7619ZM12.2394 18.82C12.7957 18.2737 13.7039 18.2737 14.2603 18.82L15.4211 17.6378C14.2202 16.4587 12.2794 16.4587 11.0786 17.6378L12.2394 18.82ZM14.2603 18.82C14.8082 19.358 14.8082 20.2239 14.2603 20.7619L15.4211 21.9441C16.6304 20.7567 16.6304 18.8252 15.4211 17.6378L14.2603 18.82ZM20.6242 15.6956L21.4196 16.4767L22.5804 15.2945L21.785 14.5134L20.6242 15.6956ZM15.4211 18.82L17.8078 16.4767L16.647 15.2944L14.2603 17.6377L15.4211 18.82ZM17.8078 16.4767L18.6032 15.6956L17.4424 14.5134L16.647 15.2945L17.8078 16.4767ZM16.647 16.4767L18.2379 18.0387L19.3987 16.8565L17.8078 15.2945L16.647 16.4767ZM21.785 14.5134C21.4266 14.1616 21.0998 13.8383 20.7993 13.6131C20.4791 13.3732 20.096 13.1716 19.6137 13.1716V14.8284C19.6145 14.8284 19.619 14.8273 19.6395 14.8357C19.6663 14.8466 19.7183 14.8735 19.806 14.9391C19.9969 15.0822 20.2326 15.3112 20.6242 15.6956L21.785 14.5134ZM18.6032 15.6956C18.9948 15.3112 19.2305 15.0822 19.4215 14.9391C19.5091 14.8735 19.5611 14.8466 19.5879 14.8357C19.6084 14.8273 19.6129 14.8284 19.6137 14.8284V13.1716C19.1314 13.1716 18.7483 13.3732 18.4281 13.6131C18.1276 13.8383 17.8008 14.1616 17.4424 14.5134L18.6032 15.6956Z"></path>
+              </svg>
+              <input placeholder="Password" title="Password" name="password" type="password" class="input_field" id="signup-password" minlength="8" autocomplete="new-password" required>
+            </div>
             <ul class="pw-rules" id="pw-rules" aria-live="polite">
               <li data-pw="len">8 or more characters</li>
               <li data-pw="letter">A letter</li>
@@ -238,24 +247,49 @@
               <li data-pw="symbol">A symbol (optional)</li>
             </ul>
 
-            <label for="vendor-toggle" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 0.875rem; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card-alt);">
-              <input type="checkbox" id="vendor-toggle" name="vendor" style="margin-top: 0.2rem; width: 1rem; height: 1rem; accent-color: var(--accent-green); cursor: pointer;" />
+            <label for="vendor-toggle" class="vendor_row">
+              <input type="checkbox" id="vendor-toggle" name="vendor" />
               <span>
-                <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">I am a vendor</span>
-                <span style="display: block; font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.25rem;">Assigns the Salesperson tag for selling rigs and gear.</span>
+                <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: #212121;">I am a vendor</span>
+                <span style="display: block; font-size: 0.6875rem; color: #8B8E98; margin-top: 0.2rem;">Adds the Salesperson tag for selling rigs and gear.</span>
               </span>
             </label>
 
-            <button type="submit" class="btn btn-primary">CREATE ACCOUNT</button>
-            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+            <button type="submit" class="sign-in_btn">CREATE ACCOUNT</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem; margin: 0; text-align: center;"></p>
           </form>
 
-          <form id="login-form" style="display: none; flex-direction: column; gap: 1rem;">
-            <input type="email" name="email" placeholder="Email address" class="input-field" autocomplete="email" />
-            <input type="password" name="password" placeholder="Password" class="input-field" autocomplete="current-password" />
-            <button type="submit" class="btn btn-primary">SIGN IN</button>
-            <p data-form-message style="font-size: 0.75rem; min-height: 1rem;"></p>
+          <form id="login-form" style="display: none; flex-direction: column; gap: 12px; width: 100%; align-items: stretch;">
+            <div class="input_container">
+              <label class="input_label" for="li-email">Email</label>
+              <svg fill="none" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg" class="icon">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M7 8.5L9.94202 10.2394C11.6572 11.2535 12.3428 11.2535 14.058 10.2394L17 8.5"></path>
+                <path stroke-linejoin="round" stroke-width="1.5" stroke="#141B34" d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.7551 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.7551 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09882 3.53656C5.95033 3.61566 4.37608 3.65521 3.24495 4.79065C2.11382 5.92608 2.08114 7.45885 2.01576 10.5244C1.99474 11.5101 1.99475 12.4899 2.01577 13.4756Z"></path>
+              </svg>
+              <input placeholder="name@mail.com" title="Email" name="email" type="email" class="input_field" id="li-email" autocomplete="email" required>
+            </div>
+            <div class="input_container">
+              <label class="input_label" for="li-password">Password</label>
+              <svg fill="none" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg" class="icon">
+                <path stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M18 11.0041C17.4166 9.91704 16.273 9.15775 14.9519 9.0993C13.477 9.03404 11.9788 9 10.329 9C8.67911 9 7.18091 9.03404 5.70604 9.0993C3.95328 9.17685 2.51295 10.4881 2.27882 12.1618C2.12602 13.2541 2 14.3734 2 15.5134C2 16.6534 2.12602 17.7727 2.27882 18.865C2.51295 20.5387 3.95328 21.8499 5.70604 21.9275C6.42013 21.9591 7.26041 21.9834 8 22"></path>
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M6 9V6.5C6 4.01472 8.01472 2 10.5 2C12.9853 2 15 4.01472 15 6.5V9"></path>
+                <path fill="#141B34" d="M21.2046 15.1045L20.6242 15.6956V15.6956L21.2046 15.1045ZM21.4196 16.4767C21.7461 16.7972 22.2706 16.7924 22.5911 16.466C22.9116 16.1395 22.9068 15.615 22.5804 15.2945L21.4196 16.4767ZM18.0228 15.1045L17.4424 14.5134V14.5134L18.0228 15.1045ZM18.2379 18.0387C18.5643 18.3593 19.0888 18.3545 19.4094 18.028C19.7299 17.7016 19.7251 17.1771 19.3987 16.8565L18.2379 18.0387ZM14.2603 20.7619C13.7039 21.3082 12.7957 21.3082 12.2394 20.7619L11.0786 21.9441C12.2794 23.1232 14.2202 23.1232 15.4211 21.9441L14.2603 20.7619ZM12.2394 20.7619C11.6914 20.2239 11.6914 19.358 12.2394 18.82L11.0786 17.6378C9.86927 18.8252 9.86927 20.7567 11.0786 21.9441L12.2394 20.7619ZM12.2394 18.82C12.7957 18.2737 13.7039 18.2737 14.2603 18.82L15.4211 17.6378C14.2202 16.4587 12.2794 16.4587 11.0786 17.6378L12.2394 18.82ZM14.2603 18.82C14.8082 19.358 14.8082 20.2239 14.2603 20.7619L15.4211 21.9441C16.6304 20.7567 16.6304 18.8252 15.4211 17.6378L14.2603 18.82ZM20.6242 15.6956L21.4196 16.4767L22.5804 15.2945L21.785 14.5134L20.6242 15.6956ZM15.4211 18.82L17.8078 16.4767L16.647 15.2944L14.2603 17.6377L15.4211 18.82ZM17.8078 16.4767L18.6032 15.6956L17.4424 14.5134L16.647 15.2945L17.8078 16.4767ZM16.647 16.4767L18.2379 18.0387L19.3987 16.8565L17.8078 15.2945L16.647 16.4767ZM21.785 14.5134C21.4266 14.1616 21.0998 13.8383 20.7993 13.6131C20.4791 13.3732 20.096 13.1716 19.6137 13.1716V14.8284C19.6145 14.8284 19.619 14.8273 19.6395 14.8357C19.6663 14.8466 19.7183 14.8735 19.806 14.9391C19.9969 15.0822 20.2326 15.3112 20.6242 15.6956L21.785 14.5134ZM18.6032 15.6956C18.9948 15.3112 19.2305 15.0822 19.4215 14.9391C19.5091 14.8735 19.5611 14.8466 19.5879 14.8357C19.6084 14.8273 19.6129 14.8284 19.6137 14.8284V13.1716C19.1314 13.1716 18.7483 13.3732 18.4281 13.6131C18.1276 13.8383 17.8008 14.1616 17.4424 14.5134L18.6032 15.6956Z"></path>
+              </svg>
+              <input placeholder="Password" title="Password" name="password" type="password" class="input_field" id="li-password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="sign-in_btn">SIGN IN</button>
+            <p data-form-message style="font-size: 0.75rem; min-height: 1rem; margin: 0; text-align: center;"></p>
           </form>
+
+          <div class="separator">
+            <hr class="line">
+            <span>Or</span>
+            <hr class="line">
+          </div>
+          <div class="auth-switch" id="auth-mode">
+            <button type="button" class="note" data-mode="signin" id="switch-signin">Already with us? Sign in</button>
+            <button type="button" class="note" data-mode="signup" id="switch-signup" style="display: none;">New here? Create one</button>
+          </div>
         </div>
         </div>
 
@@ -280,10 +314,12 @@
         const isSignup = mode !== 'signin';
         signupForm.style.display = isSignup ? 'flex' : 'none';
         loginForm.style.display = isSignup ? 'none' : 'flex';
-        document.getElementById('auth-heading').textContent = isSignup ? 'CREATE ACCOUNT' : 'WELCOME BACK';
+        document.getElementById('auth-heading').textContent = isSignup ? 'Create your account' : 'Welcome back';
         document.getElementById('auth-sub').textContent = isSignup
-          ? 'Takes about ten seconds.'
-          : 'Sign in to manage your events, rigs and orders.';
+          ? 'One account for events, rigs, orders and your profile.'
+          : 'Your events, rigs and orders are waiting.';
+        document.getElementById('switch-signin').style.display = isSignup ? 'inline' : 'none';
+        document.getElementById('switch-signup').style.display = isSignup ? 'none' : 'inline';
         document.querySelectorAll('#auth-mode button').forEach((b) => {
           b.classList.toggle('active', b.dataset.mode === (isSignup ? 'signup' : 'signin'));
         });

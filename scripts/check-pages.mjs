@@ -103,7 +103,7 @@ for (const page of CONTENT_PAGES) {
   check('drawer panel uses the light glass recipe', /rgba\(255, 255, 255, 0\.1[0-9]?\) 0%/.test(drawer));
 
   const account = readFileSync(join(ROOT, 'account.html'), 'utf8');
-  check('account page has a mode toggle', /id="auth-mode"/.test(account) && /srn-segmented/.test(account));
+  check('account page has a mode toggle', /id="auth-mode"/.test(account) && /data-mode="signin"/.test(account));
   check('account page keeps both forms for alternating fields',
     /id="signup-form"/.test(account) && /id="login-form"/.test(account));
 
