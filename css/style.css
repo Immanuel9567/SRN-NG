@@ -297,9 +297,9 @@ button, input, textarea, select {
   transform: translateX(-50%);
   /* Floating pill: centred, inset from both screen edges, never full-bleed. */
   width: calc(100% - 2rem);
-  /* Wide enough for the icon chips, the brand and the account controls;
-     flex never gets to squeeze the logo. */
-  max-width: 70rem;
+  /* Wide enough for the icon chips, the brand and the account controls
+     without ever squeezing the logo (content needs ~74rem). */
+  max-width: 75rem;
   z-index: 50;
   border-radius: 9999px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
@@ -1950,7 +1950,12 @@ button.card {
 
 .navbar-links {
   position: relative;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.navbar-links::-webkit-scrollbar { display: none; }
 
 /* The pill itself. Width/transform are driven from js/app.js. */
 .srn-nav-pill {
@@ -2024,57 +2029,6 @@ button.card {
 @media (prefers-reduced-motion: reduce) {
   .srn-nav-pill { transition: opacity 0.3s ease; }
   .srn-nav-glare { display: none; }
-}
-
-/* Nav controls share the bar's glass: translucent pill, hairline border,
-   blur, top highlight. */
-.navbar .btn {
-  padding: 0.5rem 1.1rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.navbar .btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
-[data-theme="light"] .navbar .btn {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(10, 10, 20, 0.12);
-}
-
-[data-theme="light"] .navbar .btn:hover {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(10, 10, 20, 0.18);
-}
-
-.nav-user {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  padding: 0.3rem 0.85rem 0.3rem 0.3rem;
-}
-
-.nav-user:hover { background: rgba(255, 255, 255, 0.14); }
-
-[data-theme="light"] .nav-user {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(10, 10, 20, 0.12);
-}
-
-[data-theme="light"] .nav-user:hover { background: rgba(255, 255, 255, 0.85); }
-
-/* Between the desktop breakpoint and 1200px the links go icon-only so the
-   bar never has to squeeze anything. */
-@media (min-width: 1024px) and (max-width: 1199.98px) {
-  .navbar-links .nav-label { display: none; }
 }
 
 /* ==========================================================================
