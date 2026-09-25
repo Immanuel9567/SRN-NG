@@ -471,11 +471,10 @@ function initNavLiquid() {
   }
 
   const active = () => links.querySelector('.nav-link.active');
-  const hover = (e) => position(e.currentTarget, true);
+  // The pill only moves when a link is clicked, never on hover.
   links.querySelectorAll('.nav-link').forEach((link) => {
-    link.addEventListener('mouseenter', hover);
+    link.addEventListener('click', () => position(link, true));
   });
-  links.addEventListener('mouseleave', () => position(active(), true));
 
   const settle = () => position(active(), false);
   settle();
