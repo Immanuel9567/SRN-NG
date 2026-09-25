@@ -418,3 +418,90 @@ function initPalette() {
     btn.addEventListener('click', open);
   });
 }
+
+// ---- liquid nav: icons, sliding pill, mouse glare ---------------------------
+// The reference is Transsion Hub's floating glass nav: a spring-eased pill that
+// glides behind the hovered/active link and a light cone that follows the
+// pointer. Same behaviour here, wrapped in SRN's dark glass and green accents.
+
+const SRN_NAV_ICONS = {
+  'index.html': 'line-md:home',
+  'gallery.html': 'line-md:image',
+  'activities.html': 'mdi:gamepad-variant',
+  'news.html': 'line-md:document',
+  'members.html': 'line-md:account',
+  'sim-rigs.html': 'mdi:steering',
+  'media.html': 'line-md:play',
+  'shop.html': 'line-md:cart',
+  'about.html': 'line-md:information',
+};
+
+const SRN_NAV_PILL_TRANSITION =
+  'transform 0.5s cubic-bezier(0.34, 1.2, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.2, 0.64, 1)';
+
+function initNavIcons(scope) {
+  scope.querySelectorAll('.nav-link, .mobile-nav-link').forEach((link) => {
+    if (link.querySelector('iconify-icon')) return;
+    const name = SRN_NAV_ICONS[link.getAttribute('href')];
+    if (!name) return;
+    const icon = document.createElement('iconify-icon');
+    icon.setAttribute('icon', name);
+    icon.setAttribute('width', '15');
+    icon.setAttribute('height', '15');
+    link.insertBefore(icon, link.firstChild);
+  });
+}
+
+function initNavLiquid() {
+  const links = document.querySelector('.navbar-links');
+  const navbar = document.querySelector('.navbar');
+  if (!links || !navbar) return;
+
+  // Sliding pill.
+  const pill = document.createElement('span');
+  pill.className = 'srn-nav-pill';
+  links.insertBefore(pill, links.firstChild);
+
+  function position(target, animate) {
+    if (!target) return;
+    pill.style.transition = animate ? SRN_NAV_PILL_TRANSITION : 'none';
+    pill.style.width = `${target.offsetWidth}px`;
+    pill.style.transform = `translateX(${target.offsetLeft}px)`;
+    if (!animate) void pill.offsetWidth; // reflow so the next move springs
+  }
+
+  const active = () => links.querySelector('.nav-link.active');
+  const hover = (e) => position(e.currentTarget, true);
+  links.querySelectorAll('.nav-link').forEach((link) => {
+    link.addEventListener('mouseenter', hover);
+  });
+  links.addEventListener('mouseleave', () => position(active(), true));
+
+  const settle = () => position(active(), false);
+  settle();
+  window.addEventListener('resize', settle);
+  window.addEventListener('load', settle);
+
+  // Mouse-following glare across the whole pill.
+  const glare = document.createElement('span');
+  glare.className = 'srn-nav-glare';
+  navbar.appendChild(glare);
+  navbar.addEventListener('mousemove', (e) => {
+    const rect = navbar.getBoundingClientRect();
+    glare.style.setProperty('--x', `${e.clientX - rect.left}px`);
+    glare.style.setProperty('--y', `${e.clientY - rect.top}px`);
+  });
+}
+
+// Decorate the desktop bar, the mobile drawer, then layer the liquid effects.
+(function () {
+  const boot = () => {
+    document.querySelectorAll('.navbar-links, .mobile-menu').forEach(initNavIcons);
+    initNavLiquid();
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();

@@ -31,8 +31,7 @@ for (const page of CONTENT_PAGES) {
     order.join(',') === 'js/data.js,js/api.js,js/theme.js,js/app.js', order.join(','));
 
   check(`${page}: has a nav`, /<nav/.test(html));
-  check(`${page}: has a footer`, /<footer/.test(html));
-  check(`${page}: uses the full footer grid`, /class="footer-grid"/.test(html));
+  check(`${page}: no footer (removed by design)`, !/<footer/.test(html));
   check(`${page}: drawer sits outside nav`, html.indexOf('class="mobile-menu"') > html.indexOf('</nav>'));
   check(`${page}: no link to the deleted README.md`, !/README\.md/.test(html));
 }
