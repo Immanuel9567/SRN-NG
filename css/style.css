@@ -135,23 +135,23 @@ button, input, textarea, select {
 /* Page Header */
 .page-header {
   position: relative;
-  padding-top: 5.5rem;
-  padding-bottom: 4rem;
+  padding-top: 3.5rem;
+  padding-bottom: 2.5rem;
   background-color: var(--bg-alt);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 @media (min-width: 768px) {
   .page-header {
-    padding-top: 10rem;
-    padding-bottom: 5rem;
+    padding-top: 5rem;
+    padding-bottom: 3rem;
   }
 }
 
 @media (min-width: 1024px) {
   .page-header {
-    padding-top: 12rem;
-    padding-bottom: 6.5rem;
+    padding-top: 6rem;
+    padding-bottom: 3.5rem;
   }
 }
 
@@ -668,14 +668,14 @@ button, input, textarea, select {
 
 /* Section Padding */
 .section-py {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 @media (min-width: 768px) {
   .section-py {
-    padding-top: 7rem;
-    padding-bottom: 7rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
 }
 

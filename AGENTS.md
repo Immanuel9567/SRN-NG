@@ -194,7 +194,7 @@ use it, because it has caught a navbar bug that the API tests could not see.
   previous run and produced false failures. If a check fails mysteriously, look for a stray
   `node server/index.js` process before debugging the app.
 - **The nav is at the bottom, so nothing may assume a top bar.** `.page-header` uses
-  `padding-top: 5.5rem`; do not restore the old 8rem top offset.
+  `padding-top: 3.5rem`; do not inflate it back towards the old 8rem.
 - **Pages must survive an empty datastore.** A fresh deployment has no content, and a crash on an
   empty collection kills the rest of that page's `DOMContentLoaded` handler. Guard every
   `COLLECTION[0]`. `npm run test:empty` loads all 15 pages against empty data and fails on any error.
