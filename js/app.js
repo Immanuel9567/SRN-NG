@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initReveal();
   initToTop();
   initEgg();
+  initPalette();
   // Signed-in state in the navbar. Loaded from js/api.js, which must come first.
   if (typeof SRN !== 'undefined') {
     SRN.renderAccountState().then((user) => initHeaderChrome(user));
@@ -240,4 +241,180 @@ function openSettingsPanel(user) {
     document.removeEventListener('click', close);
   };
   setTimeout(() => document.addEventListener('click', close), 0);
+}
+
+// ---- search palette (Ctrl+K or /) -----------------------------------------
+// One overlay for the whole site: static pages plus live news, members, rigs,
+// merch and games. Data is fetched on first open and cached. Everything is
+// escaped through SRN.esc because every collection holds user-authored text.
+
+const SRN_PALETTE_PAGES = [
+  { label: 'Home', href: 'index.html', group: 'Pages' },
+  { label: 'Gallery', href: 'gallery.html', group: 'Pages' },
+  { label: 'Activities', href: 'activities.html', group: 'Pages' },
+  { label: 'News', href: 'news.html', group: 'Pages' },
+  { label: 'Members', href: 'members.html', group: 'Pages' },
+  { label: 'Sim Rigs', href: 'sim-rigs.html', group: 'Pages' },
+  { label: 'Media', href: 'media.html', group: 'Pages' },
+  { label: 'Shop', href: 'shop.html', group: 'Pages' },
+  { label: 'About', href: 'about.html', group: 'Pages' },
+  { label: 'Contact', href: 'contact.html', group: 'Pages' },
+  { label: 'My Account', href: 'account.html', group: 'Pages' },
+];
+
+function initPalette() {
+  let paletteData = null;
+  let overlay = null;
+  let input = null;
+  let list = null;
+  let activeIndex = 0;
+  let visible = [];
+
+  async function loadData() {
+    if (paletteData) return paletteData;
+    const entries = [...SRN_PALETTE_PAGES];
+    const safe = (p, map) => p.catch(() => []).then((rows) => rows.forEach((r) => entries.push(map(r))));
+    await Promise.all([
+      safe(SRN.news().then((d) => d.articles || []), (a) => ({
+        label: a.title, sub: a.tag || 'News', href: `news-article.html?slug=${encodeURIComponent(a.slug)}`, group: 'News' })),
+      safe(SRN.members().then((d) => d.members || []), (m) => ({
+        label: m.name, sub: [m.rank, m.city].filter(Boolean).join(' · ') || 'Member', href: `member-profile.html?id=${encodeURIComponent(m.id)}`, group: 'Members' })),
+      safe(SRN.rigs().then((d) => d.rigs || []), (r) => ({
+        label: r.name, sub: [r.owner, r.city].filter(Boolean).join(' · ') || 'Rig', href: 'sim-rigs.html', group: 'Rigs' })),
+      safe(SRN.merch().then((d) => d.merch || []), (i) => ({
+        label: i.name, sub: i.category || 'Shop', href: 'shop.html', group: 'Shop' })),
+      safe(SRN.games().then((d) => d.games || []), (g) => ({
+        label: g.name, sub: g.genre || 'Game', href: 'activities.html', group: 'Games' })),
+    ]);
+    paletteData = entries;
+    return entries;
+  }
+
+  function build() {
+    overlay = document.createElement('div');
+    overlay.className = 'srn-palette-overlay';
+    overlay.innerHTML = `
+      <div class="srn-palette" role="dialog" aria-modal="true" aria-label="Search the site">
+        <div class="srn-palette-head">
+          <iconify-icon icon="mdi:magnify" width="18" height="18"></iconify-icon>
+          <input type="text" class="srn-palette-input" placeholder="Search news, members, rigs, shop..." aria-label="Search query" />
+          <kbd>ESC</kbd>
+        </div>
+        <div class="srn-palette-list"></div>
+      </div>`;
+    document.body.appendChild(overlay);
+    input = overlay.querySelector('input');
+    list = overlay.querySelector('.srn-palette-list');
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (visible[activeIndex]) go(visible[activeIndex]); }
+    });
+  }
+
+  function render(query) {
+    const q = (query || '').trim().toLowerCase();
+    const all = paletteData || [];
+    const scored = [];
+    for (const entry of all) {
+      const hay = `${entry.label} ${entry.sub || ''}`.toLowerCase();
+      if (q && !hay.includes(q)) continue;
+      scored.push({ entry, rank: entry.label.toLowerCase().startsWith(q) ? 0 : 1 });
+    }
+    scored.sort((a, b) => a.rank - b.rank);
+    const groups = new Map();
+    for (const { entry } of scored) {
+      if (!groups.has(entry.group)) groups.set(entry.group, []);
+      groups.get(entry.group).push(entry);
+    }
+    visible = [];
+    const esc = SRN.esc;
+    // Highlight the matched slice. The pieces are escaped individually, so the
+    // mark tag is the only markup that ever reaches innerHTML unescaped.
+    const mark = (text) => {
+      if (!q) return esc(text);
+      const i = text.toLowerCase().indexOf(q);
+      if (i === -1) return esc(text);
+      return `${esc(text.slice(0, i))}<mark>${esc(text.slice(i, i + q.length))}</mark>${esc(text.slice(i + q.length))}`;
+    };
+    let html = '';
+    for (const [group, items] of groups) {
+      html += `<div class="srn-palette-group">${esc(group)}</div>`;
+      for (const entry of items.slice(0, 6)) {
+        const idx = visible.length;
+        html += `
+          <button type="button" class="srn-palette-item${idx === activeIndex ? ' active' : ''}" data-idx="${idx}">
+            <span class="srn-palette-label">${mark(entry.label)}</span>
+            <span class="srn-palette-sub">${esc(entry.sub || '')}</span>
+          </button>`;
+        visible.push(entry);
+      }
+    }
+    list.innerHTML = html || '<p class="srn-palette-empty">Nothing matches. Try a driver, track or game.</p>';
+    list.querySelectorAll('[data-idx]').forEach((btn) => {
+      btn.addEventListener('click', () => go(visible[Number(btn.dataset.idx)]));
+      btn.addEventListener('mousemove', () => {
+        const idx = Number(btn.dataset.idx);
+        if (idx !== activeIndex) { activeIndex = idx; paint(); }
+      });
+    });
+    activeIndex = 0;
+    paint();
+  }
+
+  function paint() {
+    list.querySelectorAll('.srn-palette-item').forEach((el) => {
+      el.classList.toggle('active', Number(el.dataset.idx) === activeIndex);
+    });
+    const current = list.querySelector('.srn-palette-item.active');
+    if (current) current.scrollIntoView({ block: 'nearest' });
+  }
+
+  function move(delta) {
+    if (!visible.length) return;
+    activeIndex = (activeIndex + delta + visible.length) % visible.length;
+    paint();
+  }
+
+  function go(entry) {
+    close();
+    if (entry && entry.href) window.location.href = entry.href;
+  }
+
+  function open() {
+    if (overlay) { input.focus(); return; }
+    build();
+    render('');
+    overlay.classList.add('open');
+    input.focus();
+    loadData().then(() => { if (overlay) render(input.value); });
+  }
+
+  function close() {
+    if (!overlay) return;
+    overlay.remove();
+    overlay = null;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      open();
+      return;
+    }
+    if (e.key === '/' && !typing) {
+      e.preventDefault();
+      open();
+      return;
+    }
+    if (e.key === 'Escape') close();
+  });
+
+  document.querySelectorAll('[data-palette-open]').forEach((btn) => {
+    btn.addEventListener('click', open);
+  });
 }

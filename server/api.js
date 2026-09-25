@@ -31,6 +31,11 @@ const GAMES = 'games';
 const FRIENDS = 'friends';
 const NOTIFICATIONS = 'notifications';
 const COMMENTS = 'comments';
+const REACTIONS = 'reactions';
+
+// Fixed reaction vocabulary for the pit wall. Adding a kind here exposes it to
+// every client and makes the new key valid in POST /api/news/:slug/reactions.
+const REACTION_KINDS = ['flag', 'fire', 'love', 'trophy'];
 
 const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,24}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -652,7 +657,55 @@ export async function handleApi(req, res, url, cookies) {
         createdAt: new Date().toISOString(),
       };
       update(COMMENTS, [], (list) => [comment, ...list]);
+      // Tell the article's author someone hit their pit wall. No self-notes.
+      const art = read(NEWS, []).find((a) => a.slug === slug);
+      const author = art && read(USERS, []).find((u) => u.username === art.createdBy);
+      if (author && author.id !== actor.id) {
+        pushNote(author.id, 'comment', `${actor.username} commented on your article "${art.title}"`, `news-article.html?slug=${slug}`);
+      }
       return json(201, { comment });
+    }
+
+    // ================= reactions: one toggle per kind per driver ===========
+    const newsReactions = path.match(/^\/api\/news\/([\w-]+)\/reactions$/);
+
+    function reactionCounts(slug) {
+      const all = read(REACTIONS, []).filter((r) => r.slug === slug);
+      const counts = {};
+      for (const kind of REACTION_KINDS) counts[kind] = all.filter((r) => r.kind === kind).length;
+      return { all, counts };
+    }
+
+    if (newsReactions && method === 'GET') {
+      const slug = newsReactions[1];
+      if (!read(NEWS, []).some((a) => a.slug === slug)) return json(404, { error: 'No such article.' });
+      const { all, counts } = reactionCounts(slug);
+      const mine = actor ? all.filter((r) => r.userId === actor.id).map((r) => r.kind) : [];
+      return json(200, { counts, mine, kinds: REACTION_KINDS });
+    }
+
+    if (newsReactions && method === 'POST') {
+      if (!actor) return json(401, { error: 'Sign in to react.' });
+      const slug = newsReactions[1];
+      if (!read(NEWS, []).some((a) => a.slug === slug)) return json(404, { error: 'No such article.' });
+      const body = await readBody(req);
+      const kind = clean(body.kind, 20);
+      if (!REACTION_KINDS.includes(kind)) {
+        return json(400, { error: `Reaction must be one of: ${REACTION_KINDS.join(', ')}.` });
+      }
+      const all = read(REACTIONS, []);
+      const existing = all.find((r) => r.slug === slug && r.kind === kind && r.userId === actor.id);
+      let active;
+      if (existing) {
+        update(REACTIONS, [], (list) => list.filter((r) => r.id !== existing.id));
+        active = false;
+      } else {
+        update(REACTIONS, [], (list) => [...list, {
+          id: newId('rct'), slug, kind, userId: actor.id, createdAt: new Date().toISOString(),
+        }]);
+        active = true;
+      }
+      return json(200, { active, counts: reactionCounts(slug).counts });
     }
 
 

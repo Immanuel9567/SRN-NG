@@ -630,6 +630,10 @@ const SRN = (() => {
     // anyway); posting needs the server because other people have to see it.
     comments: (slug) => read(`/api/news/${encodeURIComponent(slug)}/comments`, () => ({ comments: [] })),
     postComment: (slug, text) => api('POST', `/api/news/${encodeURIComponent(slug)}/comments`, { text }),
+    // Same story for reactions: read anywhere, toggle on the server only.
+    reactions: (slug) => read(`/api/news/${encodeURIComponent(slug)}/reactions`,
+      () => ({ counts: {}, mine: [], kinds: ['flag', 'fire', 'love', 'trophy'] })),
+    toggleReaction: (slug, kind) => api('POST', `/api/news/${encodeURIComponent(slug)}/reactions`, { kind }),
 
     // orders
     placeOrder: (items) => api('POST', '/api/orders', { items }, () => local.placeOrder(items)),

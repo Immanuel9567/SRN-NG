@@ -3,6 +3,20 @@
 // Same tag and `icon` attribute as https://iconify.design/docs/iconify-icon/
 
 const SRN_ICONIFY = {
+  'line-md:arrow-up':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  'line-md:login':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h5v16h-5"/><path d="M10 8l4 4-4 4M4 12h10"/></svg>',
+  'mdi:magnify':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>',
+  'mdi:heart-outline':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.7-9.3-9A5 5 0 0 1 12 6.5 5 5 0 0 1 21.3 11c-1.8 4.3-9.3 9-9.3 9z"/></svg>',
+  'mdi:fire':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s5 4.3 5 9a5 5 0 0 1-10 0c0-1.8.8-3.2 1.8-4.6.4 1.3 1.1 2.1 2.2 2.6-.2-2.4.2-4.9 1-7z"/></svg>',
+  'mdi:flag-checkered':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 5h13l-2.5 4L18 13H5"/><path d="M9 5v0M12 5v0M10.5 9v0M14 9v0M9 13v0M12 13v0"/></svg>',
+  'mdi:trophy-outline':
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H5a3 3 0 0 0 3.2 4M16 5h3a3 3 0 0 1-3.2 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg>',
   'line-md:sunny':
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   'line-md:moon':

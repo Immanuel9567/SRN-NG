@@ -29,6 +29,7 @@
     </a>
     <a class="subhead-back" href="news.html">&larr; Back to News</a>
     <div class="subhead-tools">
+        <button type="button" class="subhead-search" data-palette-open aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><iconify-icon icon="mdi:magnify" width="15" height="15"></iconify-icon><span>Search</span><kbd>Ctrl K</kbd></button>
       <a href="admin.html" class="subhead-admin" data-admin-entry hidden>Admin</a>
       <button type="button" class="subhead-bell" data-notify-open aria-label="Notifications" hidden>
         <iconify-icon icon="line-md:bell" width="18" height="18"></iconify-icon>
@@ -212,6 +213,8 @@
               ${article.body.map(p => `<p>${esc(p)}</p>`).join('')}
             </div>
 
+            <div class="srn-reactions" id="reaction-bar" aria-label="Reactions"></div>
+
             <section class="srn-comments" id="pit-wall" aria-label="Comments">
               <h2 style="font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 1.25rem;">
                 Pit Wall <span class="srn-comment-count" id="cmt-count">0</span>
@@ -244,7 +247,52 @@
       `;
 
       initPitWall(article.slug);
+      initReactions(article.slug);
     });
+
+    // Reaction bar: flag / fire / love / trophy, one toggle per kind per driver.
+    // Counts are public; toggling needs a signed-in driver on the server.
+    const REACTION_ICONS = { flag: 'mdi:flag-checkered', fire: 'mdi:fire', love: 'mdi:heart-outline', trophy: 'mdi:trophy-outline' };
+    const REACTION_LABELS = { flag: 'Flag it', fire: 'On fire', love: 'Love it', trophy: 'Podium worthy' };
+
+    async function initReactions(slug) {
+      const bar = document.getElementById('reaction-bar');
+      if (!bar) return;
+      const esc = SRN.esc;
+      let state;
+      try {
+        state = await SRN.reactions(slug);
+      } catch { return; }
+      const kinds = state.kinds && state.kinds.length ? state.kinds : Object.keys(REACTION_ICONS);
+      const mine = new Set(state.mine || []);
+
+      function draw() {
+        bar.innerHTML = kinds.map((k) => `
+          <button type="button" class="srn-react${mine.has(k) ? ' active' : ''}" data-kind="${esc(k)}"
+                  aria-pressed="${mine.has(k)}" title="${esc(REACTION_LABELS[k] || k)}">
+            <iconify-icon icon="${esc(REACTION_ICONS[k] || 'mdi:flag-checkered')}" width="16" height="16"></iconify-icon>
+            <span>${Number(state.counts[k] || 0)}</span>
+          </button>
+        `).join('');
+        bar.querySelectorAll('[data-kind]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const kind = btn.dataset.kind;
+            btn.disabled = true;
+            try {
+              const out = await SRN.toggleReaction(slug, kind);
+              state.counts = out.counts;
+              if (out.active) mine.add(kind); else mine.delete(kind);
+            } catch (err) {
+              SRN.toast(err.message, 'error');
+            } finally {
+              btn.disabled = false;
+              draw();
+            }
+          });
+        });
+      }
+      draw();
+    }
 
     // The pit wall: comments on this article. Reading works everywhere; posting
     // needs a signed-in driver on the real server (offline mode hides the form).

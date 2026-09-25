@@ -77,7 +77,7 @@ for (const [file, source, label] of [
 }
 
 // ---- empty inbox collections -----------------------------------------------
-for (const name of ['messages', 'newsletter', 'orders', 'friends', 'notifications']) {
+for (const name of ['messages', 'newsletter', 'orders', 'friends', 'notifications', 'comments', 'reactions']) {
   const target = join(ROOT, 'data', `${name}.json`);
   if (!existsSync(target)) {
     write(name, []);

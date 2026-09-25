@@ -300,6 +300,35 @@ try {
     listed.data.comments.some((c) => c.text === 'Great race report. See you at the next meet!'));
   check('comment list never leaks password material', !JSON.stringify(listed.data).includes('hash') && !JSON.stringify(listed.data).includes('salt'));
 
+  // ---- reactions ------------------------------------------------------------
+  check('reactions on an unknown article are 404', (await call(anon, 'GET', '/api/news/nope/reactions')).status === 404);
+  check('anonymous cannot react', (await call(anon, 'POST', '/api/news/seeded-article/reactions', { kind: 'fire' })).status === 401);
+  check('unknown reaction kind is 400', (await call(user, 'POST', '/api/news/seeded-article/reactions', { kind: 'sparkles' })).status === 400);
+  const r1 = await call(user, 'POST', '/api/news/seeded-article/reactions', { kind: 'fire' });
+  check('driver reacts to an article', r1.status === 200 && r1.data?.active === true && r1.data?.counts?.fire === 1, JSON.stringify(r1.data));
+  const r2 = await call(user, 'POST', '/api/news/seeded-article/reactions', { kind: 'fire' });
+  check('reacting twice untoggles', r2.status === 200 && r2.data?.active === false && r2.data?.counts?.fire === 0);
+  await call(user, 'POST', '/api/news/seeded-article/reactions', { kind: 'flag' });
+  await call(vendor, 'POST', '/api/news/seeded-article/reactions', { kind: 'flag' });
+  const rview = await call(anon, 'GET', '/api/news/seeded-article/reactions');
+  check('reaction counts are public and per kind', rview.data?.counts?.flag === 2 && rview.data?.counts?.fire === 0, JSON.stringify(rview.data));
+  check('anonymous reaction view has no mine list', Array.isArray(rview.data?.mine) && rview.data.mine.length === 0);
+  const rmine = await call(user, 'GET', '/api/news/seeded-article/reactions');
+  check('signed-in driver sees their own reactions', rmine.data?.mine?.length === 1 && rmine.data.mine[0] === 'flag');
+
+  // ---- comment notifications ------------------------------------------------
+  // The published article belongs to driver_one, so a comment from the vendor
+  // account must notify the admin jar, and the author's own comment must not.
+  await call(vendor, 'POST', '/api/news/srn-announces-season-opener/comments', { text: 'Buzzing for this one.' });
+  const authorNotes = await call(admin, 'GET', '/api/notifications');
+  check('article author is notified of a new comment',
+    authorNotes.data?.notifications?.some((n) => n.type === 'comment' && n.text.includes('wheel_shop') && n.href.includes('srn-announces-season-opener')),
+    JSON.stringify(authorNotes.data));
+  const unreadBefore = authorNotes.data?.unread ?? 0;
+  await call(admin, 'POST', '/api/news/srn-announces-season-opener/comments', { text: 'My own thread, my own comment.' });
+  const authorNotes2 = await call(admin, 'GET', '/api/notifications');
+  check('commenting on your own article does not notify you', authorNotes2.data?.unread === unreadBefore);
+
   // ---- rigs ---------------------------------------------------------------
   check('anonymous cannot submit a rig', (await call(anon, 'POST', '/api/rigs', { name: 'x', owner: 'y' })).status === 401);
   const vendorJar = jar();
