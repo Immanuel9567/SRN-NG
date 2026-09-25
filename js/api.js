@@ -258,7 +258,7 @@ const SRN = (() => {
         // honest answer prevents a misleading one: this store only ever holds
         // accounts created on this device, so an unknown email is usually a
         // server account stuck in offline mode.
-        fail('You are offline: this browser only knows accounts created here. Once the server is back online, reload the page and sign in again.', 401);
+        fail('You are offline: this browser only knows accounts created here. The server is unreachable right now - wait a few seconds and try again; the page reconnects on its own.', 401);
       }
       const ok = (await localHash(String(payload.password ?? ''), user.salt)) === user.hash;
       if (!ok) fail('Email or password is incorrect.', 401);
