@@ -88,10 +88,10 @@ for (const page of CONTENT_PAGES) {
     check(`${page}: offers SIGN IN`, />SIGN IN</.test(html));
   }
 
-  check('Roboto is loaded', /family=Roboto/.test(css));
+  check('Archivo is loaded', /family=Archivo/.test(css));
   check('Inter is no longer the site font', !/family=Inter/.test(css));
-  check('body font is Roboto', /--font-sans: 'Roboto'/.test(css));
-  check('display font is Roboto', /--font-display: 'Roboto'/.test(css));
+  check('body font is Archivo', /--font-sans: 'Archivo'/.test(css));
+  check('display font is Archivo', /--font-display: 'Archivo'/.test(css));
 
   check('.glass-text exists', /\.glass-text \{/.test(css));
   check('.glass-text falls back where background-clip:text is unsupported',

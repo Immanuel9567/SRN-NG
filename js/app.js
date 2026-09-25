@@ -3,7 +3,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   initActivePageLinks();
-  initReveal();
   initToTop();
   initEgg();
   initPalette();
@@ -12,27 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     SRN.renderAccountState().then((user) => initHeaderChrome(user));
   }
 });
-
-// Reveal-on-scroll. Elements are opted in only when IntersectionObserver exists,
-// so content is never hidden for users (or test DOMs) without it.
-function initReveal() {
-  if (typeof IntersectionObserver !== 'function') return;
-  const targets = document.querySelectorAll('main > section, main .card');
-  if (!targets.length) return;
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('srn-in');
-      io.unobserve(entry.target);
-    });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
-  targets.forEach((el, i) => {
-    el.classList.add('srn-reveal');
-    // A small stagger inside each parent keeps grids from moving as one block.
-    el.style.transitionDelay = `${(i % 4) * 60}ms`;
-    io.observe(el);
-  });
-}
 
 // Back-to-top pill, parked above the bottom navbar.
 function initToTop() {

@@ -235,8 +235,8 @@
           "--border-light": "rgba(255, 255, 255, 0.1)"
         },
         "typography": {
-          "--font-display": "'Roboto', system-ui (weights 300-900)",
-          "--font-sans": "'Roboto', system-ui (weights 300-900)",
+          "--font-display": "'Archivo', system-ui (weights 300-900)",
+          "--font-sans": "'Archivo', system-ui (weights 300-900)",
           "logo_mark": "Orbitron is still loaded but is used only by the inline logo SVG.",
           "loaded_from": "Google Fonts @import at the top of css/style.css"
         },
