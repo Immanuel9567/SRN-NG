@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2300E676'/><path d='M17 45L32 17L47 45' stroke='%2308080C' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><path d='M23 37H41' stroke='%2308080C' stroke-width='6.5' stroke-linecap='round'/></svg>' />
   <title>Article — SIM Racing NG</title>
   <meta name="description" content="Read article on SIM Racing Nigeria." />
   <link rel="stylesheet" href="css/style.css" />
@@ -210,6 +211,14 @@
             <div style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;">
               ${article.body.map(p => `<p>${esc(p)}</p>`).join('')}
             </div>
+
+            <section class="srn-comments" id="pit-wall" aria-label="Comments">
+              <h2 style="font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 1.25rem;">
+                Pit Wall <span class="srn-comment-count" id="cmt-count">0</span>
+              </h2>
+              <div id="cmt-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+              <div id="cmt-form-zone" style="margin-top: 1.5rem;"></div>
+            </section>
           </div>
 
           ${fallbackRelated.length > 0 ? `
@@ -233,7 +242,79 @@
           ` : ''}
         </article>
       `;
+
+      initPitWall(article.slug);
     });
+
+    // The pit wall: comments on this article. Reading works everywhere; posting
+    // needs a signed-in driver on the real server (offline mode hides the form).
+    async function initPitWall(slug) {
+      const esc = SRN.esc;
+      const listEl = document.getElementById('cmt-list');
+      const countEl = document.getElementById('cmt-count');
+      const zoneEl = document.getElementById('cmt-form-zone');
+      if (!listEl || !countEl || !zoneEl) return;
+
+      function render(list) {
+        countEl.textContent = String(list.length);
+        if (!list.length) {
+          listEl.innerHTML = '<p style="color: var(--text-dim); font-size: 0.875rem;">No comments yet. Set the pace.</p>';
+          return;
+        }
+        listEl.innerHTML = list.map((c) => `
+          <div class="srn-comment">
+            <img class="srn-comment-avatar" src="${esc(c.avatar || 'media/placeholder.png')}" alt="" onerror="this.src='media/placeholder.png'" />
+            <div>
+              <div class="srn-comment-meta"><strong>${esc(c.username)}</strong> · ${esc((c.createdAt || '').slice(0, 10))}</div>
+              <div class="srn-comment-body">${esc(c.text)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      let comments = [];
+      try {
+        comments = (await SRN.comments(slug)).comments || [];
+      } catch { /* static build: keep the empty state */ }
+      render(comments);
+
+      const user = await SRN.me().catch(() => null);
+      if (!user) {
+        zoneEl.innerHTML = `
+          <a href="account.html?mode=signin" class="btn btn-outline-light" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <iconify-icon icon="line-md:login" width="16" height="16"></iconify-icon> Sign in to join the pit wall
+          </a>`;
+        return;
+      }
+      zoneEl.innerHTML = `
+        <form class="srn-comments-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <textarea class="input-field" maxlength="600" placeholder="Radio check. What did you think of this one?" aria-label="Write a comment"></textarea>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Be quick but never rude.</span>
+            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.4rem;">Post comment</button>
+          </div>
+        </form>`;
+      const form = zoneEl.querySelector('form');
+      const textarea = zoneEl.querySelector('textarea');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = textarea.value.trim();
+        if (!text) return;
+        const btn = form.querySelector('button');
+        btn.disabled = true;
+        try {
+          const { comment } = await SRN.postComment(slug, text);
+          comments = [comment, ...comments];
+          render(comments);
+          textarea.value = '';
+          SRN.toast('Comment posted.', 'success');
+        } catch (err) {
+          SRN.toast(err.message, 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    }
   </script>
 </body>
 </html>

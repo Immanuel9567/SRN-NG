@@ -3,11 +3,72 @@
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   initActivePageLinks();
+  initReveal();
+  initToTop();
+  initEgg();
   // Signed-in state in the navbar. Loaded from js/api.js, which must come first.
   if (typeof SRN !== 'undefined') {
     SRN.renderAccountState().then((user) => initHeaderChrome(user));
   }
 });
+
+// Reveal-on-scroll. Elements are opted in only when IntersectionObserver exists,
+// so content is never hidden for users (or test DOMs) without it.
+function initReveal() {
+  if (typeof IntersectionObserver !== 'function') return;
+  const targets = document.querySelectorAll('main > section, main .card');
+  if (!targets.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('srn-in');
+      io.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  targets.forEach((el, i) => {
+    el.classList.add('srn-reveal');
+    // A small stagger inside each parent keeps grids from moving as one block.
+    el.style.transitionDelay = `${(i % 4) * 60}ms`;
+    io.observe(el);
+  });
+}
+
+// Back-to-top pill, parked above the bottom navbar.
+function initToTop() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'srn-to-top';
+  btn.setAttribute('aria-label', 'Back to top');
+  btn.innerHTML = '<iconify-icon icon="line-md:arrow-up" width="18" height="18"></iconify-icon>';
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(btn);
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 600);
+  }, { passive: true });
+}
+
+// Easter egg: typing "srn" anywhere drops a podium of checkered confetti.
+function initEgg() {
+  let buffer = '';
+  document.addEventListener('keydown', (e) => {
+    if (e.key && e.key.length === 1) buffer = (buffer + e.key.toLowerCase()).slice(-3);
+    if (buffer !== 'srn') return;
+    buffer = '';
+    const colors = ['#00E676', '#22D3EE', '#FF6B1A', '#F471B5', '#FFFFFF'];
+    for (let i = 0; i < 36; i++) {
+      const bit = document.createElement('div');
+      bit.className = 'srn-confetti';
+      bit.style.left = `${Math.random() * 100}vw`;
+      bit.style.background = colors[i % colors.length];
+      bit.style.animationDelay = `${Math.random() * 0.6}s`;
+      bit.style.animationDuration = `${2 + Math.random() * 1.4}s`;
+      if (i % 3 === 0) bit.style.borderRadius = '50%';
+      document.body.appendChild(bit);
+      setTimeout(() => bit.remove(), 4200);
+    }
+    if (typeof SRN !== 'undefined') SRN.toast('PODIUM MODE. See you on track.', 'success');
+  });
+}
 
 // Initialize Navbar Scroll & Mobile Menu Toggle
 function initNavbar() {

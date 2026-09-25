@@ -626,6 +626,11 @@ const SRN = (() => {
     notifications: () => read('/api/notifications', () => ({ notifications: [] })),
     markNotification: (id) => api('PATCH', `/api/notifications/${id}/read`, null, () => ({ ok: true })),
 
+    // Comments read fine offline (an article has no pit wall without a server
+    // anyway); posting needs the server because other people have to see it.
+    comments: (slug) => read(`/api/news/${encodeURIComponent(slug)}/comments`, () => ({ comments: [] })),
+    postComment: (slug, text) => api('POST', `/api/news/${encodeURIComponent(slug)}/comments`, { text }),
+
     // orders
     placeOrder: (items) => api('POST', '/api/orders', { items }, () => local.placeOrder(items)),
     orders: (scope) => read(scope ? `/api/orders?scope=${scope}` : '/api/orders',

@@ -223,7 +223,9 @@ use it, because it has caught a navbar bug that the API tests could not see.
 | POST | `/api/events/:id/rsvp` | signed in | toggle; returns `{attending, count}` |
 | GET | `/api/news` | anyone | |
 | POST | `/api/news` | admin | slug generated and de-duplicated |
-| DELETE | `/api/news/:slug` | admin | |
+| DELETE | `/api/news/:slug` | admin | also deletes the article's comments |
+| GET | `/api/news/:slug/comments` | anyone | 404 for an unknown slug |
+| POST | `/api/news/:slug/comments` | signed in | `{ text }` up to 600 chars; rate limited |
 | GET | `/api/games`, `/api/members`, `/api/merch`, `/api/rigs` | anyone | rigs and merch hide `pending` |
 | PATCH | `/api/members/me` | signed in | city, sim, bio, avatar, socials, gamesPlayed; creates the profile if missing |
 | GET | `/api/friends` | signed in | friends, incoming, outgoing |

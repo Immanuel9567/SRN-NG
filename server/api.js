@@ -30,6 +30,7 @@ const MEMBERS = 'members';
 const GAMES = 'games';
 const FRIENDS = 'friends';
 const NOTIFICATIONS = 'notifications';
+const COMMENTS = 'comments';
 
 const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,24}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -614,8 +615,46 @@ export async function handleApi(req, res, url, cookies) {
       const after = before.filter((a) => a.slug !== newsDelete[1]);
       if (after.length === before.length) return json(404, { error: 'No such article.' });
       update(NEWS, [], () => after);
+      // The pit wall dies with the article: no orphaned comments.
+      update(COMMENTS, [], (list) => list.filter((c) => c.slug !== newsDelete[1]));
       return json(200, { ok: true });
     }
+
+    // ================= comments: the pit wall ==============================
+    // Anyone can read; only signed-in drivers can post. Comments on an unknown
+    // article are 404, and an article deletion is only complete once its pit
+    // wall goes with it.
+    const newsComments = path.match(/^\/api\/news\/([\w-]+)\/comments$/);
+
+    if (newsComments && method === 'GET') {
+      const slug = newsComments[1];
+      if (!read(NEWS, []).some((a) => a.slug === slug)) return json(404, { error: 'No such article.' });
+      const comments = read(COMMENTS, []).filter((c) => c.slug === slug);
+      return json(200, { comments });
+    }
+
+    if (newsComments && method === 'POST') {
+      if (!actor) return json(401, { error: 'Sign in to join the pit wall.' });
+      const slug = newsComments[1];
+      if (!read(NEWS, []).some((a) => a.slug === slug)) return json(404, { error: 'No such article.' });
+      const body = await readBody(req);
+      const text = clean(body.text, 600);
+      if (!text) return json(400, { error: 'Comment cannot be empty.' });
+      const rl = rateLimit(clientKey(req, 'comment'), { limit: 12, windowMs: 10 * 60 * 1000 });
+      if (rl.limited) return json(429, { error: 'Too many comments. Take a lap and try again shortly.' });
+      const comment = {
+        id: newId('cmt'),
+        slug,
+        userId: actor.id,
+        username: actor.username,
+        avatar: actor.avatar || '',
+        text,
+        createdAt: new Date().toISOString(),
+      };
+      update(COMMENTS, [], (list) => [comment, ...list]);
+      return json(201, { comment });
+    }
+
 
     // ================= rigs: signed in submits, admin approves ============
     if (route === 'GET /api/rigs') {

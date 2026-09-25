@@ -281,6 +281,25 @@ try {
   check('unread drops to zero', (await call(admin, 'GET', '/api/inbox')).data.stats.unread === 0);
   check('marking an unknown message 404', (await call(admin, 'PATCH', '/api/messages/nope/read')).status === 404);
 
+  // ---- comments: the pit wall ---------------------------------------------
+  // The logout block above cleared the user jar, so sign driver_one back in first.
+  check('re-login for the comment section is 200',
+    (await call(user, 'POST', '/api/auth/login', { email: 'driver@srn.ng', password: 'Password!1' })).status === 200);
+  check('comments on an article start empty',
+    (await call(anon, 'GET', '/api/news/seeded-article/comments')).data?.comments?.length === 0);
+  check('anonymous cannot post a comment', (await call(anon, 'POST', '/api/news/seeded-article/comments', { text: 'hi' })).status === 401);
+  check('comment on an unknown article is 404',
+    (await call(user, 'POST', '/api/news/nope/comments', { text: 'hi' })).status === 404);
+  const c1 = await call(user, 'POST', '/api/news/seeded-article/comments', { text: 'Great race report. See you at the next meet!' });
+  check('signed-in driver posts a comment 201', c1.status === 201 && c1.data?.comment?.username === 'driver_one', JSON.stringify(c1.data));
+  check('whitespace-only comment is 400', (await call(user, 'POST', '/api/news/seeded-article/comments', { text: '   ' })).status === 400);
+  const longComment = await call(user, 'POST', '/api/news/seeded-article/comments', { text: 'v'.repeat(2000) });
+  check('oversized comment is capped at 600 chars', longComment.status === 201 && longComment.data?.comment?.text.length === 600);
+  const listed = await call(anon, 'GET', '/api/news/seeded-article/comments');
+  check('comments are publicly listed with the author name', listed.data?.comments?.length === 2 &&
+    listed.data.comments.some((c) => c.text === 'Great race report. See you at the next meet!'));
+  check('comment list never leaks password material', !JSON.stringify(listed.data).includes('hash') && !JSON.stringify(listed.data).includes('salt'));
+
   // ---- rigs ---------------------------------------------------------------
   check('anonymous cannot submit a rig', (await call(anon, 'POST', '/api/rigs', { name: 'x', owner: 'y' })).status === 401);
   const vendorJar = jar();
