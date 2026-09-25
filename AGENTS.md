@@ -87,6 +87,9 @@ a plain file host and every account call runs against a **browser-local datastor
 
 - Covered offline: signup, sign-in, sign-out, session, interests, driver profile (avatar is kept as
   a data URL), event submission, RSVP, rig and merch listings, orders, newsletter, contact form.
+- The fallback also catches a server that dies mid-session: the API answers every route with JSON,
+  so an HTTP error without a JSON body came from the hosting proxy, not the API, and account calls
+  fall through to the local store instead of showing a raw status.
 - Not covered offline: everything admin (`SRN.users`, role changes, news, moderation queues,
   `?scope=all`) and friends/notifications, which need other people. Those reject with
   *"This needs the SRN server."* rather than pretending to work.
@@ -131,7 +134,8 @@ a plain file host and every account call runs against a **browser-local datastor
 | Seed the datastore | `npm run seed` (idempotent; `-- --force` reseeds content) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
-| API tests only | `npm run test:api` (160 checks) |
+| API tests only | `npm run test:api` (198 checks) |
+| Server-loss fallback | `npm run test:serverloss` (6 checks; signup survives the server dying mid-session) |
 | DOM render tests only | `npm run test:render` (84 checks, uses jsdom) |
 | Empty-datastore sweep | `npm run test:empty` (29 checks across 15 pages) |
 | Offline accounts (no API) | `npm run test:offline` (17 checks against a plain static host) |

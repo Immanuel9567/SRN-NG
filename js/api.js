@@ -506,7 +506,14 @@ const SRN = (() => {
       try {
         return await request(method, path, body);
       } catch (err) {
-        if (err.status || !localFn) throw err;
+        // The API answers every route, including its own 404s, with a JSON body.
+        // An HTTP error WITHOUT that JSON body came from something between the
+        // page and the server: the hosting proxy answering for a server that
+        // died mid-session, or a static host that only looked live during the
+        // probe. Treat those exactly like a transport failure.
+        const answeredByTheApi = Boolean(err.status && err.data);
+        if (err.status && answeredByTheApi) throw err;
+        if (!err.status && !localFn) throw err;
         apiProbe = Promise.resolve(false); // server went away mid-session
       }
     }
