@@ -39,14 +39,14 @@ If you were handed an outside description of this project claiming React, TypeSc
   top-level `const` declarations are visible to later scripts on the same page, but are **not**
   properties of `window`. `window.SRN` is `undefined` from outside the page; do not test it that way.
 
-**Backend** — `server/`, plain `node:http`. Zero runtime dependencies.
+**Backend** — `server/`, plain `node:http`, with `better-sqlite3` for durable storage.
 
 - `server/index.js` — serves the static site *and* `/api/*` from one origin, so browser code uses
   relative URLs only. No CORS, no proxy. Blocks `/data`, `/server`, `/scripts`, `/skills`,
   `/node_modules`, `/.git`.
 - `server/api.js` — the routes.
 - `server/auth.js` — `scrypt` password hashing, session tokens, cookie handling.
-- `server/store.js` — atomic JSON read/write. `SRN_DATA_DIR` overrides the location (used by tests).
+- `server/store.js` — SQLite collection reads/writes. `SRN_DATA_DIR` overrides the persistent bucket (used by tests).
 
 **Datastore** — SQLite, gitignored.
 
@@ -101,7 +101,7 @@ a plain file host and every account call runs against a **browser-local datastor
 - Passwords are digested (WebCrypto SHA-256, or a non-cryptographic fallback on plain `http`), never
   stored in plaintext — but this is browser storage, not a security boundary.
 - **It is a stopgap, not multi-user hosting.** Local accounts exist in one browser only. Run
-  `npm run dev` (or host `server/`) for shared, real accounts written to `data/users.json`.
+  `npm run dev` (or host `server/`) for shared accounts stored in SQLite under `data/srn.db`.
 - `account.html` shows an "offline" notice when this mode is active; `SRN.offline()` returns a
   promise for that flag.
 - `npm run test:offline` boots a dumb static file server with no API and asserts all of the above.
@@ -135,6 +135,8 @@ a plain file host and every account call runs against a **browser-local datastor
 | Static-only dev server | `npm run dev:static` (Vite; no API, pages fall back to mock data) |
 | Build | `npm run build` (emits all 15 pages to `dist/`) |
 | Seed the datastore | `npm run seed` (empty collections + one admin; idempotent) |
+| Back up SQLite and uploaded photos | `npm run backup:data` (writes ignored `backups/` snapshot) |
+| Persistence integration test | `npm run test:persistence` (restart server and verify user/activity/photo durability) |
 | Rotate the admin password | `npm run reset-admin -- admin@srn.ng` |
 | **Run every check** | `npm run check` |
 | API tests only | `npm run test:api` (198 checks) |
@@ -371,11 +373,11 @@ check:pages` audits every hardcoded dark colour in every inline style and fails 
 covers it, so this cannot silently regress. The real fix is still converting those inline styles to
 classes; `.cart-bar`, `.hero-scrim` and `.hero-scrim-fade` have already been moved over.
 
-**Rig photo uploads.** `POST /api/rigs` accepts a `photo` field as a `data:` URL. `saveUpload()` in
+**Photo uploads.** `POST /api/rigs` accepts a `photo` field as a `data:` URL. `saveUpload()` in
 `server/store.js` validates the MIME type (PNG/JPEG/WebP), enforces a 2 MB cap, and writes to
-`media/uploads/` so the static server can serve it. The request body limit is 4 MB because base64
-inflates by roughly a third. `media/uploads/` is gitignored. `SRN_UPLOAD_DIR` redirects it, which is
-how the tests avoid writing into the working tree.
+`<SRN_DATA_DIR>/uploads/`. The server maps stable `media/uploads/...` URLs to that private directory.
+The request body limit is 4 MB because base64 inflates by roughly a third. The bucket is gitignored.
+`SRN_UPLOAD_DIR` can override the upload directory for a separate persistent mount or test fixture.
 
 **Heights.** The navbar pill uses `padding: 0.625rem` vertically and `.sticky-subhead` uses
 `min-height: 3.25rem` with `padding: 0.625rem`. Both were `0.5rem` / `3rem` and read as too thin.

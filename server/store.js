@@ -62,13 +62,12 @@ export function update(name, fallback, mutate) {
   return next;
 }
 
-// Uploaded images live under media/uploads/ so the static server can serve them
-// without opening up the datastore.
-// Overridable so the tests never write into the working tree. The public path
-// stays media/uploads/... regardless; only the physical location moves.
+// Uploaded images share the same persistent data bucket as SQLite. The HTTP
+// server maps the stable public media/uploads/... URL to this private directory.
+// SRN_UPLOAD_DIR remains available for tests and object-store mounts.
 export const UPLOAD_DIR = process.env.SRN_UPLOAD_DIR
   ? resolve(process.env.SRN_UPLOAD_DIR)
-  : join(ROOT, 'media', 'uploads');
+  : join(DATA_DIR, 'uploads');
 export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
 
 const EXT_BY_MIME = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };

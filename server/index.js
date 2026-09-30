@@ -9,7 +9,7 @@ import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { handleApi } from './api.js';
 import { parseCookies } from './auth.js';
-import { ROOT } from './store.js';
+import { ROOT, UPLOAD_DIR } from './store.js';
 
 const PORT = Number(process.env.PORT || 5173);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -98,6 +98,17 @@ const server = createServer(async (req, res) => {
     res.writeHead(status, headers);
     res.end(body === undefined ? '' : JSON.stringify(body));
     return;
+  }
+
+  // Keep public photo URLs stable while keeping the bucket itself private.
+  // Only server-generated filenames are eligible; user paths cannot escape UPLOAD_DIR.
+  const uploadedPhoto = url.pathname.match(/^\/media\/uploads\/(up-[a-z0-9-]+\.(?:png|jpg|webp))$/i);
+  if (uploadedPhoto) {
+    const photoFile = join(UPLOAD_DIR, uploadedPhoto[1]);
+    if (existsSync(photoFile) && statSync(photoFile).isFile()) {
+      sendStatic(res, photoFile);
+      return;
+    }
   }
 
   const resolved = resolvePage(url.pathname);

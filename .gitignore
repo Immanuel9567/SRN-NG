@@ -3,6 +3,7 @@ dist/
 .DS_Store
 *.local
 
-# runtime state: the sqlite datastore and uploaded images
+# Runtime state and snapshots contain user records and uploaded photos.
 data/
 media/uploads/
+backups/

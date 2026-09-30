@@ -14,7 +14,7 @@
     "test:render": "node scripts/render-check.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:inline": "node scripts/check-inline-js.mjs",
-    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:render && npm run test:serverloss && npm run test:hostguard && npm run test:empty && npm run test:offline && npm run test:build",
+    "check": "npm run check:skills && npm run check:pages && npm run check:inline && npm run test:api && npm run test:persistence && npm run test:render && npm run test:serverloss && npm run test:hostguard && npm run test:empty && npm run test:offline && npm run test:build",
     "test:hostguard": "node scripts/check-host-guard.mjs",
     "reset-admin": "node scripts/reset-admin.mjs",
     "test:empty": "node scripts/check-empty-state.mjs",
@@ -23,7 +23,9 @@
     "ensure-deps": "node scripts/ensure-deps.mjs",
     "precheck": "node scripts/ensure-deps.mjs",
     "test:serverloss": "node scripts/check-server-loss.mjs",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "test:persistence": "node scripts/test-data-persistence.mjs",
+    "backup:data": "node scripts/backup-data.mjs"
   },
   "devDependencies": {
     "jsdom": "^29.1.1",

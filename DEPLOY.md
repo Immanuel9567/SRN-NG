@@ -1,27 +1,41 @@
-# Deploy the SRN account server
+# Local SRN-NG data bucket
 
-SRN requires a Node server and persistent storage for shared accounts and admin access. GitHub Pages is not a supported production deployment. The sandbox preview is temporary, not production hosting.
+SRN runs as a local Node server. The website and `/api` share one origin; accounts, activities, profiles and other collections persist in SQLite. Rig and profile photos are saved on disk beside the database.
 
-## External hosting
+## Data files
 
-Connect this repository to a Node-capable host such as Render or Railway.
+The default bucket is the ignored `data/` directory in this repository:
 
-- Install: `npm ci`
-- Start: `npm start`
-- Set `SRN_ADMIN_PASSWORD` through the host's secret settings before first boot.
-- Mount persistent storage and set `SRN_DATA_DIR` to that mount's writable directory.
-- Configure persistent upload storage with `SRN_UPLOAD_DIR` as appropriate.
-- Choose a plan with persistent storage and no idle suspension if continuous availability is required. Hosting can incur charges; obtain approval before provisioning.
+- `data/srn.db` — SQLite database.
+- `data/uploads/` — uploaded PNG, JPEG and WebP photos.
 
-The server serves both the website and `/api` on the same origin. Use its URL for login, not the former GitHub Pages URL. A fresh database creates `admin@srn.ng`. Existing database passwords are not changed by setting the initial seed password.
+Both paths are gitignored. They stay in the checked-out repo folder but are not committed or pushed. Do not put account data, passwords or uploaded user photos in a Git branch.
 
-## Local development
+## Run locally
 
-```
+```sh
 npm ci
-npm run dev
+npm start
 ```
 
-## Verification after deployment
+Open `http://localhost:5173`. `npm start` runs the Node server; `npm run dev:static` is static-only and does not provide shared accounts or admin functions.
 
-Verify signup, signout, signin, admin access, and persistence after restart before calling the deployment complete. Browser-local fallback accounts are not shared server accounts and do not automatically migrate.
+To put the bucket somewhere else on the same machine, set `SRN_DATA_DIR` before starting. Photos go to `<SRN_DATA_DIR>/uploads/` automatically unless `SRN_UPLOAD_DIR` is explicitly set.
+
+## Back up and restore
+
+Create a consistent database-and-photos snapshot:
+
+```sh
+npm run backup:data
+```
+
+It writes an ignored `backups/srn-<timestamp>/` directory. Set `SRN_BACKUP_DIR` or pass a destination path to store it elsewhere. Copy backups outside the repository for safekeeping. To restore, stop the server, copy the snapshot's `srn.db` and `uploads/` into `data/`, then restart.
+
+## Verify persistence
+
+```sh
+npm run test:persistence
+```
+
+The integration test registers a test user, submits an activity and rig photo, restarts the server, then confirms all records and the photo remain available. It uses a disposable test bucket and does not alter `data/srn.db`.
